@@ -1,0 +1,91 @@
+{
+    "tasks": [
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe build active file -> Debug Configuration",
+            "command": "C:\\Program Files\\mingw32\\bin\\g++.exe",
+            "args": [
+                "-fdiagnostics-color=always",
+                "-g",
+                "-ggdb",
+                "-pedantic-errors",
+                " -Wall",
+                "-Wextra ",
+                " -Wconversion",
+                "-Wsign-conversion",
+                "-Wshadow",
+                "-Wenum-compare",
+                "-std=c++23",
+                "${fileDirname}\\*.cpp", 
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                  "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                  "file": 1,
+                  "line": 2,
+                  "column": 3,
+                  "severity": 4,
+                  "message": 5
+                }
+            },  
+            
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Debug Configuration."
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++.exe build active file -> Release Configuration",
+            "command": "C:\\Program Files\\mingw32\\bin\\g++.exe",
+            "args": [
+                
+                "-O2",
+                "-DNDEBUG",
+                "-pedantic-errors",
+                " -Wall",
+                "-Weffc++",
+                "-Wextra ",
+                "-Wconversion",
+                "-Wsign-conversion",
+                "-Werror",
+                "-Wshadow",
+                "-Wenum-compare",
+                "-std=c++23",
+                "${fileDirname}\\*.cpp",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": {
+                "owner": "cpp",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                  "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
+                  "file": 1,
+                  "line": 2,
+                  "column": 3,
+                  "severity": 4,
+                  "message": 5
+                }
+            },  
+            
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Release Configuration."
+        }
+    ],
+    "version": "2.0.0"
+}
