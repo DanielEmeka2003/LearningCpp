@@ -74,6 +74,19 @@ namespace Myfcn
         }
 
     }
+
+    int sumDigits(int dividend)
+    {
+        /*Recursive termination condition.
+        Returns the dividend back if it is not a base10 digit.*/
+        if (dividend < 10)
+        return dividend;
+        //Holds the quotient and remainder of input dividend/divisor where the divisor is equal to 10.
+        auto quotient_rem{std::div(dividend, 10)};
+        //The quotient now becomes the dividend.
+        return sumDigits(quotient_rem.quot) + quotient_rem.rem;
+    }
+
     
 } // namespace Myfcn
 

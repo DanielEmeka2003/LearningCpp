@@ -115,6 +115,7 @@ namespace Myfcn
         }
     }
 
+    int sumDigits(int dividend);
 
 } // namespace Myfcn
 
