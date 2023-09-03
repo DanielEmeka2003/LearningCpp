@@ -26,7 +26,7 @@ OBJECT_FILES = main.o myfunctions1.o
 RM = -del
 # Marco for specifying the directory to change for make to run
 SUBSYSTEMDIR = Game
-PROGRAM_NAME = */\*
+PROGRAM_NAME = BLACKJACK
 
 
 ifeq ($(CONFIGURATIONFlAGS), DEBUG)
@@ -56,11 +56,13 @@ $(TARGET).o: $(TARGET).cpp myfunctions1.h
 myfunctions1.o: myfunctions1.cpp myfunctions1.h
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) myfunctions1.cpp
 
+timer.o: timer.cpp timer.h
+	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) timer.cpp
+
+
 # Hi_lo object files
 hi_lo.o: hi_lo.cpp random.h myfunctions1.h
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) hi_lo.cpp
-# Hi_lo object files
-
 # Hi_lo object files
 
 # BlackJack object files

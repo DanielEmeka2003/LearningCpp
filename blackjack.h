@@ -9,7 +9,8 @@
 
 namespace blackjack
 {
-    
+    //Body of the BlackJack Game.
+    void body(int argumentCount, char** argumentVector);
 } // namespace blackjack
 
 

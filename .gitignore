@@ -1,3 +1,6 @@
 ECHO is on.
 
-#ignore all .files
+#ignore all .exe generated files
+*.exe
+#ignore all .o generated files
+*.o

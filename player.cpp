@@ -1,19 +1,27 @@
 #include <format>
+#include <sstream>
+#include <numeric>
 
 #include "player.h"
 #include "myfunctions1.h"
+
+Player::Player(std::string name): m_name{name} 
+{ 
+    ++m_individual_number; 
+}
+Player::Player(): m_name{"Unknown"}
+{
+    std::stringstream ss{};
+    ss << ++m_individual_number;
+    m_name += ss.str();
+}
 
 float& Player::placeBet(std::string_view prompt)
 {
     return m_betAmount = Myfcn::getInput<float>(prompt);
 }
 
-const std::string& Player::getName() const
-{
-    return m_name;
-}
-
-const std::string& Player::getChoice_HitoRStand(std::string_view prompt)
+const std::string& Player::getChoice_HitORStand(std::string_view prompt)
 {
     while (true)
     {
@@ -32,6 +40,17 @@ Hand& Player::getHand()
 {
     return m_hand;
 }
+
+float& Player::getBetAmount()
+{
+    return m_betAmount;
+}
+
+const std::string& Player::getName() const
+{
+    return m_name;
+}
+
 const Hand& Player::getHand() const
 {
     return m_hand;
@@ -42,5 +61,17 @@ void Player::displayHand() const
     std::cout << std::format("[{}] I have in hand:\n", m_name);
 
     for (auto &&i : m_hand)
-    std::cout << i << " value: " << i() << '\n';
+    std::cout << i << "\tvalue: " << i() << '\n';
+
+    std::cout << "Total\tvalue: " << std::reduce(m_hand.cbegin(), m_hand.cend()).getAdditionValue() << '\n';
+}
+
+float Player::getBetAmount() const
+{
+    return m_betAmount;
+}
+
+size_t Player::getIndividualNumber()
+{
+    return m_individual_number;
 }

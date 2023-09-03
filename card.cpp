@@ -7,51 +7,26 @@ namespace ranges = std::ranges;
 
 
 /*----------------Enum CardRank & CardSuit---------------------*/
-CardRank& operator++(CardRank& r)
+Card::CardRank& operator++(Card::CardRank& r)
 {
-    return r = static_cast<CardRank>(static_cast<int>(r) + 1);
+    if (r == Card::CardRank::maxRanks)
+    return r = Card::CardRank::maxRanks;
+
+    return r = static_cast<Card::CardRank>(static_cast<int>(r) + 1);
 }
-CardSuit& operator++(CardSuit& s)
+Card::CardSuit& operator++(Card::CardSuit& s)
 {
-    return s = static_cast<CardSuit>(static_cast<int>(s) + 1);
+    if (s == Card::CardSuit::maxSuits)
+    return s = Card::CardSuit::maxSuits;
+
+    return s = static_cast<Card::CardSuit>(static_cast<int>(s) + 1);
 }
 
 /*---------------------Card----------------------------------*/
-std::ostream& operator<<(std::ostream& out, const Card& temp)
+Card::Card(CardRank rank, CardSuit suit, AceChoice choice)
+: m_rank{rank}, m_suit{suit}, m_choice{choice}
 {
-    if (temp.m_face)
-    {
-        switch (temp.m_rank)
-        {
-        case CardRank::two :    out << '2'; break;
-        case CardRank::three :  out << '3'; break;
-        case CardRank::four :   out << '4'; break;
-        case CardRank::five :   out << '5'; break;
-        case CardRank::six :    out << '6'; break;
-        case CardRank::seven :  out << '7'; break;
-        case CardRank::eight :  out << '8'; break;
-        case CardRank::nine :   out << '9'; break;
-        case CardRank::ten :    out << "10"; break;
-        case CardRank::jack :   out << 'J'; break;
-        case CardRank::queen :  out << 'Q'; break;
-        case CardRank::king :   out << 'K'; break;
-        case CardRank::ace :    out << 'A'; break;
-        default: return out; break;
-        }
-        switch (temp.m_suit)
-        {
-        case CardSuit::clubs :      out << " \u2663"; break;
-        case CardSuit::diamonds :   out << " \u2666"; break;
-        case CardSuit::hearts :     out << " \u2665"; break;
-        case CardSuit::spades :     out << " \u2660"; break;  
-        default: return out; break;
-        }
-    }
-    else
-    {
-        out << "[FD]";
-    }
-    return out;
+    m_sum_value = this->operator()();
 }
 
 int Card::operator()() const
@@ -83,7 +58,8 @@ Card::operator bool() const
     return false;
 }
 
-void Card::changeAceChoice(AceChoice c)
+
+void Card::changeAceValue(AceChoice c)
 {
     if (m_rank == CardRank::ace)
     {
@@ -91,10 +67,56 @@ void Card::changeAceChoice(AceChoice c)
         m_sum_value = this->operator()();    
     }
 }
-
 int Card::getAdditionValue() const
 {
     return m_sum_value;
+}
+
+void Card::changeFace(bool faceup) const
+{
+    const_cast<bool&>(m_faceup) = faceup;
+}
+
+bool Card::getFace() const
+{
+    return m_faceup;
+}
+
+std::ostream& operator<<(std::ostream& out, const Card& temp)
+{
+    if (temp.m_faceup)
+    {
+        switch (temp.m_rank)
+        {
+        case Card::CardRank::two :    out << "[2 "; break;
+        case Card::CardRank::three :  out << "[3 "; break;
+        case Card::CardRank::four :   out << "[4 "; break;
+        case Card::CardRank::five :   out << "[5 "; break;
+        case Card::CardRank::six :    out << "[6 "; break;
+        case Card::CardRank::seven :  out << "[7 "; break;
+        case Card::CardRank::eight :  out << "[8 "; break;
+        case Card::CardRank::nine :   out << "[9 "; break;
+        case Card::CardRank::ten :    out << "[10"; break;
+        case Card::CardRank::jack :   out << "[J "; break;
+        case Card::CardRank::queen :  out << "[Q "; break;
+        case Card::CardRank::king :   out << "[K "; break;
+        case Card::CardRank::ace :    out << "[A "; break;
+        default: out << "[N "; break;
+        }
+        switch (temp.m_suit)
+        {
+        case Card::CardSuit::clubs :      out << "\u2663]"; break;
+        case Card::CardSuit::diamonds :   out << "\u2666]"; break;
+        case Card::CardSuit::hearts :     out << "\u2665]"; break;
+        case Card::CardSuit::spades :     out << "\u2660]"; break;  
+        default: out << "/]"; break;
+        }
+    }
+    else
+    {
+        out << "[FD]";
+    }
+    return out;
 }
 
 Card operator+(const Card& x, const Card& y)
@@ -105,11 +127,44 @@ Card operator+(const Card& x, const Card& y)
 }
 
 /*------------------------DECK------------------------------*/
+
+Deck::Deck()
+{
+    size_t static_counter{};
+    for (Card::CardSuit s{}; s < Card::CardSuit::maxSuits; ++s)
+    {
+        for (Card::CardRank r{}; r < Card::CardRank::maxRanks; ++r)
+        {
+            m_deck.at(static_counter++) = {r, s};
+        }
+    }
+}
+
+void Deck::shuffleDeck()
+{
+    ranges::shuffle(m_deck, Myfcn::Random::mt);
+}
+
+Card& Deck::operator[](size_t index)
+{
+    return m_deck.at(index);
+}
+
+const Card& Deck::operator[](size_t index) const
+{
+    return m_deck.at(index);
+}
+
+size_t Deck::size() const
+{
+    return m_deck.size();
+}
+
 std::ostream& operator<<(std::ostream& out, const Deck& temp)
 {
-    for (size_t i = 0; i < temp.deck.size(); i++)
+    for (size_t i = 0; i < temp.size(); i++)
     {
-        out << temp.deck[i] << '\t';
+        out << temp[i] << '\t';
 
         if ( (i+1) % 13 == 0 )
         out << '\n';
@@ -117,21 +172,3 @@ std::ostream& operator<<(std::ostream& out, const Deck& temp)
     
     return out;
 }
-
-void Deck::createDeck()
-{
-    size_t static_counter{};
-    for (CardSuit s{}; s < CardSuit::maxSuits; ++s)
-    {
-        for (CardRank r{}; r < CardRank::maxRanks; ++r)
-        {
-            deck.at(static_counter++) = {r, s};
-        }
-    }
-}
-
-void Deck::shuffleDeck()
-{
-    ranges::shuffle(deck, Random::mt);
-}
-

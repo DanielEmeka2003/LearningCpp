@@ -1,23 +1,18 @@
 #include <thread>
-#include <chrono>
 #include <format>
 #include <numeric>
 
 #include "dealer.h"
 #include "myfunctions1.h"
 
+
 namespace chrono = std::chrono;
-using namespace std::chrono_literals;
 
 
-void Dealer::askForBet(Player& player)
+void Dealer::askForBet(Player& p)
 {
-    for (size_t i = 0; i < player.individual_number; i++)
-    {
-        std::string prompt{std::format("[Dealer] {} place your bet in naria[NGN] chips: ", player.getName())};
-        m_bank.emplace_back(player.getName(), player.placeBet(prompt));
-    }
-    
+    std::string prompt{std::format("[Dealer] {}\tplace your bet in naria chips \u20A6: ", p.getName())};
+    p.placeBet(prompt);
 }
 
 void Dealer::shuffleCards()
@@ -25,25 +20,25 @@ void Dealer::shuffleCards()
     for (chrono::seconds s = 0s; s < 4s; ++s)
     {
         std::cout << "[Dealer] Shuffling.......\n";
-        std::this_thread::sleep_for(3s);
+        dramaticPause(3s);
     }
     std::cout << "Done\n";
     m_deck.shuffleDeck();
 }
 
-Dealer& Dealer::deal(Player& player, size_t numberofcards)
+Dealer& Dealer::deal(Player& p, size_t numberofcards)
 {
-    if (m_static_counter >= m_deck.deck.size())
+    if (m_static_counter >= m_deck.size())
     {
         std::cout << "[Dealer] No more cards to deal\n";
         return *this;
     }
 
-    while ((numberofcards + 10) >= m_deck.deck.size())
+    while ((numberofcards + 10) >= m_deck.size())
     {
-        numberofcards = Myfcn::getInput<size_t>( std::format("[Dealer] Not happening {}! Pick again: ", player.getName()) );
+        numberofcards = Myfcn::getInput<size_t>( std::format("[Dealer] Not happening {}! Pick again: ", p.getName()) );
 
-        if ((numberofcards + 10) <= m_deck.deck.size())
+        if ((numberofcards + 10) <= m_deck.size())
         {
             std::cout << "Alright\n";
             break;
@@ -53,14 +48,14 @@ Dealer& Dealer::deal(Player& player, size_t numberofcards)
     for (size_t i = 0; i < numberofcards; i++)
     {
         //Dramatic pause.. 
-        std::this_thread::sleep_for(2s);
+        dramaticPause(2s);
 
-        if (m_deck.deck.at(m_static_counter))
+        if ( m_deck[m_static_counter] )
         {
             int choice{};
             while (true)
             { 
-                choice = {Myfcn::getInput<int>("[Dealer] You have an Ace! 1 or 11? ")};
+                choice = { Myfcn::getInput<int>(std::format("[Dealer] {}!\tYou have an Ace, 1 or 11? ", p.getName()) ) };
 
                 if (choice != 1 and choice != 11)
                 std::cout << "Inavild Input; Try Again!\n";
@@ -68,46 +63,62 @@ Dealer& Dealer::deal(Player& player, size_t numberofcards)
                 break;
             }
             if (choice == 1)
-            m_deck.deck[m_static_counter].changeAceChoice(Card::AceChoice::one);
-        }
+            m_deck[m_static_counter].changeAceValue(Card::AceChoice::one);
 
-        player.getHand().push_back({m_deck.deck.at(m_static_counter)});
-        std::cout << "[Dealer] " <<  player.getName() << " has been dealt " << player.getHand().at(m_static_counter) << '\n';
+        }
+        
+        p.getHand().push_back(m_deck[m_static_counter]);
+        std::cout << "[Dealer] " <<  p.getName() << "\thas been dealt " << p.getHand().back() << '\n';
 
         ++m_static_counter;  
     }
     return *this;
 }
 
-Dealer& Dealer::deal(Card::Up_or_Down flag)
+Dealer& Dealer::deal(bool flag)
 {
-    if (m_static_counter >= m_deck.deck.size())
+    if (m_static_counter >= m_deck.size())
     {
         std::cout << "[Dealer] No more cards to draw\n";
         return *this;
     }
 
     if (!flag)
-    m_deck.deck[m_static_counter].m_face = false;
+    m_deck[m_static_counter].changeFace(false);
 
-    m_hand.push_back(m_deck.deck[m_static_counter]);
-    std::cout << "[Dealer] I have dealt " << m_hand[m_static_counter] << " *by the table\n";
+    //Dramatic pause.. 
+    dramaticPause(3s);
+
+    m_hand.push_back(m_deck[m_static_counter]);
+    std::cout << "[Dealer] drawn " << m_hand.back() << " (*by) the table\n";
 
     ++m_static_counter;
 
     return *this;
 }
 
-std::string_view Dealer::checkexitscenarios(const Hand& player) const
+std::string_view Dealer::playerPossibleOutcomes(const Player& p) const
 {
-    auto total{std::reduce(player.begin(), player.end()).getAdditionValue()};
+    auto total{std::reduce(p.getHand().cbegin(), p.getHand().cend()).getAdditionValue()};
 
     if (total > 21)
     return HigherThan21;
-
     else if (total == 21)
     return EqualTo21;
+    else if( total > std::reduce(m_hand.cbegin(), m_hand.cend()).getAdditionValue() )
+    return P_HandGreaterThan_D;
+    else
+    return "";
+}
 
+std::string_view Dealer::possibleOutcomes() const
+{
+    auto total{std::reduce(m_hand.cbegin(), m_hand.cend()).getAdditionValue()};
+
+    if (total > 21)
+    return HigherThan21;
+    else if (total <= 16)
+    return EqualToAndLessThan16;
     else
     return "";
 }
@@ -116,7 +127,7 @@ void Dealer::roundTable(Player& p)
 {
     auto answer
     {
-        p.getChoice_HitoRStand(std::format("[Dealer] {} do you want another card?\n[{}] ", p.getName(), p.getName() ))
+        p.getChoice_HitORStand(std::format("[Dealer] {}\tdo you want another card?\n[{}] ", p.getName(), p.getName() ))
     };
 
     if (answer == "hit" or answer == "Hit" or answer == "HIT")
@@ -130,33 +141,30 @@ void Dealer::roundTable(Player& p)
     }
 }
 
-void Dealer::manageBets(size_t playernumber, IncreaseBy amount)
+void Dealer::manageBets(Player& p, IncreaseBy amount) const
 {
     if (amount == IncreaseBy::fifthy_percent)
     {
-        m_bank.at(playernumber - 1).second.get() += m_bank[playernumber - 1].second.get() * 0.5f;
+        p.getBetAmount() += p.getBetAmount() * 0.5f;
         /*------------------------------------------------------------------------------------*/
         std::cout << 
-        std::format("[Dealer] {} here's 1/2times your bet: {} naria chips. Congratulations.\n",
-        m_bank.at(playernumber - 1).first.get(), m_bank.at(playernumber - 1).second.get());
+        std::format("[Dealer] {}\there's 1/2times your bet: \u20A6{} naria chips. Congratulations.\n", p.getName(), p.getBetAmount());
     }
     else if (amount == IncreaseBy::hunderd_percent)
     {
-        m_bank.at(playernumber - 1).second.get() += m_bank[playernumber - 1].second.get() * 1.f;
+        p.getBetAmount() += p.getBetAmount() * 1.f;
         /*------------------------------------------------------------------------------------*/
         std::cout << 
-        std::format("[Dealer] {} here's 2times your bet: {} naria chips. Congratulations.\n",
-        m_bank.at(playernumber - 1).first.get(), m_bank.at(playernumber - 1).second.get());
+        std::format("[Dealer] {}\there's 2times your bet: \u20A6{} naria chips. Congratulations.\n", p.getName(), p.getBetAmount());
     }
-}
-
-void Dealer::manageBets(size_t playernumber)
-{
-    m_bank[playernumber - 1].second.get() = 0.f;
-    /*------------------------------------------------------------------------------------*/
-    std::cout << 
-        std::format("[Dealer] {} you lose your bet: {} naria chips. Sorry.\n", 
-        m_bank.at(playernumber - 1).first.get(), m_bank.at(playernumber - 1).second.get());
+    else if (amount == IncreaseBy::zero_percent)
+    {
+        p.getBetAmount() = 0.f;
+        /*------------------------------------------------------------------------------------*/
+        std::cout << 
+        std::format("[Dealer] {}\tyou lose your bet: \u20A6{} naria chips. Sorry.\n", p.getName(), p.getBetAmount());
+    }
+    
 }
 
 void Dealer::displayHand() const
@@ -164,5 +172,16 @@ void Dealer::displayHand() const
     std::cout << "[Dealer] I have in hand:\n";
 
     for (auto &&i : m_hand)
-    std::cout << i << " value: " << i() << '\n';
+    {
+        if (i.getFace() == false)
+        i.changeFace(true);
+
+        std::cout << i << "\tvalue: " << i() << '\n';
+    }
+    std::cout << "Total\tvalue: " << std::reduce(m_hand.cbegin(), m_hand.cend()).getAdditionValue() << '\n';
+}
+
+void Dealer::dramaticPause(std::chrono::seconds pausetime) const
+{
+    std::this_thread::sleep_for(pausetime);
 }

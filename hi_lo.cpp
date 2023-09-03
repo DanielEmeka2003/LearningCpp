@@ -6,6 +6,8 @@
 
 namespace Myfcn::hi_lo
 {
+    // Returns the choice(y/n) of the user - contains error checking. 
+    // Not to be called explicitly, refer to the body() function for that.
     char getChoice()
     {
         while (true)
@@ -23,6 +25,9 @@ namespace Myfcn::hi_lo
         return '\0';
     }
 
+    /* Asks the user for a valid guess, if the user enters an invalid guess the function handles it 
+    by printing an error message telling the user to enter a valid guess.
+    Not to be called explicitly, refer to the body() function for that. */
     int GuessValidation(size_t n_of_tries)
     {
         std::stringstream stringPrompt{};
