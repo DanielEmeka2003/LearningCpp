@@ -88,7 +88,7 @@ blackjack.o: blackjack.cpp blackjack.h dealer.h player.h card.h myfunctions1.h
 point2d.o: point2d.cpp point2d.h 
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) point2d.cpp
 
-board.o: board.cpp board.h point2d.h
+board.o: board.cpp board.h point2d.h random.h
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) board.cpp
 
 fiftheenpuzzle.o: fiftheenpuzzle.cpp myfunctions1.h fiftheenpuzzle.h board.h point2d.h
