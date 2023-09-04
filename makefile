@@ -26,7 +26,7 @@ OBJECT_FILES = main.o myfunctions1.o
 RM = -del
 # Marco for specifying the directory to change for make to run
 SUBSYSTEMDIR = Game
-PROGRAM_NAME = BLACKJACK
+PROGRAM_NAME = FIFTHEENPUZZLE
 
 
 ifeq ($(CONFIGURATIONFlAGS), DEBUG)
@@ -40,6 +40,9 @@ OBJECT_FILES += card.o player.o dealer.o blackjack.o
 endif
 ifeq ($(PROGRAM_NAME), HI_LO)
 OBJECT_FILES += hi_lo.o
+endif
+ifeq ($(PROGRAM_NAME), FIFTHEENPUZZLE)
+OBJECT_FILES += point2d.o board.o fiftheenpuzzle.o
 endif
 
 all: intro $(TARGET).exe
@@ -60,12 +63,13 @@ timer.o: timer.cpp timer.h
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) timer.cpp
 
 
-# Hi_lo object files
+# Hi_lo object files--------------------------------------------------------------
 hi_lo.o: hi_lo.cpp random.h myfunctions1.h
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) hi_lo.cpp
-# Hi_lo object files
+# Hi_lo object files--------------------------------------------------------------
 
-# BlackJack object files
+
+# BlackJack object files-----------------------------------------------------------
 card.o: card.cpp card.h random.h
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) card.cpp
 
@@ -77,7 +81,19 @@ dealer.o: dealer.cpp dealer.h player.h card.h myfunctions1.h
 
 blackjack.o: blackjack.cpp blackjack.h dealer.h player.h card.h myfunctions1.h 
 	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) blackjack.cpp
-# BlackJack object files
+# BlackJack object files-------------------------------------------------------------
+
+
+#FiftheenPuzzle object files---------------------------------------------------------
+point2d.o: point2d.cpp point2d.h 
+	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) point2d.cpp
+
+board.o: board.cpp board.h point2d.h
+	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) board.cpp
+
+fiftheenpuzzle.o: fiftheenpuzzle.cpp myfunctions1.h fiftheenpuzzle.h board.h point2d.h
+	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) fiftheenpuzzle.cpp
+#FiftheenPuzzle object files------------------------------------------------------------
 
 
 subsystem:

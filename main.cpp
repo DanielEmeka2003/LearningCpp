@@ -32,10 +32,6 @@
 #include <map>
 
 #include "myfunctions1.h"
-#include "card.h"
-#include "player.h"
-#include "dealer.h"
-#include "blackjack.h"
 //#include "timer.h"
 
 
