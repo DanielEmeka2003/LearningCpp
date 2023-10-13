@@ -85,18 +85,15 @@
         "xtr1common": "cpp",
         "xtree": "cpp",
         "xutility": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "any": "cpp",
+        "source_location": "cpp",
+        "spanstream": "cpp"
     },
     
     "makefile.clearOutputBeforeBuild": true,
     "makefile.ignoreDirectoryCommands": false,
     "makefile.launchConfigurations": [
-        {
-            "cwd": "c:\\Users\\MIKE EMEKA\\Documents\\C++\\Game",
-            "binaryPath": "c:\\Users\\MIKE EMEKA\\Documents\\C++\\Game\\clip",
-            "binaryArgs": [],
-            "stopAtEntry": true
-        },
         {
             "cwd": "c:\\Users\\MIKE EMEKA\\Documents\\C++",
             "binaryPath": "c:\\Users\\MIKE EMEKA\\Documents\\C++\\main",

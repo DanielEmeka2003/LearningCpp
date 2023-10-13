@@ -1,10 +1,9 @@
-#include <iostream>
-#include <sstream>
-
+#include "stream/i_o.h"
+#include "stringoutputstream.h"
 #include "myfunctions1.h"
 #include "Random.h"
 
-namespace Myfcn::hi_lo
+namespace hi_lo
 {
     // Returns the choice(y/n) of the user - contains error checking. 
     // Not to be called explicitly, refer to the body() function for that.
@@ -28,27 +27,23 @@ namespace Myfcn::hi_lo
     /* Asks the user for a valid guess, if the user enters an invalid guess the function handles it 
     by printing an error message telling the user to enter a valid guess.
     Not to be called explicitly, refer to the body() function for that. */
-    int GuessValidation(size_t n_of_tries)
+    int guessValidation(size_t n_of_tries)
     {
-        std::stringstream stringPrompt{};
+        StringOutputStream prompt{std::ostringstream{"Guess #", std::ios_base::app}};
+        prompt.write(n_of_tries, ':');
 
-        stringPrompt << "Guess #" << n_of_tries << ": ";
-        int guess{Myfcn::getInput<int>(stringPrompt.str())};
+        int guess{ Myfcn::getInput<int>(prompt.get_streamdata()) };
 
         while (true)
         {
-
             if (guess < 0 or guess > 100)
             {
-                std::cout << "Out range(Must be within 1 - 100)!\n";
-                guess = Myfcn::getInput<int>(stringPrompt.str());
+                System::coutput.printwl("Out range(Must be within 1 - 100)!");
+                guess = Myfcn::getInput<int>(prompt.get_streamdata());
             }
 
             else
-            {
-                stringPrompt.str("");
-                break;
-            }
+            { break; }
         }
 
         return guess;
@@ -56,36 +51,40 @@ namespace Myfcn::hi_lo
     
     void body()
     {
+        using namespace Myfcn;
+        using namespace Streams;
+
         char choice{};
 
         do
         {
-            std::cout << "\nI am thinking of nmber between 1 and 100. " << " You have 7 tries to guess what it is.\n";
-            int randomInteger{static_cast<int>(Random::get(1, 100))};
+            System::coutput.printwl("");
+            
+            System::coutput.printws_endl("I am thinking of nmber between 1 and 100.", "You have 7 tries to guess what it is.");
 
-            //std::cout << "Random number: " << randomInteger << '\n';
+            int randomInteger{static_cast<int>(Random::get(1, 100))};
 
             for (size_t n_of_tries = 1; n_of_tries <= 7; n_of_tries++)
             {
-                int guess{GuessValidation(n_of_tries)};
+                int guess{guessValidation(n_of_tries)};
 
                 if (guess != randomInteger)
-                std::cout << "Your guess is too " << ((guess > randomInteger)? "high" : "low") << '\n';
+                System::coutput.printws_endl("Your guess is too", (guess > randomInteger? "high" : "low"));
                 else
                 {
-                    std::cout << "Correct! You win!....\n";
+                    System::coutput.printwl("Correct! You win!....");
                     break;
                 }
 
                 if (n_of_tries == 7)
-                std::cout << "Sorry, you lose. The correct number was " << randomInteger << ".\n";
+                System::coutput.printws_endl("Sorry, you lose. The correct number was", randomInteger);
             }
 
             choice = getChoice();
 
         } while (choice == 'y' or choice == 'Y');
 
-        std::cout << "GoodBye!\n";
+        System::coutput.printwl("Goodbye!");
     }
 
     

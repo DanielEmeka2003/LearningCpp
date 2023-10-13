@@ -1,11 +1,12 @@
 #include <cassert>
 #include <limits>
+#include <stdexcept>
 
 #include "myfunctions1.h"
 
 namespace Myfcn
 {
-    bool isPrime(int n)
+    bool isPrime(int n) noexcept
     {
         if (n <= 1)
         return false;
@@ -19,72 +20,20 @@ namespace Myfcn
         return true;
     }
 
-    void ignoreBufferInput()
+    int sum_ofposbase10digits(int base10number)
     {
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-    }
-
-    bool inputBufferValidation()
-    {
-        if (std::cin.fail())
-        {   
-            if (std::cin.eof())
-            {
-                std::cerr << "Input stream closed due to End of File Character used!....\n";
-                std::exit(1);
-            }
-
-            std::cin.clear();
-            ignoreBufferInput();
-            //std::cout << "Inside fail condition\n";
-            return false;
-        }
+        //Throw an exception if base10number is negative.
+        if(base10number < 0)
+        throw std::invalid_argument{"Error base10number must be positive!"};
         
-        if (std::cin.gcount() > 1)
-        {
-            //std::cout << "Inside gcount condition\n";
-            return false;
-        }
-
-        return true;
-    }
-
-    bool isEven(int x)
-    {
-        if (x % 2 == 0)
-        return true;
-
-        return false;
-    }
-
-    std::int64_t powint(int base, int exponent)
-    {
-        assert(exponent >= 0 and "Exponent must be greater than 0");
-
-        if (exponent == 0)
-        return std::int64_t(1); // static_cast preferred here
-
-        // Recursion Section!
-        if (exponent == 1)
-        return base;
-        else
-        {
-            --exponent;
-            return std::int64_t(powint(base, exponent) * base); // static_cast preferred here
-        }
-
-    }
-
-    int sumDigits(int dividend)
-    {
         /*Recursive termination condition.
-        Returns the dividend back if it is not a base10 digit.*/
-        if (dividend < 10)
-        return dividend;
-        //Holds the quotient and remainder of input dividend/divisor where the divisor is equal to 10.
-        auto quotient_rem{std::div(dividend, 10)};
-        //The quotient now becomes the dividend.
-        return sumDigits(quotient_rem.quot) + quotient_rem.rem;
+        Returns the base10number back if it is not a base10 digit.*/
+        if (base10number >= 0 and base10number <= 9)
+        return base10number;
+        //Holds the quotient and remainder of input base10number/divisor where the divisor is equal to 10.
+        auto quot_rem{std::div(base10number, 10)};
+        //The quotient now becomes the base10number.
+        return sum_ofposbase10digits(quot_rem.quot) + quot_rem.rem;
     }
 
     

@@ -2,116 +2,115 @@
 # .PHONY used to indicate a certain target is not a file
 
 
-# Marco for specifying inculde directories to the compiler
-INCULDES = -Iheaders
-# Marco for specifying library files to link against for the linker
-LIBS = 
-# Marco holding the cpp compiler
-CXX = g++.exe
-# Marco for specifying flags for the compiler
-CXXFLAGS = -std=c++23 -pedantic-errors -Wall -Weffc++ -Wextra -Wconversion -Wsign-conversion -Werror -Wshadow -Wenum-compare
-# Marco for specifying build configuration flags, empty for Release and not empty for debug
-CONFIGURATIONFlAGS = DEBUG
-# Marco for specifying flags for the preprocessor
-CPPFLAGS = -O2 -DNDEBUG
-# Marco for compiling .cpp files
-COMPILE = -c
-# Marco for linking object files
-LINK = -o
-# Marco for holding the target file name to compile, link and name the executable as
-TARGET = main
-# Marco for holding various object files to link against
-OBJECT_FILES = main.o myfunctions1.o
-# Marco for specifying command to remove files - shell specific 
-RM = -del
-# Marco for specifying the directory to change for make to run
-SUBSYSTEMDIR = Game
-PROGRAM_NAME = FIFTHEENPUZZLE
+includes = -Iheader
+libs = 
+cxx = g++.exe
+cxxflags = -std=c++23 -pedantic-errors -Wall -Weffc++ -Wextra -Wconversion -Wsign-conversion -Werror -Wshadow -Wenum-compare
+configurationflags = debug
+preprocessorflags = -E
+compile = -c
+target = main
+obj_files = main.o myfunctions1.o
+rm = -del
+subsystem = sfml
+program_name = filediscoveryinput
 
 
-ifeq ($(CONFIGURATIONFlAGS), DEBUG)
-CONFIGURATIONFlAGS = -g -ggdb
+ifeq ($(configurationflags), debug)
+configurationflags = -g -ggdb
 else
-CONFIGURATIONFlAGS = $(CPPFLAGS)
+configurationflags =  -O2 -DNDEBUG
 endif
 
-ifeq ($(PROGRAM_NAME), BLACKJACK)
-OBJECT_FILES += card.o player.o dealer.o blackjack.o
+ifeq ($(program_name), blackjack)
+obj_files += card.o player.o dealer.o blackjack.o
 endif
-ifeq ($(PROGRAM_NAME), HI_LO)
-OBJECT_FILES += hi_lo.o
+ifeq ($(program_name), hi_lo)
+obj_files += hi_lo.o
 endif
-ifeq ($(PROGRAM_NAME), FIFTHEENPUZZLE)
-OBJECT_FILES += point2d.o board.o fiftheenpuzzle.o
+ifeq ($(program_name), fiftheenpuzzle)
+obj_files += point2d.o board.o fiftheenpuzzle.o
+endif
+ifeq ($(program_name), filediscoveryinput)
+obj_files += filediscoveryinput.o
 endif
 
-all: intro $(TARGET).exe
+all: intro $(target).exe
 
 intro:
-	echo [make.exe running]; Program Expected: $(PROGRAM_NAME).
+	echo [make.exe running]; Program Expected: $(program_name)
 
-$(TARGET).exe: $(TARGET).o $(OBJECT_FILES)
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(LINK) $(TARGET) $(OBJECT_FILES)
+$(target).exe: $(obj_files)
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) -o $(target) $(obj_files)
 
-$(TARGET).o: $(TARGET).cpp myfunctions1.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) $(TARGET).cpp 
+$(target).o: $(target).cpp header/myfunctions1.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) $(target).cpp 
 
-myfunctions1.o: myfunctions1.cpp myfunctions1.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) myfunctions1.cpp
-
-timer.o: timer.cpp timer.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) timer.cpp
+myfunctions1.o: myfunctions1.cpp header/myfunctions1.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) myfunctions1.cpp
 
 
-# Hi_lo object files--------------------------------------------------------------
-hi_lo.o: hi_lo.cpp random.h myfunctions1.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) hi_lo.cpp
-# Hi_lo object files--------------------------------------------------------------
+# Timer___________________________________________________________________
+timer.o: timer.cpp header/timer.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) timer.cpp
+# Timer___________________________________________________________________
 
 
-# BlackJack object files-----------------------------------------------------------
-card.o: card.cpp card.h random.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) card.cpp
-
-player.o: player.cpp player.h card.h myfunctions1.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) player.cpp
-
-dealer.o: dealer.cpp dealer.h player.h card.h myfunctions1.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) dealer.cpp
-
-blackjack.o: blackjack.cpp blackjack.h dealer.h player.h card.h myfunctions1.h 
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) blackjack.cpp
-# BlackJack object files-------------------------------------------------------------
+# Hi_lo object files___________________________________________________________________
+hi_lo.o: hi_lo.cpp header/random.h header/myfunctions1.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) hi_lo.cpp
+# Hi_lo object files___________________________________________________________________
 
 
-#FiftheenPuzzle object files---------------------------------------------------------
-point2d.o: point2d.cpp point2d.h 
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) point2d.cpp
+# BlackJack object files___________________________________________________________________
+card.o: card.cpp header/card.h header/random.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) card.cpp
 
-board.o: board.cpp board.h point2d.h random.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) board.cpp
+player.o: player.cpp header/player.h header/card.h header/myfunctions1.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) player.cpp
 
-fiftheenpuzzle.o: fiftheenpuzzle.cpp myfunctions1.h fiftheenpuzzle.h board.h point2d.h
-	$(CXX) $(CONFIGURATIONFlAGS) $(CXXFLAGS) $(COMPILE) fiftheenpuzzle.cpp
-#FiftheenPuzzle object files------------------------------------------------------------
+dealer.o: dealer.cpp header/dealer.h header/player.h header/card.h header/myfunctions1.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) dealer.cpp
+
+blackjack.o: blackjack.cpp header/blackjack.h header/dealer.h header/player.h header/card.h header/myfunctions1.h 
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) blackjack.cpp
+# BlackJack object files___________________________________________________________________
+
+
+#FiftheenPuzzle object files___________________________________________________________________
+point2d.o: point2d.cpp header/point2d.h 
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) point2d.cpp
+
+board.o: board.cpp header/board.h header/point2d.h header/random.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) board.cpp
+
+fiftheenpuzzle.o: fiftheenpuzzle.cpp header/myfunctions1.h header/fiftheenpuzzle.h header/board.h header/point2d.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) fiftheenpuzzle.cpp
+#FiftheenPuzzle object files___________________________________________________________________
+
+
+#FileDiscovery object files___________________________________________________________________
+filediscoveryinput.o: filediscoveryinput.cpp header/filediscoveryinput.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) filediscoveryinput.cpp
+#FileDiscovery object files___________________________________________________________________
 
 
 subsystem:
-	cd $(SUBSYSTEMDIR) && $(MAKE)
+	cd $(subsystemDIR) && $(MAKE)
 
 .PHONY : clean
 
 clean:
-	$(RM) *.o $(TARGET).exe
+	$(rm) *.o $(target).exe
 
 
 # Unimportant targets
 checkVersion: 
-	$(CXX) --version
+	$(cxx) --version
 
 .cpp.o: 
-	$(CXX) $(CXXFLAGS) $(COMPILE) *.cpp
+	$(cxx) $(cxxflags) $(compile) *.cpp
 
 .cpp: .cpp.o
-	$(CXX) $(CXXFLAGS) $(LINK) $(TARGET) *.o
+	$(cxx) $(cxxflags) $(compile) $(target) *.o
 

@@ -3,6 +3,7 @@
 
 #include "fiftheenpuzzle.h"
 #include "myfunctions1.h"
+#include "stream/output.h"
 
 using namespace std::chrono_literals;
 
@@ -11,24 +12,21 @@ namespace fiftheenpuzzle
     //Introduction to the fiftheenpuzzle game.
     void intro()
     {
-        std::cout << "\nWelcome to FiftheenPuzzle\n\n";
-        std::cout 
-        << "w - slide tile up.\n"
-        << "s - slide tile down.\n"
-        << "a - slide tile left.\n"
-        << "d - right tile right.\n"
-        << "q - quit fiftheenpuzzle.\n\n";
+        System::coutput.print_endl("");
+        System::coutput.printwl("Welcome to FiftheenPuzzle");
+
+        System::coutput.printwl("w: slide tile up.", "s: slide tile down.", "a: slide tile left.", "d: right tile right.", "q: quit game.");
+        System::coutput.print_endl("");
     }
 
     void randomizeBoard(Board& b)
     {
         for (std::chrono::seconds s = 0s; s < 4s; ++s)
         {
-            std::cout << "Randomizing Board.......\n";
+            System::coutput.printwl("Randomizing Board......");
             std::this_thread::sleep_for(2s);
         }
         b.randomize();
-        std::cout << '\n';
     }
 
     //Performs input actions.
@@ -39,7 +37,8 @@ namespace fiftheenpuzzle
             Tile e_t{b}, u_t{b, *maybeTilePosition};
             e_t.swap(u_t);
         }
-        std::cout << b << '\n';
+        System::coutput.printwl(b);
+        System::coutput.print_endl("");
     }
 
     //Asks For Play again choice.
@@ -63,18 +62,18 @@ namespace fiftheenpuzzle
 
     void body()
     {
-        std::system("chcp 65001");
-        std::system("color 06");
-
         while (true)
         {
             intro();
 
             Board b{};
 
-            std::cout << b << "\n\n";
+            System::coutput.printwl(b);
+            System::coutput.print_endl("");
+
             randomizeBoard(b);
-            std::cout << b << "\n\n";
+            System::coutput.printwl(b);
+            System::coutput.print_endl("");
             
             bool is_solved{false};
             char userinput{};
@@ -93,18 +92,20 @@ namespace fiftheenpuzzle
                 case 's': inputActions(b, b.slideTile(Point2d::Direction::down)); break;
                 case 'a': inputActions(b, b.slideTile(Point2d::Direction::left)); break;
                 case 'd': inputActions(b, b.slideTile(Point2d::Direction::right)); break;
-                case 'q': std::cout << "GoodBye\n"; return;
+                case 'q': System::coutput.print_endl("GoodBye!"); return;
                 }
 
                 /*Since it is impossible for the puzzle to be solved under a max of [n < 15], where n is the numer of tries/moves.
                 Let the program start checking for a win condition after the player has reached 15 tries/moves.
-                Solely to facilitate optimization and canbe removed if needed.*/
+                Solely to facilitate optimization and can be removed if needed.*/
                 if (static_counter > nOfTriesTillCheck)
                 {
                     //Check for a win condition.
                     if (b == Board{})
                     {
-                        std::cout << "The Puzzle is Solved!\nCongratulations.\n\n";
+                        System::coutput.printwl("The Puzzle is Solved!", "Congratulations.");
+                        System::coutput.print_endl("");
+                        System::coutput.print_endl("");
                         is_solved = true;
                     }
                 }
@@ -114,13 +115,12 @@ namespace fiftheenpuzzle
             userinput = playAgainChoice();
             if (userinput == 'n' or userinput == 'N')
             {
-                std::cout << "Goodbye.\n";
+                System::coutput.print_endl("Goodbye!");
                 break;
             }
             else
-            {
-                std::system("cls");
-            }
+            std::system("cls");
+            
             
         }/*------------------------EndofWhileLoop------------------------*/
         
