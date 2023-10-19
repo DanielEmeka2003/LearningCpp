@@ -6,7 +6,6 @@
 #include <ostream>
 #include <type_traits>
 #include <chrono>
-#include <utility>
 
 namespace Streams
 {
@@ -30,7 +29,7 @@ namespace Streams
         using basic_ostream_fcn = std::basic_ostream<CharT, std::char_traits<CharT>>& (std::basic_ostream<CharT, std::char_traits<CharT>>&);
 
         //Holds the output stream object.
-        std::basic_ostream<CharT>&& m_out;
+        std::basic_ostream<CharT>& m_out;
 
         /*An exculsive flag used to signal if an argument of an output function was written out.
         The condition for an agrument to be consider printable:
@@ -48,7 +47,7 @@ namespace Streams
         /*Used in formatting functions to keep track of the first argument given*/
         bool m_isFirstArg1{true};
     public:
-        constexpr OutputStream(std::basic_ostream<CharT>&& out) noexcept;
+        constexpr OutputStream(std::basic_ostream<CharT>& out) noexcept;
 
         //Copying is not allowed.
         OutputStream(const OutputStream&) = default;
@@ -171,8 +170,8 @@ namespace Streams
     };
 
     template <typename CharT>
-    constexpr OutputStream<CharT>::OutputStream(std::basic_ostream<CharT>&& out) noexcept
-    : m_out{ std::forward<std::basic_ostream<CharT>>(out) }
+    constexpr OutputStream<CharT>::OutputStream(std::basic_ostream<CharT>& out) noexcept
+    : m_out{out}
     {}
 
     template <typename CharT>

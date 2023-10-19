@@ -10,8 +10,8 @@ namespace System
 {
     /*Instantiations*/
     
-    inline Streams::InputStream cinput{ std::forward<decltype(std::cin)>(std::cin) };
-    inline Streams::InputStream wcinput{ std::forward<decltype(std::wcin)>(std::wcin) };
+    inline Streams::InputStream cinput{ std::cin };
+    inline Streams::InputStream wcinput{ std::wcin };
 
 } // namespace Streams::System
 

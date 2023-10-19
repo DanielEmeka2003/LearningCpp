@@ -807,9 +807,9 @@ namespace filediscovery
             }
             catch(const FileDiscoveryInputError& e)
             {
-                System::cerror.print_endl("");
-                System::cerror.printws_endl(e.what());
-                System::cerror.print_endl("");
+                System::cerror.write_endl("");
+                System::cerror.writews_endl(e.what());
+                System::cerror.write_endl("");
 
                 input.m_option = {};
                 input.m_optionsubset = {};

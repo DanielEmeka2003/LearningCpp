@@ -31,7 +31,7 @@ namespace Streams
         using basic_ostream_fcn = std::basic_ostream<CharT, std::char_traits<CharT>>& (std::basic_ostream<CharT, std::char_traits<CharT>>&);
         
         //Holds the file output stream object.
-        std::basic_ofstream<CharT>&& m_ofstream;
+        std::basic_ofstream<CharT> m_ofstream;
 
         /*An exculsive flag used to signal if an argument of a write function was writeed out.
         The condition for an agrument to be consider writeable:
@@ -49,12 +49,7 @@ namespace Streams
         /*Used in formatting functions to keep track of the first argument given*/
         bool m_isFirstArg1{true};
     public:
-        /*Uses std::forward from the utility library to forward rvalue reference ofstream to data member m_ofstream as a rvalue.
-        [Miscellany] It would have been just fine to use std::move instead, but the semantics behind what i am trying to do favours forwarding.
-        Tips:
-        If you wish to write to a file but not overwrite the file's contents completely, the std::ios_base::openmode should be 
-        std::ios_base::in(the open mode used for reading). If std::ios_base::out is used instead, the contents of the file would be
-        completely overwritten.*/
+        
         constexpr FileOutputStream(std::basic_ofstream<CharT>&& ofstream) noexcept;
 
         FileOutputStream(const FileOutputStream&) = delete;
@@ -201,7 +196,7 @@ namespace Streams
 
     template <typename CharT>
     constexpr FileOutputStream<CharT>::FileOutputStream(std::basic_ofstream<CharT>&& ofstream) noexcept
-    :m_ofstream{ std::forward<std::basic_ofstream<CharT>>(ofstream) }
+    : m_ofstream{ std::forward<std::basic_ofstream<CharT>>(ofstream) }
     {}
 
     template <typename CharT>

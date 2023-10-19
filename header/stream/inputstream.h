@@ -8,7 +8,6 @@
 #include <chrono>
 #include <string>
 #include <limits>
-#include <utility>
 #include <stdexcept>
 
 #include "output.h"
@@ -20,7 +19,7 @@ namespace Streams
     {
     private:
         //Holds the input stream object.
-        std::basic_istream<CharT>&& m_in;
+        std::basic_istream<CharT>& m_in;
 
         //A flag used to signal if an input function has been called or not.
         //Used in conjunction with m_readEndTime data member.
@@ -39,7 +38,7 @@ namespace Streams
         /*Takes in a reference to an input stream object.
         This class models an aggregrate relationship with its data member(m_in)- meaning it is neither responsible for the
         creation or destruction of any input stream object given to it, it only presents an easier inerface on using input stream objects.*/
-        constexpr InputStream(std::basic_istream<CharT>&& in) noexcept;
+        constexpr InputStream(std::basic_istream<CharT>& in) noexcept;
         
         //Copying is not allowed.
         InputStream(const InputStream&) = default;
@@ -141,8 +140,8 @@ namespace Streams
     };
 
     template <typename CharT>
-    constexpr InputStream<CharT>::InputStream(std::basic_istream<CharT>&& in) noexcept
-    : m_in{ std::forward<std::basic_istream<CharT>>(in) }
+    constexpr InputStream<CharT>::InputStream(std::basic_istream<CharT>& in) noexcept
+    : m_in{ in }
     {}
     
 

@@ -12,11 +12,11 @@ namespace System
 
     /*Pre-defined class template instantiations*/
 
-    inline Streams::OutputStream coutput{ std::forward<decltype(std::cout)>(std::cout) };
-    inline Streams::OutputStream cerror{ std::forward<decltype(std::cerr)>(std::cerr) };
+    inline Streams::OutputStream coutput{ std::cout };
+    inline Streams::OutputStream cerror{ std::cerr };
 
-    inline Streams::OutputStream wcoutput{ std::forward<decltype(std::wcout)>(std::wcout) };
-    inline Streams::OutputStream wcerror{ std::forward<decltype(std::wcerr)>(std::wcerr) };
+    inline Streams::OutputStream wcoutput{ std::wcout };
+    inline Streams::OutputStream wcerror{ std::wcerr };
     
     /*std::basic_ostream function template manipulators implemented as function pointers*/
 

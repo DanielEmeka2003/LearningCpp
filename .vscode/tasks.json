@@ -5,6 +5,7 @@
             "label": "C/C++: g++.exe build active file -> Debug Configuration",
             "command": "C:\\Program Files\\mingw32\\bin\\g++.exe",
             "args": [
+                "-Iheader",
                 "-fdiagnostics-color=always",
                 "-g",
                 "-ggdb",
@@ -47,7 +48,7 @@
             "label": "C/C++: g++.exe build active file -> Release Configuration",
             "command": "C:\\Program Files\\mingw32\\bin\\g++.exe",
             "args": [
-                
+                "-Iheader",
                 "-O2",
                 "-DNDEBUG",
                 "-pedantic-errors",

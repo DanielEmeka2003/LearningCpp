@@ -13,7 +13,7 @@ target = main
 obj_files = main.o myfunctions1.o
 rm = -del
 subsystem = sfml
-program_name = filediscoveryinput
+program_name = main
 
 
 ifeq ($(configurationflags), debug)

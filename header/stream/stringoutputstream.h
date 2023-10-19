@@ -29,7 +29,7 @@ namespace Streams
         using basic_ostream_fcn = std::basic_ostream<CharT, std::char_traits<CharT>>& (std::basic_ostream<CharT, std::char_traits<CharT>>&);
 
         //Holds string output stream object.
-        std::basic_ostringstream<CharT>&& m_osstream;
+        std::basic_ostringstream<CharT> m_osstream;
 
         /*An exculsive flag used to signal if an argument of a write function was writeed out.
         The condition for an agrument to be consider writeable:

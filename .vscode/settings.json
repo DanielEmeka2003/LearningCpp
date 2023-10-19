@@ -88,7 +88,8 @@
         "variant": "cpp",
         "any": "cpp",
         "source_location": "cpp",
-        "spanstream": "cpp"
+        "spanstream": "cpp",
+        "regex": "cpp"
     },
     
     "makefile.clearOutputBeforeBuild": true,

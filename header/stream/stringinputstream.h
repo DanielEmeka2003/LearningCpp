@@ -16,7 +16,7 @@ namespace Streams
     {
     private:
         //Holds string input stream object.
-        std::basic_istringstream<CharT>&& m_isstream;
+        std::basic_istringstream<CharT> m_isstream;
         
         //A flag used to signal if function insert has been called or not.
         //Used in conjunction with m_readEndTime data member.

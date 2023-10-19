@@ -16,7 +16,7 @@ namespace Streams
     {
     private:
         //Holds the input stream object.
-        std::basic_ifstream<CharT>&& m_ifstream;
+        std::basic_ifstream<CharT> m_ifstream;
 
         //A flag used to signal if function read_str has been called or not.
         //Used in conjunction with m_readEndTime data member.
