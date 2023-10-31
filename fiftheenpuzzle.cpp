@@ -12,18 +12,18 @@ namespace fiftheenpuzzle
     //Introduction to the fiftheenpuzzle game.
     void intro()
     {
-        System::coutput.print_endl("");
-        System::coutput.printwl("Welcome to FiftheenPuzzle");
+        System::coutput.write_endl("");
+        System::coutput.writewl("Welcome to FiftheenPuzzle");
 
-        System::coutput.printwl("w: slide tile up.", "s: slide tile down.", "a: slide tile left.", "d: right tile right.", "q: quit game.");
-        System::coutput.print_endl("");
+        System::coutput.writewl("w: slide tile up.", "s: slide tile down.", "a: slide tile left.", "d: right tile right.", "q: quit game.");
+        System::coutput.write_endl("");
     }
 
     void randomizeBoard(Board& b)
     {
         for (std::chrono::seconds s = 0s; s < 4s; ++s)
         {
-            System::coutput.printwl("Randomizing Board......");
+            System::coutput.writewl("Randomizing Board......");
             std::this_thread::sleep_for(2s);
         }
         b.randomize();
@@ -37,8 +37,8 @@ namespace fiftheenpuzzle
             Tile e_t{b}, u_t{b, *maybeTilePosition};
             e_t.swap(u_t);
         }
-        System::coutput.printwl(b);
-        System::coutput.print_endl("");
+        System::coutput.writewl(b);
+        System::coutput.write_endl("");
     }
 
     //Asks For Play again choice.
@@ -68,12 +68,12 @@ namespace fiftheenpuzzle
 
             Board b{};
 
-            System::coutput.printwl(b);
-            System::coutput.print_endl("");
+            System::coutput.writewl(b);
+            System::coutput.write_endl("");
 
             randomizeBoard(b);
-            System::coutput.printwl(b);
-            System::coutput.print_endl("");
+            System::coutput.writewl(b);
+            System::coutput.write_endl("");
             
             bool is_solved{false};
             char userinput{};
@@ -92,7 +92,7 @@ namespace fiftheenpuzzle
                 case 's': inputActions(b, b.slideTile(Point2d::Direction::down)); break;
                 case 'a': inputActions(b, b.slideTile(Point2d::Direction::left)); break;
                 case 'd': inputActions(b, b.slideTile(Point2d::Direction::right)); break;
-                case 'q': System::coutput.print_endl("GoodBye!"); return;
+                case 'q': System::coutput.write_endl("GoodBye!"); return;
                 }
 
                 /*Since it is impossible for the puzzle to be solved under a max of [n < 15], where n is the numer of tries/moves.
@@ -103,9 +103,9 @@ namespace fiftheenpuzzle
                     //Check for a win condition.
                     if (b == Board{})
                     {
-                        System::coutput.printwl("The Puzzle is Solved!", "Congratulations.");
-                        System::coutput.print_endl("");
-                        System::coutput.print_endl("");
+                        System::coutput.writewl("The Puzzle is Solved!", "Congratulations.");
+                        System::coutput.write_endl("");
+                        System::coutput.write_endl("");
                         is_solved = true;
                     }
                 }
@@ -115,7 +115,7 @@ namespace fiftheenpuzzle
             userinput = playAgainChoice();
             if (userinput == 'n' or userinput == 'N')
             {
-                System::coutput.print_endl("Goodbye!");
+                System::coutput.write_endl("Goodbye!");
                 break;
             }
             else

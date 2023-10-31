@@ -7,6 +7,7 @@
 #include <cstdint> 
 #include <type_traits>
 #include <string>
+#include <stdexcept>
 
 #include "stream/i_o.h"
 
@@ -19,10 +20,10 @@ namespace Myfcn
     /*Function getInput<T>(std::string_view) asks the user through a prompt message[string_view object prompt] 
     for an input of type T, determined by the caller.
 
-    prompt - prompt message, uses Streams::System.printws(arg) to output the prompt message.
+    prompt - prompt message, uses Streams::System.writews(arg) to output the prompt message.
 
-    werrorhandling(with error handling) - if true the function getInput performs error handling by calling
-    function InputStream::read_ to read the user input, else it calls InputStream::read to read the user input.
+    wleftOverInputs(with error handling) - if true the function getInput performs error handling by calling
+    function InputStream<CharT>::readwEC to read the user input, else it calls InputStream<Char>::read to read the user input.
     [Note] This parameter is useless in the case of the type to extract being a std::string, because at compile time it is replaced
     with InputStream::read_str, for reading user input to std::strings
     Behaves exactly like this:
@@ -31,27 +32,51 @@ namespace Myfcn
         System::cinput.read_str(input);
         else
         {
-            if (werrorhandling)
-            System::cinput.read_(input);
+            if (wleftOverInputs)
+            System::cinput.readwEC(input);
             else
             System::cinput.read(input);
         }   
     }*/
     template <typename T>
-    T getInput(std::string_view prompt, [[maybe_unused]] bool werrorhandling = true)
+    T getInput(std::string_view prompt, [[maybe_unused]] bool wleftOverInputs = false)
     {
         T input{};
-        System::coutput.printws(prompt);
+        System::coutput.writews(prompt);
 
         if constexpr (std::is_same_v<T, std::string>)
-        System::cinput.read_str(input);
+        {
+            try
+            {
+                System::cinput.read_str(input);
+            }
+            catch(const std::exception&)
+            {} 
+        }
         else
         {
-            if (werrorhandling)
-            System::cinput.read_(input);
-            else
-            System::cinput.read(input);
+            while (true)
+            {
+                try
+                {
+                    if (wleftOverInputs)
+                    System::cinput.readwLO(input);
+                    else
+                    System::cinput.read(input);
+
+                    break; //do not move, needed here
+                }
+                catch(const std::exception& e)
+                {
+                    System::cinput.ignoreLeftOverInputs();
+                    System::cerror.write_endl("<Try again!>");
+                    System::coutput.writews(prompt);
+                }
+                
+            }
+            
         }
+
         return input;
     }
 
@@ -60,7 +85,6 @@ namespace Myfcn
 
     int sum_ofposbase10digits(int base10number);
 
-    
     #if 0 //Sentiment Code
 
     // Performs selection sort[ascending order] on a fixed array of any type

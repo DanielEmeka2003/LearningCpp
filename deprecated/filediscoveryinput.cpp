@@ -520,7 +520,7 @@ namespace filediscovery
 
     void FileDiscoveryInput::_falseNotAnOption_errorhandling()
     {
-        m_exception_message.emptyStrUsedByStream();//empty the string output stream before writting
+        m_exception_message.empty_str();//empty the string output stream before writting
         
         constexpr size_t totalNumberOfStaticTableLines{96};
 
@@ -605,12 +605,12 @@ namespace filediscovery
             dynamicTableLine(true, nStaticTableLine, m_option.size());
         }
 
-        throw FileDiscoveryInputError{m_exception_message.getStrUsedByStream()}; 
+        throw FileDiscoveryInputError{m_exception_message.get_str()}; 
     }
 
     void FileDiscoveryInput::_falseNotANonModOptionSubset_errorhandling()
     {
-        m_exception_message.emptyStrUsedByStream();//empty the string output stream before writting
+        m_exception_message.empty_str();//empty the string output stream before writting
 
         constexpr size_t totalNumberOfStaticTableLines{110};
 
@@ -697,12 +697,12 @@ namespace filediscovery
             dynamicTableLine(true, nStaticTableLine, m_optionsubset.size());
         }
 
-        throw FileDiscoveryInputError{m_exception_message.getStrUsedByStream()};
+        throw FileDiscoveryInputError{m_exception_message.get_str()};
     }
 
     void FileDiscoveryInput::_falseShouldNotHaveOptionSubset_errorhandling()
     {
-        m_exception_message.emptyStrUsedByStream();//empty the string output stream before writting
+        m_exception_message.empty_str();//empty the string output stream before writting
 
         constexpr size_t totalNumberOfStaticTableLines{95};
 
@@ -754,7 +754,7 @@ namespace filediscovery
             dynamicTableLine(true, nStaticTableLine, m_option.size());
         }
 
-        throw FileDiscoveryInputError{m_exception_message.getStrUsedByStream()}; 
+        throw FileDiscoveryInputError{m_exception_message.get_str()}; 
     }
 
 

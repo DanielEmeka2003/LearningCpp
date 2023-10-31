@@ -7,9 +7,7 @@
 
 namespace Myfcn
 {
-    using namespace std::chrono_literals;
-
-    class Timer
+       class Timer
     {
     private:
     
@@ -22,14 +20,15 @@ namespace Myfcn
         bool m_isTimerZero{true};
 
     public:
-        constexpr Timer() = default;
-        Timer(const Timer&) = default;
-        Timer(Timer&&) = default;
+        constexpr Timer() noexcept = default;
+        
+        Timer(const Timer&) noexcept = default;
+        Timer(Timer&&) noexcept = default;
 
-        Timer& operator=(const Timer&) = default;
-        Timer& operator=(Timer&&) = default;
+        Timer& operator=(const Timer&) noexcept = default;
+        Timer& operator=(Timer&&) noexcept = default;
 
-        constexpr ~Timer() = default;
+        constexpr ~Timer() noexcept = default;
         
         /*Starts timer. Once started subsequent calls to the function would do nothing as it would be redundant.*/
         void start() noexcept;

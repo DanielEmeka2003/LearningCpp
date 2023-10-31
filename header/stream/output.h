@@ -12,11 +12,11 @@ namespace System
 
     /*Pre-defined class template instantiations*/
 
-    inline Streams::OutputStream coutput{ std::cout };
-    inline Streams::OutputStream cerror{ std::cerr };
+    inline Streams::OutputStream coutput{ &std::cout };
+    inline Streams::OutputStream cerror{ &std::cerr };
 
-    inline Streams::OutputStream wcoutput{ std::wcout };
-    inline Streams::OutputStream wcerror{ std::wcerr };
+    inline Streams::OutputStream wcoutput{ &std::wcout };
+    inline Streams::OutputStream wcerror{ &std::wcerr };
     
     /*std::basic_ostream function template manipulators implemented as function pointers*/
 
@@ -30,14 +30,14 @@ namespace System
 
     /*std::basic_ostream function template manipulators implemented as function pointers full instantiations*/
     
-    inline std::basic_ostream<char>& (&endl_v_char)(std::basic_ostream<char>&) = std::endl<char, std::char_traits<char>>;
-    inline std::basic_ostream<char>& (&ends_v_char)(std::basic_ostream<char>&) = std::ends<char, std::char_traits<char>>;
-    inline std::basic_ostream<char>& (&flush_v_char)(std::basic_ostream<char>&) = std::flush<char, std::char_traits<char>>;
+    inline std::basic_ostream<char>& (&endl_v_c)(std::basic_ostream<char>&) = std::endl<char, std::char_traits<char>>;
+    inline std::basic_ostream<char>& (&ends_v_c)(std::basic_ostream<char>&) = std::ends<char, std::char_traits<char>>;
+    inline std::basic_ostream<char>& (&flush_v_c)(std::basic_ostream<char>&) = std::flush<char, std::char_traits<char>>;
 
     
-    inline std::basic_ostream<wchar_t>& (&endl_v_wchar)(std::basic_ostream<wchar_t>&) = std::endl<wchar_t, std::char_traits<wchar_t>>;
-    inline std::basic_ostream<wchar_t>& (&ends_v_wchar)(std::basic_ostream<wchar_t>&) = std::ends<wchar_t, std::char_traits<wchar_t>>;
-    inline std::basic_ostream<wchar_t>& (&flush_v_wchar)(std::basic_ostream<wchar_t>&) = std::flush<wchar_t, std::char_traits<wchar_t>>;
+    inline std::basic_ostream<wchar_t>& (&endl_v_wc)(std::basic_ostream<wchar_t>&) = std::endl<wchar_t, std::char_traits<wchar_t>>;
+    inline std::basic_ostream<wchar_t>& (&ends_v_wc)(std::basic_ostream<wchar_t>&) = std::ends<wchar_t, std::char_traits<wchar_t>>;
+    inline std::basic_ostream<wchar_t>& (&flush_v_wc)(std::basic_ostream<wchar_t>&) = std::flush<wchar_t, std::char_traits<wchar_t>>;
 
 
 

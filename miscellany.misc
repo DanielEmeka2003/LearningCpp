@@ -1,0 +1,90 @@
+#if 0
+/*
+    "┌──────────┬────────────┬──────────────────────────┐\n"
+    "│  number  │   iomanip  │      representation      │\n"
+    "├──────────┼────────────┼──────────────────────────┤\n";
+    "├──────────┼────────────┼──────────────────────────┤\n" :
+    "└──────────┴────────────┴──────────────────────────┘\n";
+*/
+#endif
+
+#if 0
+    ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+    // #ifdef _WIN32
+    //     std::cout << "Running on Windows" << std::endl;
+    // #elif __linux__
+    //     std::cout << "Running on Linux" << std::endl;
+    // #elif __APPLE__
+    //     std::cout << "Running on macOS" << std::endl;
+    // #else
+    //     std::cout << "Running on an unknown operating system" << std::endl;
+    // #endif
+    ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#endif
+
+#if 0
+        ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        //std::regex reg0{"abc.", std::regex_constants::icase}; //. Any character except newline
+        //std::regex reg1{"abc?"};                         //? Zero or one preceding character
+        //std::regex reg2{"abc*"};                         //* Zero or more preceding character
+        //std::regex reg3{"abc+"};                         //+ One or more preceding character
+        //std::regex reg4{"ab[cd]*"};                      //[...] Any character inside the square brackets is a match
+        //std::regex reg5{"ab[^cd]"};                      //[^...] Any character that is not inside the square brackets is a match
+        //std::regex reg6{"ab[cd]{3}"};                    //{n} Exactly n number of characters is a match
+        //std::regex reg7{"ab[cd]{3,}"};                   //{n,} Exactly n number of characters and more
+        //std::regex reg8{"ab[cd]{3,5}"};                  //{n1,n2} Exactky n1 - n2 number of characters are matches
+        //std::regex reg9{"abc[12]|de[fg]"};               // n1|n2 either n1 or n2 is a match
+        /*std::regex reg10{"(abc)(de+)\\1\\2"};               (n1)\\nofgroup Paranthesis defines a group and the backslash+nofgroup
+        means the submatch appears exactly in that position*/
+        ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+        ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+        /*Valid locale names in C++ are used for localization and include locale names such as "en_US" for American English or "fr_FR" 
+        for French. These locale names allow you to specify the language and cultural conventions for formatting numbers, dates, 
+        and other text-based operations in your C++ code.
+
+        The specific valid locale names may vary depending on the compiler and platform you are using. 
+        However, most C++ compilers, including both GCC (g++) and Microsoft Visual C++ (MSVC), support locale names based on the 
+        standard POSIX locale naming conventions and ISO 639 language codes. Here are some common examples:
+
+        Language and Country Locale Names (based on POSIX locale naming conventions):
+
+        "en_US" for American English
+        "fr_FR" for French (France)
+        "de_DE" for German (Germany)
+        "es_ES" for Spanish (Spain)
+        "ja_JP" for Japanese (Japan)
+        Language-Only Locale Names (using ISO 639 language codes):
+
+        "en" for English
+        "fr" for French
+        "de" for German
+        "es" for Spanish
+        "ja" for Japanese
+        Keep in mind that the availability of specific locales may depend on your system's locale settings and installed language packs. 
+        You can typically check which locales are available on your system by using the locale -a command in a Unix-like environment.*/
+        ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+        ─────────────────────────
+        FILE OUT AND TRUNC STUFF
+        ─────────────────────────
+
+        In C++, the `std::ios_base::openmode` flags `out` and `trunc` are related to file operations, but they serve different purposes. 
+        They are not the same, and understanding their differences is important when working with file streams.
+
+        1. **`std::ios_base::out`**:
+        
+           - `out` is an open mode flag that is used when opening a file for output operations, like writing to the file.
+           - It does not inherently truncate an existing file; its primary purpose is to allow output operations on the file.
+           - If the file exists, and you open it with the `out` flag without other flags like `in`, 
+           it will effectively overwrite the file's contents. This operation may or may not truncate the file, 
+           depending on the specific implementation of the C++ standard library.
+        
+        2. **`std::ios_base::trunc`**:
+        
+           - `trunc` is another open mode flag that is used to specify that if the file being opened already exists,
+           its contents should be truncated (i.e., the file should be cleared) before performing any output operations.
+           - This flag, when used in conjunction with `out`, ensures that the file is both opened for output and any existing contents are 
+           removed. It explicitly specifies the truncation behavior.
+           ────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+#endif

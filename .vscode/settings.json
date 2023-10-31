@@ -97,6 +97,14 @@
     "makefile.launchConfigurations": [
         {
             "cwd": "c:\\Users\\MIKE EMEKA\\Documents\\C++",
+            "binaryPath": "c:\\Users\\MIKE EMEKA\\Documents\\C++\\main.exe",
+            "binaryArgs": [
+                "main.nc"
+            ],
+            "stopAtEntry": true
+        },
+        {
+            "cwd": "c:\\Users\\MIKE EMEKA\\Documents\\C++",
             "binaryPath": "c:\\Users\\MIKE EMEKA\\Documents\\C++\\main",
             "binaryArgs": [],
             "stopAtEntry": true
@@ -112,7 +120,6 @@
     "C_Cpp.default.cppStandard": "c++23",
     "C_Cpp.default.cStandard": "c23",
     "C_Cpp.default.compilerPath": "C:\\Program Files\\mingw32\\bin\\g++.exe",
-    
     
 }
 
