@@ -61,7 +61,7 @@ namespace Streams
         InputStream& operator=(const InputStream&) = delete;
         InputStream& operator=(InputStream&&) = delete;
 
-        virtual ~InputStream() noexcept = default;
+        virtual ~InputStream() noexcept;
 
         /*
         Takes in a variable amount of arguments(as far as those arguments have overloaded the extraction operator[operator>>] to work with it)
@@ -243,6 +243,9 @@ namespace Streams
     : m_in{ in }
     {}
     
+    template <typename CharT>
+    InputStream<CharT>::~InputStream() noexcept
+    { m_in = nullptr; }
 
     template <typename CharT>
     template <typename Arg1, typename... Args>

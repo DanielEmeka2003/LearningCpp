@@ -1,6 +1,6 @@
 
 
-int32 main()
+main(): int32
 {
-    give !!!!!!!!!~~~~---~-23;
+    give 9 or 3
 }

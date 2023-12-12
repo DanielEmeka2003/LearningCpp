@@ -13,7 +13,7 @@ namespace Myfcn
     class DrawBoxAroundText
     {
     public:
-        enum class Style{plain, round, bold, doublelined};
+        enum class Style{none, plain, round, bold, doublelined};
     private:
         Streams::OutputStream<char>& m_out;
         Style m_s{};

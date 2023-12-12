@@ -30,39 +30,38 @@
 
 #include <source_location>
 #include <csignal>
-#include <cstdarg>
 
 #include "stream/i_o.h"
 #include "stream/stringoutputstream.h"
 #include "stream/stringinputstream.h"
 #include "stream/fileoutputstream.h"
 #include "stream/fileinputstream.h"
-
 #include "myfunctions1.h"
 #include "timer.h"
 
 #include "readfile.h"
 #include "ncLexer.h"
 #include "ncParser.h"
+#include "ncCodeGen.h"
 
 using namespace std::string_literals;
+using namespace std::string_view_literals;
 
 
 void signal_handler(int signal)
 {
-    System::cerror.writews_endl("Caught Signal", signal, "[std::exit(signal called)]");
+    System::cerror.writews_endl("Caught Signal", signal, "[std::exit(signal) called]");
     std::exit(signal);
 }
 
-
 void checkPLOFile(const std::filesystem::path& path);
-
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
 {
     using namespace Streams;
-
+    
     std::signal(SIGINT, signal_handler);
+    std::signal(SIGSEGV, signal_handler);
 
     if (argc != 2)
     {
@@ -76,20 +75,23 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         
         /*Find out why function identifers can be bound to both lvalue and rvalue references*/
         
-        // checkPLOFile(argv[1]);
+        //checkPLOFile(argv[1]);
 
         Myfcn::ReadFile ncFile{argv[1]};
 
-        Nc::NcLexer lex{ncFile.storeFileContents().retrieveBuffer()};
-        
-        ncFile.emptyBuffer();
-        
+        Nc::NcLexer lex{ std::move(ncFile.storeFileContents().retrieveBuffer()) };
+        lex.logBoxStyle(Nc::NcLog::BoxLineStyle::bold);
         lex.lexFileBuffer();
-        
+
         Nc::NcParser parse{lex.getTokenList()};
+        parse.logBoxStyle(Nc::NcLog::BoxLineStyle::bold);
         parse.parseTokenList();
+
+        Nc::NcCodeGen codegen{ std::move(parse.getAST()) };
+        codegen.generate();
         
         
+        //int32: ("const")
 
         /*Brace initialization is not to be used with function template type:
         main.cpp:125:74: error: invalid initialization of non-const reference of type 'std::basic_ostream<char>& (&)(std::basic_ostream<char>&)' from an rvalue of type '<brace-enclosed initializer list>'
@@ -101,11 +103,11 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
     }
     catch(const std::exception& e)
     {
-        System::cerror.writews_endl("In function", std::source_location::current().function_name(), ':', "{Exception}", e.what());
+        System::cerror.writews_endl(std::source_location::current().function_name(), "{Exception}", e.what());
     }
     catch(...)
     {
-        System::cerror.writews_endl("In function", std::source_location::current().function_name(), ':', "Inside catch all exception");
+        System::cerror.writews_endl(std::source_location::current().function_name(), "Inside catch all exception");
     }
     
     return EXIT_SUCCESS;

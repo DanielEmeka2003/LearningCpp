@@ -30,7 +30,7 @@ namespace Streams
         FileInputStream& operator=(const FileInputStream&) = delete;
         FileInputStream& operator=(FileInputStream&&) = delete;
 
-        constexpr ~FileInputStream() = default;
+        ~FileInputStream() noexcept = default;
 
         /*Returns a reference to the file input stream object given.(Preferred)*/
         constexpr std::basic_ifstream<CharT>& get() noexcept;

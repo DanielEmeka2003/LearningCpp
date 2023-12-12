@@ -36,10 +36,16 @@ namespace Myfcn
         return *this;
     }
 
+    std::string& ReadFile::retrieveBuffer()
+    { return m_buffer; }
+
     const std::string& ReadFile::retrieveBuffer() const
     { return m_buffer; }
 
     ReadFile& ReadFile::emptyBuffer()
     { return (m_buffer.clear(), *this); }
+
+    bool ReadFile::isBufferEmpty()
+    { return m_buffer.empty(); }
 
 } // namespace MyFcn

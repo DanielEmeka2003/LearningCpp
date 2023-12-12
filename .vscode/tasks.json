@@ -3,7 +3,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++.exe build active file -> Debug Configuration",
-            "command": "C:\\Program Files\\mingw32\\bin\\g++.exe",
+            "command": "C:\\Program Files\\mingw64\\bin\\g++.exe",
             "args": [
                 "-Iheader",
                 "-fdiagnostics-color=always",
@@ -46,7 +46,7 @@
         {
             "type": "cppbuild",
             "label": "C/C++: g++.exe build active file -> Release Configuration",
-            "command": "C:\\Program Files\\mingw32\\bin\\g++.exe",
+            "command": "C:\\Program Files\\mingw64\\bin\\g++.exe",
             "args": [
                 "-Iheader",
                 "-O2",

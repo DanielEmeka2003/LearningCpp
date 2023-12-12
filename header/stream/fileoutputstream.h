@@ -29,7 +29,7 @@ namespace Streams
         FileOutputStream& operator=(const FileOutputStream&) = delete;
         FileOutputStream& operator=(FileOutputStream&&) = delete;
 
-        constexpr ~FileOutputStream() = default;
+        ~FileOutputStream() noexcept = default;
 
         /*Returns a reference to the file output stream object given.(Preferred)*/
         constexpr std::basic_ofstream<CharT>& get() noexcept;

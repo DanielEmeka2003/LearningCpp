@@ -89,7 +89,8 @@
         "any": "cpp",
         "source_location": "cpp",
         "spanstream": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "csignal": "cpp"
     },
     
     "makefile.clearOutputBeforeBuild": true,
@@ -119,7 +120,16 @@
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.default.cppStandard": "c++23",
     "C_Cpp.default.cStandard": "c23",
-    "C_Cpp.default.compilerPath": "C:\\Program Files\\mingw32\\bin\\g++.exe",
+    "C_Cpp.default.compilerPath": "C:\\Program Files\\mingw64\\bin\\g++.exe",
+    "C_Cpp.intelliSenseMemoryLimit": 4296,
+    "C_Cpp.autocompleteAddParentheses": true,
+    "C_Cpp.autocomplete": "default",
+    "editor.suggest.matchOnWordStartOnly": false,
+    "editor.snippets.codeActions.enabled": true,
+    "editor.suggest.showSnippets": true,
+    "editor.tabCompletion": "onlySnippets",
+    "emmet.showSuggestionsAsSnippets": true,
+    "C_Cpp.suggestSnippets": true,
     
 }
 

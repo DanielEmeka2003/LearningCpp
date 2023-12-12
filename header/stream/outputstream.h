@@ -77,7 +77,7 @@ namespace Streams
         OutputStream& operator=(const OutputStream&) = delete;
         OutputStream& operator=(OutputStream&&) = delete;
 
-        virtual ~OutputStream() noexcept = default;
+        virtual ~OutputStream() noexcept;
 
         /*Takes in a variable amount of arguments and writes them as they were(as far as those arguments have overloaded the
         insertion operator[operator<<] to work with it).
@@ -293,6 +293,10 @@ namespace Streams
     constexpr OutputStream<CharT>::OutputStream(std::basic_ostream<CharT>* out) noexcept
     : m_out{out}
     {}
+
+    template <typename CharT>
+    OutputStream<CharT>::~OutputStream() noexcept
+    { m_out = nullptr; }
 
     template <typename CharT>
     template <typename Arg1, typename... Args>

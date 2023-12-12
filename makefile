@@ -37,10 +37,13 @@ ifeq ($(program_name), pl0c)
 obj_files += readfile.o pl0_lexer.o pl0_parser.o
 endif
 ifeq ($(program_name), ncc)
-obj_files += readfile.o drawboxaroundtext.o ncLexer.o ncParser.o ncCodeGen.o
+obj_files += readfile.o drawboxaroundtext.o ncLexer.o ncParser.o ncAST.o ncCodeGen.o
 endif
 
 all: intro $(target).exe
+
+nccTest:
+	main.exe main.nc && gcc -m32 assembly.s -o asm && asm.exe
 
 intro:
 	echo [make.exe running]; Program Expected: $(program_name)
@@ -117,14 +120,17 @@ pl0_parser.o: pl0_parser.cpp header/pl0_parser.h header/pl0_lexer.h
 
 
 #ncc────────────────────────────────────────────────────────────────────────
-ncLexer.o: ncLexer.cpp header/ncLexer.h header/drawboxaroundtext.h
+ncLexer.o: ncLexer.cpp header/ncLexer.h header/ncLog.h header/drawboxaroundtext.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncLexer.cpp
 
-ncParser.o: ncParser.cpp header/ncParser.h header/ncLexer.h header/drawboxaroundtext.h
+ncParser.o: ncParser.cpp header/ncParser.h header/ncLexer.h  header/ncLog.h header/drawboxaroundtext.h header/ncAST.h header/ncNonTerminal.h header/ncTerminal.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncParser.cpp
 
-ncCodeGen.o: ncCodeGen.cpp header/ncCodeGen.h
+ncCodeGen.o: ncCodeGen.cpp header/ncCodeGen.h header/ncAST.h header/ncNonTerminal.h header/ncTerminal.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncCodeGen.cpp
+
+ncAST.o: ncAST.cpp header/ncAST.h header/ncNonTerminal.h header/ncTerminal.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncAST.cpp
 #ncc────────────────────────────────────────────────────────────────────────
 
 

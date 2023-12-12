@@ -17,8 +17,10 @@ namespace Myfcn
         ~ReadFile() = default;
         
         ReadFile& storeFileContents();
+        std::string& retrieveBuffer();
         const std::string& retrieveBuffer() const;
         ReadFile& emptyBuffer();
+        bool isBufferEmpty();
     };
 
 } // namespace MyFcn

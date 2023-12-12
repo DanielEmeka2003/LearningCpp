@@ -12,6 +12,9 @@ namespace Myfcn
     {
         switch (m_s)
         {
+        case Style::none:
+            break;
+
         case Style::plain:
             m_out.write("\u250c");
             for (size_t i = 0; i < lineAmount; i++)
@@ -20,6 +23,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2510");
             break;
+
         case Style::round:
             m_out.write("\u256d");
             for (size_t i = 0; i < lineAmount; i++)
@@ -28,6 +32,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u256e");
             break;
+
         case Style::bold:
             m_out.write("\u250f");
             for (size_t i = 0; i < lineAmount; i++)
@@ -36,6 +41,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2513");
             break;
+
         case Style::doublelined:
             m_out.write("\u2554");
             for (size_t i = 0; i < lineAmount; i++)
@@ -44,6 +50,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2557");
             break;
+            
         default:
             throw std::invalid_argument{"value given to function style is not valid in DrawBoxAroundText Class"};
             break;
@@ -54,6 +61,9 @@ namespace Myfcn
     {
         switch (m_s)
         {
+        case Style::none:
+            
+            break;
         case Style::plain:
             m_out.write("\u2514");
             for (size_t i = 0; i < lineAmount; i++)
@@ -62,6 +72,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2518");
             break;
+
         case Style::round:
             m_out.write("\u2570");
             for (size_t i = 0; i < lineAmount; i++)
@@ -70,6 +81,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u256f");
             break;
+
         case Style::bold:
             m_out.write("\u2517");
             for (size_t i = 0; i < lineAmount; i++)
@@ -78,6 +90,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u251b");
             break;
+
         case Style::doublelined:
             m_out.write("\u255a");
             for (size_t i = 0; i < lineAmount; i++)
@@ -86,6 +99,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u255d");
             break;
+
         default:
             throw std::invalid_argument{"value given to function style is not valid in DrawBoxAroundText Class"};
             break;
@@ -99,6 +113,10 @@ namespace Myfcn
 
         switch (m_s)
         {
+        case Style::none:
+            m_out.write_endl(text);
+            break;
+
         case Style::plain:
             m_out.write("\u2502", text);
             for (size_t i = 0; i < size; i++)
@@ -107,6 +125,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2502");
             break;
+
         case Style::round:
             m_out.write("\u2502", text);
             for (size_t i = 0; i < size; i++)
@@ -115,6 +134,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2502");
             break;
+
         case Style::bold:
             m_out.write("\u2503", text);
             for (size_t i = 0; i < size; i++)
@@ -123,6 +143,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2503");
             break;
+
         case Style::doublelined:
             m_out.write("\u2551", text);
             for (size_t i = 0; i < size; i++)
@@ -131,6 +152,7 @@ namespace Myfcn
             }
             m_out.write_endl("\u2551");
             break;
+
         default:
             throw std::invalid_argument{"value given to function style is not valid in DrawBoxAroundText Class"};
             break;
@@ -141,6 +163,9 @@ namespace Myfcn
     {
         switch (m_s)
         {
+        case Style::none:
+            
+            break;
         case Style::plain:
             m_out.write("\u251c");
             for (size_t i = 0; i < lineAmount; i++)
