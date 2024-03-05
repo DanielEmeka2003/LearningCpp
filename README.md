@@ -1,48 +1,70 @@
 # LearningCpp
 Cpp cloud repository for vs code.
 
-This repository contains code, sometimes unrelated, that are products of my C++ learning journey - I wish i chose another languague though.
-
+This repository contains code, sometimes unrelated, that are products of my C++ learning journey.
 References to sites like:
-[link](Programiz.com)
-[link](codecademy.com)
-[link](tutorialspoint.com)
-[link](learncpp.com)
+1. [learncpp.com](www.learncpp.com) <sub>the best by far<sub>
+2. [Programiz.com](www.Programiz.com)
+3. [codecademy.com](www.codecademy.com)
 and many others.
 
-[01/01/2024] INTRODUCTION TO MY PROGRAMMING LANGUAGE NC
- Hello to the parties interested, i am currently working on a compiler for my programming language called NC - short for not C;
- I also have a partially-implemented pl0 compiler that compiles down to the C programming language.
+### 01/01/2024 Introduction to my Programming Language NC
+Hello to the parties interested, i am currently working on a compiler for my programming language called **NC** - short for not C;
+I also have a partially-implemented pl0 compiler that compiles down to the **C** programming language.
 
-[07/01/2024] UPDATE: UTF8 FINALLY
- I have wriiten a custom utf8 chracter class and also made a utf8 string class from std::basic_string<CharT, CharTraits> enable unicode support in my language.
- It can be found in file myfunctions1.cpp. Fuck icu and boost, i made my own😎.
+### 07/01/2024 Utf8 Finally
+I have wriiten a custom utf8 chracter class and also made a utf8 string class from std::basic_string<CharT, CharTraits> enable unicode support in my language.
+It can be found in file [myfunctions1.cpp](myfunctions1.cpp). _Fuck icu and boost, i made my own😎_.
 
-[05/03/2024] MORE DETAILS ON MY LANGUAGE
- My language contians or is going to contian various existing programming features and more: sumTypes, productypes, classes, function as objects, compileTime    ability to run code, generics(in form of templates), match expressions, attributes and so much more.
- It is going to be as expressive as Rust/Lisp(without marcos) and as fuild and intuitive as C++(cough...cough...👀)
+### 05/03/2024 MORE DETAILS ON MY LANGUAGE
+My language contains or is going to contain various existing programming features and more:
+- sum types
+- produc types
+- classes
+- function as objects
+- compileTime ability to run code
+- generics in form of templates
+- match expressions
+- **Decimal floating point** implementation devoid of the inherent problems of the **IEE binary floating point**
+- Wide variety of types
+- Static and Strong typing, with no implicit conversions
+- Interface programming
+- When the time comes, **concurrent, asynchronus and event-driven** programming
+- Low level to some degree
+- Memory safety(done with no Gargbe collector) and pointer/references limitations
+- Bounds checking
+- No explicit memory allocation and No explicit memory deallocation
+- Array indexing starting from **1**
+- Unicode agnostic language, with capability of using ***emoji identifiers***
+- pseudo-minimalist array of language keywords
+- expressivness
+- ability to imbed other languages to NC *a bit optimistic for now*
+- compiler attributes and so much more.
+**Languages like: _Python, Rust, Haskell, Lisp, C++, D and C_ insipre daily**
 
- The files invloved in my programming language building journey
- (1). header/NcLog.h                                     │: contains class Nc::Log, responsible for error logging
- (2). header/NcLexer.h and NcLexer.cpp                   │: contains class Nc::Lexer, responsible for lexing nc files
- (3). header/NcParser.h and NcParser.cpp                 │: contians class Nc::Parser, responsible for parsing nc files(also contains BNF for my language)
- (4). header/NcNonTerminal.h and header/NcTerminal.h     │: contians classes that represent Ast nodes in my language
- (5). header/NcAst.h and header/NcAst.cpp                │: contains class Nc::Ast, responsible for building Nc's Ast
- (6). header/NcSemantics.h and NcSemantics.cpp           │: currently empty, but would contain class Nc::Semantics that would be responsible for semantic checking
- (7). header/NcCodeGen.h and NcCodeGen.cpp               │: currently deprecated for now(but i am using LLVM for codegen)
- (8). functionality independent files:
-        header/readFile.h,
-        header/drawboxaroundtext.h,
-        header/myfunctions.h and myfunctions.cpp
+The files invloved in my programming language building journey
++ [NcLog.h](header/NcLog.h) _: contains class Nc::Log, responsible for error logging_
++ [NcLexer.h](header/NcLexer.h), [NcLexer.cpp](NcLexer.cpp) _: contains class Nc::Lexer, responsible for lexing nc files_
++ [NcParser.h](header/NcParser.h), [NcParser.cpp](NcParser.cpp) _: contians class Nc::Parser, responsible for parsing nc files(also contains BNF for my language)_
++ [NcNonTerminal.h](header/NcNonTerminal.h), [NcTerminal.h](header/NcTerminal.h) _: contians classes that represent Ast nodes in my language_
++ [NcAst.h](header/NcAst.h), [NcAst.cpp](NcAst.cpp) _: contains class Nc::Ast, responsible for building Nc's Ast. The Ast is really beautiful, will show later_
++ [NcSemantics.h](header/NcSemantics.h) and [NcSemantics.cpp](NcSemantics.cpp) _: currently empty, but would contain class Nc::Semantics that would be responsible for semantic checking_
++ [NcCodeGen.h](header/NcCodeGen.h) and [NcCodeGen.cpp](NcCodeGen.cpp) _: currently deprecated for now(but i am using LLVM for codegen)_
++ functionality only independent files: [readfile.h](header/readfile.h), [drawboxaroundtext.h](header/drawboxaroundtext.h), 
+[myfunctions1.h](header/myfunctions.h)  [myfunctions1.cpp](myfunctions1.cpp)
 
- Below shows an example error produce from my language, NC
- ![NC_Parser_Error](image.png)
+Below is an example error produce from my language, NC:
+![Example of a parser error in NC](image.png)
 
- Thanks to ([07/01/2024] unicode update), my language is unicode agnostic, but some unicode characters are still
- not allowed as identifiers - i haven't solidified acceptable unicode characters yet, but i will when i have time, or
- if you wish to help in that field, pls contact me through my email: ![my gmail](emekacryil@gmail.com)
+Thanks to ***07/01/2024 unicode update***, my language is now unicode agnostic, but some unicode characters are still not allowed as identifiers.
+I haven't solidified acceptable unicode characters yet, but i will when i have time, or if you wish to help in that field, pls contact me through my email
+[emekacryil@gmail.com](emekacryil@gmail.com)
 
- [NOTE] i rarely do commit, but if you badly want to see my local changes, you can always just ask, so i would commit the new changes.
+> [!NOTE]
+> **i rarely do commit, but if you want to view my local changes, you can always just ask, so that i would commit the new changes**
  
 
-LICENSE: none for now. But pls in your good consicience, when you need to distribute the code add the source from where it came from, thank you.
+## LICENSE
+none for now, but pls in good conscience, when you need to distribute my code add the source from where it came from, thank you.
+
+[^1]: ***A more better readme file is coming soon, explaining all the various file meaning in this repo***
