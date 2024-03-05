@@ -9,47 +9,40 @@
 
 #include "stream/stringoutputstream.h"
 #include "ncAST.h"
+#include "myfunctions1.h"
 
 namespace Nc
 {
     class LLVMHelper
     {
     protected:
-        using Constant = std::string;
+        using Constant = Myfcn::U8string;
 
         class LLVMIdentifier
         {
         public:
-            enum IdentifierKind { local, global, none };
-            using Counter = unsigned int;
-            using NcIdentifier = std::string;
+            enum IdentifierKind {local, global, none};
+            using NcIdentifier = Myfcn::U8string;
 
         private:
-            std::string m_llvmIdent{};
+            Myfcn::U8string m_llvmIdent{};
             IdentifierKind m_identKind{};
-            static inline Counter m_counter{};
-            static inline std::map<std::string, IdentifierKind> m_tracker{};
             
             LLVMIdentifier() = default;
 
         public:
             LLVMIdentifier(IdentifierKind identKind);
-            LLVMIdentifier(NcIdentifier ident, IdentifierKind identKind) ;
+            LLVMIdentifier(NcIdentifier ident, IdentifierKind identKind);
 
             /*gets the transformed NcIdentifier[using NcIdentifier = std::string],
             which is now in LLVM format i.e. LLVMIdentifier*/
-            std::string_view get() const;
-            /*dosen't actually mangles[distorts the Identifier] the NcIdentifier which has been transformed to an LLVMIdentifier,
-            but simply appends string "_$" to the LLVMIdentifier*/
-            LLVMIdentifier& mangle();
+            Myfcn::U8string_view get() const;
             /*inserts the local identifier mark(%) to the begining of an identifier that has none as it's identifierKind
             [Note] if the local identifier mark(%) is already present, no operation would be done*/
             LLVMIdentifier& insertLocalMark();
 
-            //clears tracker related static variables, to be used at the end of each function
-            static void clearTracker();
             //generates random strings
-            static std::string getRandomStr(std::size_t str_length = 4);
+            static Myfcn::U8string getRandomStr(std::size_t str_length = 4){}
 
         private:
             friend std::ostream& operator<<(std::ostream& os, const LLVMIdentifier& d) { return os << d.m_llvmIdent; }
@@ -59,18 +52,18 @@ namespace Nc
         class LLVMType
         {
         public:
-            using NcType = std::string_view;
+            using NcType = const Myfcn::U8string&;
             
         private:
-            std::string m_llvmType{};
+            Myfcn::U8string m_llvmType{};
             
             LLVMType() = default;
 
         public:
             LLVMType(NcType ncT);
 
-            std::string_view get() const;
-            static std::string mapToLLVMType(NcType ncT);
+            Myfcn::U8string_view get() const;
+            static Myfcn::U8string mapToLLVMType(NcType ncT);
 
             friend std::ostream& operator<<(std::ostream& os, const LLVMType& d) { return os << d.m_llvmType; }
             // friend bool operator==(LLVMType lt, NcType nt){ return nt == lt; }
@@ -141,12 +134,12 @@ namespace Nc
         std::string icmpI(std::string_view condition_code, const Value& v1, const Value& v2);
         std::string zextI(const Value& v, const LLVMType& ty);
 
-        std::string phi(const ValueLabelList& vl_list);
+        std::string phiI(const ValueLabelList& vl_list);
+
+        // std::string allocaI(const LLVMType& ty, std::optional<std::size_t> alignment){}
+        // std::string storeI(const Value& v){}
 
         std::string getIRstr();
-
-    private:
-        
     };
 
     class NcCodeGen: private LLVMHelper
@@ -161,31 +154,38 @@ namespace Nc
         void generate();
 
     private:
-        void Root_gen();
-        void NcFile_gen(NcFile& ncf);
+        void root_gen(){}
+        void ncFile_gen(NcFile& ncf){}
 
-        void FuncDeclaration_gen(FuncDeclaration& fd);
+        void funcDeclaration_gen(FuncDeclaration& fd){}
         
-        void Function_gen(Function& f);
+        void functionDef_gen(FunctionDef& f){}
+        void functionDecl_gen(FunctionDecl& f){}
 
-        void BlockItem_gen(BlockItem& bi);
+        void blockItem_gen(BlockItem& bi){}
+        void block(Block& block){}
         
-        void Statement_gen(Statement& s);
+        void statement_gen(Statement& s){}
         
-        void Give_gen(Give& g);
+        void ifCondtion_gen(IfCondition& ifCondition){}
+        void forLoop_gen(ForLoop& forLoop){}
+        void whileLoop_gen(WhileLoop& whileLoop){}
+        void doWhileLoop_gen(DoWhileLoop& doWhileLoop){}
+        void jumpStatement_gen(JumpStatement& js){}
 
-        void Expression_gen(Expression& e);
+        void varDeclaration_gen(VarDeclaration& vd){}
+        void varDecl_gen(VarDecl& vdec){}
 
-        void UPrefixOperation_gen(UPrefixOperation& upre);
-        void UPostfixOperation_gen(UPostfixOperation& upost);
-        void BinaryOperation_gen(BinaryOperation& b);
-        void Literal_gen(Literal& l);
-        void Variable_gen(Variable& v);
-        void Type_gen(Type& t);
+        void expression_gen(Expression& e){}
 
-        void VarDeclaration_gen(VarDeclaration& vd);
-
-        void VarDeclare_gen(VarDeclare& vdec);
+        void uPrefixOperation_gen(UPrefixOperation& exp){}
+        void uPostfixOperation_gen(UPostfixOperation& exp){}
+        void binaryOperation_gen(BinaryOperation& exp){}
+        void literal_gen(Literal& exp){}
+        void identifier_gen(Identifier& exp){}
+        void r_and_l_exp_gen(R_And_L_Exp& exp){}
+        void anyTypeListExp_gen(AnyTypeListExp& exp){}
+        void tempVarDecl_gen(TempVarDecl& exp){}
     };
 } // namespace Nc
 

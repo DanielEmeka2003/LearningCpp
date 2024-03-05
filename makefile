@@ -1,15 +1,17 @@
 
 # .PHONY used to indicate a certain target is not a file
 
-includes = -Iheader
+includes = -Iheader -I"C:/Program Files/Boost"
 libs = 
 cxx = g++.exe
-cxxflags = -std=c++23 -pedantic-errors -Wall -Weffc++ -Wextra -Wconversion -Wsign-conversion -Werror -Wshadow -Wenum-compare
+#cxxflags = -std=c++23 -pedantic-errors -Wall -Weffc++ -Wextra -Wconversion -Wsign-conversion -Werror -Wshadow -Wenum-compare
+cxxflags = -std=c++23 -pedantic-errors -Wall -Werror -Wenum-compare
 configurationflags = debug
 preprocessorflags = -E
 compile = -c
 target = main
 obj_files = main.o myfunctions1.o
+target_dependacies = header/myfunctions1.h
 rm = -del
 subsystem = sfml
 program_name = ncc
@@ -23,21 +25,27 @@ endif
 
 ifeq ($(program_name), blackjack)
 obj_files += card.o player.o dealer.o blackjack.o
+#target_dependacies
 endif
 ifeq ($(program_name), hi_lo)
 obj_files += hi_lo.o
+#target_dependacies
 endif
 ifeq ($(program_name), fiftheenpuzzle)
 obj_files += point2d.o board.o fiftheenpuzzle.o
+target_dependacies += header/board.h header/point2d.h header/random.h header/fiftheenpuzzle.h
 endif
 ifeq ($(program_name), filediscoveryinput)
 obj_files += filediscoveryinput.o
+#target_dependacies
 endif
 ifeq ($(program_name), pl0c)
 obj_files += readfile.o pl0_lexer.o pl0_parser.o
+#target_dependacies
 endif
 ifeq ($(program_name), ncc)
-obj_files += readfile.o drawboxaroundtext.o ncLexer.o ncParser.o ncAST.o ncCodeGen.o
+obj_files += ncLexer.o ncParser.o ncAst.o
+target_dependacies += header/readfile.h header/drawboxaroundtext.h header/ncLexer.h header/ncLog.h header/ncParser.h header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
 endif
 
 all: intro $(target).exe
@@ -52,7 +60,7 @@ intro:
 $(target).exe: $(obj_files)
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) -o $(target) $(obj_files)
 
-$(target).o: $(target).cpp header/myfunctions1.h
+$(target).o: $(target).cpp $(target_dependacies)
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) $(target).cpp 
 
 myfunctions1.o: myfunctions1.cpp header/myfunctions1.h
@@ -65,13 +73,6 @@ timer.o: timer.cpp header/timer.h
 
 point2d.o: point2d.cpp header/point2d.h 
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) point2d.cpp
-
-readfile.o: readfile.cpp header/readfile.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) readfile.cpp
-
-drawboxaroundtext.o: drawboxaroundtext.cpp header/drawboxaroundtext.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) drawboxaroundtext.cpp
-
 
 
 # Hi_lo object files────────────────────────────────────────────────────────────────────────
@@ -120,17 +121,17 @@ pl0_parser.o: pl0_parser.cpp header/pl0_parser.h header/pl0_lexer.h
 
 
 #ncc────────────────────────────────────────────────────────────────────────
-ncLexer.o: ncLexer.cpp header/ncLexer.h header/ncLog.h header/drawboxaroundtext.h
+ncLexer.o: ncLexer.cpp header/ncLexer.h header/ncLog.h header/drawboxaroundtext.h header/myfunctions1.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncLexer.cpp
 
-ncParser.o: ncParser.cpp header/ncParser.h header/ncLexer.h  header/ncLog.h header/drawboxaroundtext.h header/ncAST.h header/ncNonTerminal.h header/ncTerminal.h
+ncParser.o: ncParser.cpp header/ncParser.h header/ncLexer.h  header/ncLog.h header/drawboxaroundtext.h header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncParser.cpp
 
-ncCodeGen.o: ncCodeGen.cpp header/ncCodeGen.h header/ncAST.h header/ncNonTerminal.h header/ncTerminal.h
+ncCodeGen.o: ncCodeGen.cpp header/ncCodeGen.h header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncCodeGen.cpp
 
-ncAST.o: ncAST.cpp header/ncAST.h header/ncNonTerminal.h header/ncTerminal.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncAST.cpp
+ncAst.o: ncAst.cpp header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncAst.cpp
 #ncc────────────────────────────────────────────────────────────────────────
 
 

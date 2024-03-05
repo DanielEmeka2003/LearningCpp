@@ -18,79 +18,56 @@ namespace Nc
 
     LLVMHelper::LLVMIdentifier::LLVMIdentifier(IdentifierKind identKind): m_identKind{identKind}
     {
-        std::string ident = getRandomStr();
+        U8string ident = getRandomStr();
 
         if (m_identKind == local)
-        m_llvmIdent = "%"s + ident;
+        ident.insert(ident.begin(), '%'_u8), m_llvmIdent.assign(ident);
         else if (m_identKind == global)
-        m_llvmIdent = "@"s + ident;
+        {
+            ident.insert(ident.begin(), '@'_u8), m_llvmIdent.assign(ident);
+
+            if (ident != "main"_u8str)
+            m_llvmIdent.append("..nc"_u8str);
+        }
         else if (m_identKind == none)
-        m_llvmIdent = "l_"s + ident;
+        m_llvmIdent = "l_"_u8str + ident;
         else
         throw std::runtime_error{ "in function LLVMHelper::LLVMIdentifier::LLVMIdentifier: no match" };
 
-        
-        if (m_tracker.contains(m_llvmIdent))
-        {
-            m_llvmIdent += std::to_string(m_counter);
-            ++m_counter;
-        }
-        
-        m_tracker[m_llvmIdent] = identKind;
+        m_llvmIdent.insert(m_llvmIdent.begin(), '"'_u8);
+        m_llvmIdent.insert(m_llvmIdent.end(), '"'_u8);
     }
 
     LLVMHelper::LLVMIdentifier::LLVMIdentifier(NcIdentifier ident, IdentifierKind identKind): m_identKind{identKind}
     {   
         if (m_identKind == local)
-        m_llvmIdent = "%"s + ident;
+        ident.insert(ident.begin(), '%'_u8), m_llvmIdent.assign(ident);
         else if (m_identKind == global)
-        m_llvmIdent = "@"s + ident;
+        {
+            ident.insert(ident.begin(), '@'_u8), m_llvmIdent.assign(ident);
+
+            if (ident != "main"_u8str)
+            m_llvmIdent.append("..nc"_u8str);
+        }
         else if (m_identKind == none)
-        m_llvmIdent = "l_"s + ident;
+        m_llvmIdent = "l_"_u8str + ident;
         else
         throw std::runtime_error{ "in function LLVMHelper::LLVMIdentifier::LLVMIdentifier: no match" };
 
-        if (m_tracker.contains(m_llvmIdent))
-        {
-            m_llvmIdent += std::to_string(m_counter);
-            ++m_counter;
-        }
-        
-        m_tracker[m_llvmIdent] = identKind;
+        m_llvmIdent.insert(m_llvmIdent.begin(), '"'_u8);
+        m_llvmIdent.insert(m_llvmIdent.end(), '"'_u8);
     }
     
-    std::string_view LLVMHelper::LLVMIdentifier::get() const
+    U8string_view LLVMHelper::LLVMIdentifier::get() const
     { return m_llvmIdent; }
-
-    LLVMHelper::LLVMIdentifier& LLVMHelper::LLVMIdentifier::mangle()
-    {
-        if (m_identKind == IdentifierKind::global)
-        m_llvmIdent.append(".$");
-
-        return *this;
-    }
 
     LLVMHelper::LLVMIdentifier& LLVMHelper::LLVMIdentifier::insertLocalMark()
     {
-        if (m_identKind != none or m_llvmIdent.starts_with('%'))
+        if (m_identKind != none or m_llvmIdent.starts_with('%'_u8))
         return *this;
 
-        m_llvmIdent.insert(0, 1, '%');
+        m_llvmIdent.insert(m_llvmIdent.begin(), '%'_u8);
         return *this;
-    }
-
-    void LLVMHelper::LLVMIdentifier::clearTracker()
-    { m_tracker.clear(), m_counter = 0; }
-
-    std::string LLVMHelper::LLVMIdentifier::getRandomStr(std::size_t str_length)
-    {
-        std::string temp{'.'};
-
-        for (std::size_t i = 0; i < str_length; i++)
-        {
-            temp.push_back( static_cast<char>(Myfcn::Random::get(97, 122)) );
-        }
-        return temp;
     }
 
     /*--------------------------------------------------------------LLVM::LLVMType------------------------------------------------------------------*/
@@ -98,23 +75,26 @@ namespace Nc
     LLVMHelper::LLVMType::LLVMType(NcType ncT)
     { m_llvmType = mapToLLVMType(ncT); }
 
-    std::string_view LLVMHelper::LLVMType::get() const
+    U8string_view LLVMHelper::LLVMType::get() const
     { return m_llvmType; }
 
-    std::string LLVMHelper::LLVMType::mapToLLVMType(NcType ncT)
+    U8string LLVMHelper::LLVMType::mapToLLVMType(NcType ncT)
     {
-        if (ncT == NcLexer::rInt32 or ncT == NcLexer::lInt32)
-        return "i32";
-        else if (ncT == NcLexer::rInt8 or ncT == NcLexer::lInt8)
-        return "i8";
-        else if (ncT == NcLexer::rBool or ncT == NcLexer::lBool)
-        return "i1";
-        else if (ncT == "")
-        return "(undertermined type)";
+        if (ncT == NcLexer::li8 or ncT == NcLexer::li16 or ncT == NcLexer::li32 or ncT == NcLexer::li64 or ncT == NcLexer::li128)
+        return ncT;
+
+        if (ncT == NcLexer::lui8 or ncT == NcLexer::lui16 or ncT == NcLexer::lui32 or ncT == NcLexer::lui64 or ncT == NcLexer::lui128)
+        return "i32"_u8str;
+        else if (ncT == NcLexer::rInt8 or ncT == NcLexer::rInt8)
+        return "i8"_u8str;
+        else if (ncT == NcLexer::rBool or ncT == NcLexer::rBool)
+        return "i1"_u8str;
+        else if (ncT == ""_u8str)
+        return "(undertermined type)"_u8str;
         
         
         throw std::runtime_error{ "in function Nc::LLVMHelper::mapToLLVMType: unreachable" };
-        return "";
+        return ""_u8str;
     }
 
 
@@ -154,13 +134,12 @@ namespace Nc
         }
         m_stringBuffer.writewl(')', '{', "");
 
-        insertLabel(LLVMIdentifier{"entry", LLVMIdentifier::none});
+        insertLabel(LLVMIdentifier{"entry"_u8str, LLVMIdentifier::none});
     }
     void LLVMHelper::endFuncdef()
     {
         m_stringBuffer.write_endl('}');
         m_stringBuffer.write_endl("");
-        LLVMIdentifier::clearTracker();
     }
 
     void LLVMHelper::defIdentifier(const LLVMIdentifier& i, std::string_view instruction)
@@ -184,7 +163,7 @@ namespace Nc
     
     void LLVMHelper::insertLabel(const LLVMIdentifier& label)
     {
-        m_stringBuffer.write_endl("    ", std::string{ label.get() } + ":"s);
+        m_stringBuffer.write_endl("    ", label.get(), ':');
         m_currentLabel = label;
     }
 
@@ -201,7 +180,7 @@ namespace Nc
 
     void LLVMHelper::retI(const Value& v)
     {
-        m_stringBuffer.write("    ");
+        m_stringBuffer.writewt("");
         m_stringBuffer.writews("ret");
 
         std::visit([&](auto& item) { m_stringBuffer.writews_endl(v.type, item); }, v.v);
@@ -209,17 +188,16 @@ namespace Nc
 
     void LLVMHelper::brI(const LLVMIdentifier& label)
     {
-        m_stringBuffer.write("    ");
-        
+        m_stringBuffer.writewt("");
         m_stringBuffer.writews_endl("br", "label", LLVMIdentifier{label}.insertLocalMark());
     }
 
     void LLVMHelper::brI(const Value& conditionV, const LLVMIdentifier& true_label, const LLVMIdentifier& false_label)
     {
-        if (conditionV.type != LLVMType{NcLexer::lBool})
+        if (conditionV.type != LLVMType{NcLexer::rBool})
         throw std::invalid_argument{ "in function Nc::LLVMHelper::brI: parameter [condition] member, type is not a 1bit integer" };
 
-        m_stringBuffer.write("    ");
+        m_stringBuffer.writewt("");
         m_stringBuffer.writews("br");
 
         std::visit([&](auto& item) { m_stringBuffer.writews(conditionV.type, item, ','); }, conditionV.v);
@@ -565,7 +543,7 @@ namespace Nc
         sos.writews(',');
         std::visit([&sos](auto& item){ sos.write(item); }, v2.v);
 
-        m_value.type = LLVMType{ NcLexer::lBool };
+        m_value.type = LLVMType{ NcLexer::rBool };
 
         return sos.get_str();
     }
@@ -584,7 +562,7 @@ namespace Nc
         return sos.get_str();
     }
 
-    std::string LLVMHelper::phi(const ValueLabelList& vl_list)
+    std::string LLVMHelper::phiI(const ValueLabelList& vl_list)
     {
         {
             LLVMType valueTy{};
@@ -593,7 +571,7 @@ namespace Nc
                 if (count != 0)
                 {
                     if (i.first.type != valueTy)
-                    throw std::runtime_error{ "in function Nc::LLVMHelper::phi: one of the values in vl_list does not have the same type as the others" };
+                    throw std::runtime_error{ "in function Nc::LLVMHelper::phiI: one of the values in vl_list does not have the same type as the others" };
                 }
 
                 valueTy = i.first.type;
@@ -603,7 +581,7 @@ namespace Nc
 
         Streams::StringOutputStream sos{ std::ostringstream{} };
         
-        sos.writews("phi", vl_list.front().first.type, "");
+        sos.writews("phiI", vl_list.front().first.type, "");
 
         for (std::size_t count{1}; auto&& i: vl_list)
         {
@@ -627,375 +605,415 @@ namespace Nc
 
     /*----------------------------------------------------------------------NcCodeGen-----------------------------------------------------------*/
 
-    NcCodeGen::NcCodeGen(NcAST&& ast): m_ast{ std::move(ast) }
-    {}
+    NcCodeGen::NcCodeGen(NcAST&& ast): m_ast{ std::move(ast) }{}
 
     void NcCodeGen::generate()
     {
-        Root_gen();
-        std::cout << '\n' << LLVMHelper::getIRstr() << '\n';
+        root_gen();
+        std::cout << "\n\n" << LLVMHelper::getIRstr() << '\n';
     }
 
 
-    void NcCodeGen::Root_gen()
+    void NcCodeGen::root_gen()
     {
-        NcFile_gen(static_cast<Root&>(m_ast).ncF);
+        ncFile_gen(static_cast<Root&>(m_ast).getNcf());
         LLVMHelper::endInfo();
-    }  
-    void NcCodeGen::NcFile_gen(NcFile& ncf)
+    }
+    void NcCodeGen::ncFile_gen(NcFile& ncf)
     {
-        for (auto &&i : ncf.funcList)
-        {
-            FuncDeclaration_gen(*i);            
-        }
+        // for (auto &&i : ncf.funcList)
+        // {
+        //     funcDeclaration_gen(*i);            
+        // }
     }
 
-    void NcCodeGen::FuncDeclaration_gen(FuncDeclaration& fd)
+    void NcCodeGen::funcDeclaration_gen(FuncDeclaration& fd)
     {
-        Function_gen(fd.func);
-    }
-        
-    void NcCodeGen::Function_gen(Function& f)
-    {
-        beginFuncdef(LLVMType{f.type}, LLVMIdentifier{f.ident, LLVMHelper::LLVMIdentifier::global}, ArgumentList{});
-        
-        for (auto &&i : f.blockItemList)
+        std::visit([&]<typename T>(T& item)
         {
-            BlockItem_gen(*i);
-        }
-        
-        endFuncdef();
+            if constexpr (std::is_same_v<T, FunctionDef>)
+            functionDef_gen(item);
+            else if constexpr (std::is_same_v<T, FunctionDecl>)
+            functionDecl_gen(item);
+            
+        }, fd.getFuncDeclaration());
     }
 
-    void NcCodeGen::BlockItem_gen(BlockItem& bi)
+    void NcCodeGen::functionDef_gen(FunctionDef& f)
+    {
+        // beginFuncdef(LLVMType{f.type}, LLVMIdentifier{f.ident, LLVMHelper::LLVMIdentifier::global}, ArgumentList{});
+        
+        // for (auto &&i : f.blockItemList)
+        // {
+        //     BlockItem_gen(*i);
+        // }
+        
+        // endFuncdef();
+    }
+    void NcCodeGen::functionDecl_gen(FunctionDecl& f){}
+
+    void NcCodeGen::blockItem_gen(BlockItem& bi)
     {
         std::visit([&]<typename T>(T& item)
         {
             if constexpr (std::is_same_v<T, Statement>)
-            Statement_gen(item);
+            statement_gen(item);
             else if constexpr (std::is_same_v<T, VarDeclaration>)
-            VarDeclaration_gen(item);
+            varDeclaration_gen(item);
             
-        }, bi.blockItem);
-    }
-        
-    void NcCodeGen::Statement_gen(Statement& s)
-    {
-        std::visit([&]<typename T>(T& item)
-        {
-            if constexpr (std::is_same_v<T, Give>)
-            Give_gen(item);
-            else if constexpr (std::is_same_v<T, Expression>)
-            Expression_gen(item);
-            
-        }, s.statement);
-    }
-        
-    void NcCodeGen::Give_gen(Give& g)
-    {
-        Expression_gen(*g.exp);
-        auto value = LLVMHelper::getValue();
-        LLVMHelper::retI(value);
+        }, bi.getBlockItem());
     }
 
-    void NcCodeGen::Expression_gen(Expression& e)
+    void NcCodeGen::block(Block& block){}
+    
+    void NcCodeGen::statement_gen(Statement& s)
+    {
+        // std::visit([&]<typename T>(T& item)
+        // {
+        //     if constexpr (std::is_same_v<T, Give>)
+        //     give_gen(item);
+        //     else if constexpr (std::is_same_v<T, Expression>)
+        //     Expression_gen(item);
+            
+        // }, s.statement);
+    }
+
+    void NcCodeGen::ifCondtion_gen(IfCondition& ifCondition){}
+    void NcCodeGen::forLoop_gen(ForLoop& forLoop){}
+    void NcCodeGen::whileLoop_gen(WhileLoop& whileLoop){}
+    void NcCodeGen::doWhileLoop_gen(DoWhileLoop& doWhileLoop){}    
+    void NcCodeGen::jumpStatement_gen(JumpStatement& js)
+    {
+        // Expression_gen(*g.exp);
+        // auto value = LLVMHelper::getValue();
+        // LLVMHelper::retI(value);
+    }
+
+    void NcCodeGen::varDeclaration_gen([[maybe_unused]] VarDeclaration& vd)
+    {
+        // VarDeclare_gen(vd.var_declare);
+    }
+
+    void NcCodeGen::varDecl_gen([[maybe_unused]] VarDecl& vdec){}
+
+    void NcCodeGen::expression_gen(Expression& e)
     {
         std::visit([&]<typename T>(T& item)
         {
             if constexpr (std::is_same_v<T, UPrefixOperation>)
-            UPrefixOperation_gen(item);
+            uPrefixOperation_gen(item);
             else if constexpr (std::is_same_v<T, UPostfixOperation>)
-            UPostfixOperation_gen(item);
+            uPostfixOperation_gen(item);
             else if constexpr (std::is_same_v<T, BinaryOperation>)
-            BinaryOperation_gen(item);
+            binaryOperation_gen(item);
             else if constexpr (std::is_same_v<T, Literal>)
-            Literal_gen(item);
-            else if constexpr (std::is_same_v<T, Variable>)
-            Variable_gen(item);
-            else if constexpr (std::is_same_v<T, Type>)
-            Type_gen(item);
-            
-        }, e.exp);
+            literal_gen(item);
+            else if constexpr (std::is_same_v<T, Identifier>)
+            identifier_gen(item);
+            else if constexpr (std::is_same_v<T, R_And_L_Exp>)
+            r_and_l_exp_gen(item);
+            else if constexpr (std::is_same_v<T, AnyTypeListExp>)
+            anyTypeListExp_gen(item);
+            else if constexpr (std::is_same_v<T, TempVarDecl>)
+            tempVarDecl_gen(item);
+        }, e.getExp());
     }
 
-    void NcCodeGen::UPrefixOperation_gen(UPrefixOperation& upre)
+    void NcCodeGen::uPrefixOperation_gen(UPrefixOperation& upre)
     {
-        Expression_gen(*upre.right_exp);
-        auto expValue = LLVMHelper::getValue();
+        // Expression_gen(*upre.right_exp);
+        // auto expValue = LLVMHelper::getValue();
 
-        if (upre.op == NcLexer::sMinus)
-        {
-            LLVMHelper::insertComment("two's complement begin");
+        // if (upre.op == NcLexer::sMinus)
+        // {
+        //     LLVMHelper::insertComment("two's complement begin");
 
-            auto valueX = Value{ Constant{"0"}, expValue.type };
+        //     auto valueX = Value{ Constant{"0"}, expValue.type };
             
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::subI(valueX, expValue));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::subI(valueX, expValue));
 
-            LLVMHelper::insertComment("two's complement end");
-        }
-        else if (upre.op == NcLexer::sBitwiseNot or upre.op == NcLexer::rBitwiseNot)
-        {
-            LLVMHelper::insertComment("bit-negation begin");
+        //     LLVMHelper::insertComment("two's complement end");
+        // }
+        // else if (upre.op == NcLexer::sBitwiseNot or upre.op == NcLexer::rBitwiseNot)
+        // {
+        //     LLVMHelper::insertComment("bit-negation begin");
 
-            auto valueX = Value{ Constant{"-1"}, expValue.type };
+        //     auto valueX = Value{ Constant{"-1"}, expValue.type };
             
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::xorI(expValue, valueX));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::xorI(expValue, valueX));
 
-            LLVMHelper::insertComment("bit-negation end");
-        }
-        else if (upre.op == NcLexer::sNot or upre.op == NcLexer::rNot)
-        {
-            LLVMHelper::insertComment("logical-negation begin");
+        //     LLVMHelper::insertComment("bit-negation end");
+        // }
+        // else if (upre.op == NcLexer::sNot or upre.op == NcLexer::rNot)
+        // {
+        //     LLVMHelper::insertComment("logical-negation begin");
 
-            auto valueX = Value{ Constant{"0"}, expValue.type };
+        //     auto valueX = Value{ Constant{"0"}, expValue.type };
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", expValue, valueX));
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), expValue.type));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", expValue, valueX));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), expValue.type));
 
-            LLVMHelper::insertComment("logical-negation end");
-        }
-        else if (upre.op == NcLexer::rOdd)
-        {
-            LLVMHelper::insertComment("odd-check begin");
+        //     LLVMHelper::insertComment("logical-negation end");
+        // }
+        // else if (upre.op == NcLexer::rOdd)
+        // {
+        //     LLVMHelper::insertComment("odd-check begin");
 
-            auto valueX = Value{ Constant{"1"}, expValue.type };
+        //     auto valueX = Value{ Constant{"1"}, expValue.type };
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::xorI(expValue, valueX));
-            valueX.v = Constant{"0"};
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", LLVMHelper::getValue(), valueX));
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), expValue.type));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::xorI(expValue, valueX));
+        //     valueX.v = Constant{"0"};
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", LLVMHelper::getValue(), valueX));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), expValue.type));
 
-            LLVMHelper::insertComment("odd-check end");
-        }
-        else if (upre.op == NcLexer::sPlus)
-        {
-            LLVMHelper::insertComment("plus begin");
-            LLVMHelper::insertComment("plus end");
-        }
-        else if (upre.op == NcLexer::sIncrement)
-        {
-            LLVMHelper::insertComment("pre-increment begin");
-            LLVMHelper::insertComment("pre-increment end");
-        }
-        else if (upre.op == NcLexer::sDecrement)
-        {
-            LLVMHelper::insertComment("pre-decrement begin");
-            LLVMHelper::insertComment("pre-decrement end");
-        }
-        else
-        throw std::runtime_error{ "in function Nc::NcCodeGen::UPrefixOperation_gen: no match" };
+        //     LLVMHelper::insertComment("odd-check end");
+        // }
+        // else if (upre.op == NcLexer::sPlus)
+        // {
+        //     LLVMHelper::insertComment("plus begin");
+        //     LLVMHelper::insertComment("plus end");
+        // }
+        // else if (upre.op == NcLexer::sIncrement)
+        // {
+        //     LLVMHelper::insertComment("pre-increment begin");
+        //     LLVMHelper::insertComment("pre-increment end");
+        // }
+        // else if (upre.op == NcLexer::sDecrement)
+        // {
+        //     LLVMHelper::insertComment("pre-decrement begin");
+        //     LLVMHelper::insertComment("pre-decrement end");
+        // }
+        // else
+        // throw std::runtime_error{ "in function Nc::NcCodeGen::UPrefixOperation_gen: no match" };
 
     }
-    void NcCodeGen::UPostfixOperation_gen([[maybe_unused]] UPostfixOperation& upost)
+
+    void NcCodeGen::uPostfixOperation_gen([[maybe_unused]] UPostfixOperation& upost)
     {
         
     }
-    void NcCodeGen::BinaryOperation_gen([[maybe_unused]] BinaryOperation& b)
+
+    void NcCodeGen::binaryOperation_gen([[maybe_unused]] BinaryOperation& b)
     {
-        Expression_gen(*b.left_exp);
-        auto left_expValue = LLVMHelper::getValue();
+        // Expression_gen(*b.left_exp);
+        // auto left_expValue = LLVMHelper::getValue();
 
-        if (b.op != NcLexer::sAnd and b.op != NcLexer::rAnd and b.op != NcLexer::sOr and b.op != NcLexer::rOr)
-        Expression_gen(*b.right_exp);
+        // if (b.op != NcLexer::sAnd and b.op != NcLexer::rAnd and b.op != NcLexer::sOr and b.op != NcLexer::rOr)
+        // Expression_gen(*b.right_exp);
 
-        auto right_expValue = LLVMHelper::getValue();
+        // auto right_expValue = LLVMHelper::getValue();
+        
+        // if (b.op == NcLexer::sMultiply)
+        // {
+        //     LLVMHelper::insertComment("multiplication begin");
 
-        if (b.op == NcLexer::sMultiply)
-        {
-            LLVMHelper::insertComment("multiplication begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::mulI(left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::mulI(left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("multipication end");
+        // }
+        // else if (b.op == NcLexer::sDivide)
+        // {
+        //     LLVMHelper::insertComment("signed-division begin");
 
-            LLVMHelper::insertComment("multipication end");
-        }
-        else if (b.op == NcLexer::sDivide)
-        {
-            LLVMHelper::insertComment("signed-division begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::sdivI(left_expValue, right_expValue));
+        //     //figure out a solution to implement type checks so that udiv could be used instead of sdiv for unsigned integers
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::sdivI(left_expValue, right_expValue));
-            //figure out a solution to implement type checks so that udiv could be used instead of sdiv for unsigned integers
+        //     LLVMHelper::insertComment("signed-division end");
+        // }
+        // else if (b.op == NcLexer::sModuluo)
+        // {
+        //     LLVMHelper::insertComment("signed-division-remainder begin");
 
-            LLVMHelper::insertComment("signed-division end");
-        }
-        else if (b.op == NcLexer::sModuluo)
-        {
-            LLVMHelper::insertComment("signed-division-remainder begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::sremI(left_expValue, right_expValue));
+        //     //figure out a solution to implement type checks so that udiv could be used instead of sdiv for unsigned integers
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::sremI(left_expValue, right_expValue));
-            //figure out a solution to implement type checks so that udiv could be used instead of sdiv for unsigned integers
+        //     LLVMHelper::insertComment("signed-division-remainder end");
+        // }
+        // else if (b.op == NcLexer::sPlus)
+        // {
+        //     LLVMHelper::insertComment("addition begin");
 
-            LLVMHelper::insertComment("signed-division-remainder end");
-        }
-        else if (b.op == NcLexer::sPlus)
-        {
-            LLVMHelper::insertComment("addition begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::addI(left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::addI(left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("addition end");
+        // }
+        // else if (b.op == NcLexer::sMinus)
+        // {
+        //     LLVMHelper::insertComment("subtraction begin");
 
-            LLVMHelper::insertComment("addition end");
-        }
-        else if (b.op == NcLexer::sMinus)
-        {
-            LLVMHelper::insertComment("subtraction begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::subI(left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::subI(left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("subtraction end");
+        // }
+        // else if (b.op == NcLexer::sBitwiseShiftLeft)
+        // {
+        //     LLVMHelper::insertComment("bit-left-shift begin");
 
-            LLVMHelper::insertComment("subtraction end");
-        }
-        else if (b.op == NcLexer::sBitwiseShiftLeft)
-        {
-            LLVMHelper::insertComment("bit-left-shift begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::shlI(left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::shlI(left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("bit-left-shift end");
+        // }
+        // else if (b.op == NcLexer::sBitwiseShiftRight)
+        // {
+        //     LLVMHelper::insertComment("bit-right-shift begin");
 
-            LLVMHelper::insertComment("bit-left-shift end");
-        }
-        else if (b.op == NcLexer::sBitwiseShiftRight)
-        {
-            LLVMHelper::insertComment("bit-right-shift begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::ashrI(left_expValue, right_expValue));
+        //     //figure out a solution to implement type checks so that udiv could be used instead of sdiv for unsigned integers
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::ashrI(left_expValue, right_expValue));
-            //figure out a solution to implement type checks so that udiv could be used instead of sdiv for unsigned integers
+        //     LLVMHelper::insertComment("bit-right-shift end");
+        // }
+        // else if (b.op == NcLexer::sLessthan)
+        // {
+        //     LLVMHelper::insertComment("lessThan begin");
 
-            LLVMHelper::insertComment("bit-right-shift end");
-        }
-        else if (b.op == NcLexer::sLessthan)
-        {
-            LLVMHelper::insertComment("lessThan begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("slt", left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("slt", left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("lessThan end");
+        // }
+        // else if (b.op == NcLexer::sGreaterthan)
+        // {
+        //     LLVMHelper::insertComment("greaterThan begin");
 
-            LLVMHelper::insertComment("lessThan end");
-        }
-        else if (b.op == NcLexer::sGreaterthan)
-        {
-            LLVMHelper::insertComment("greaterThan begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("sgt", left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("sgt", left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("greaterThan end");
+        // }
+        // else if (b.op == NcLexer::sLessthan_equalto)
+        // {
+        //     LLVMHelper::insertComment("lessThan_or_equal begin");
 
-            LLVMHelper::insertComment("greaterThan end");
-        }
-        else if (b.op == NcLexer::sLessthan_equalto)
-        {
-            LLVMHelper::insertComment("lessThan_or_equal begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("sle", left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("sle", left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("lessThan_or_equal end");
+        // }
+        // else if (b.op == NcLexer::sGreaterthan_equalto)
+        // {
+        //     LLVMHelper::insertComment("greaterThan_or_equal begin");
 
-            LLVMHelper::insertComment("lessThan_or_equal end");
-        }
-        else if (b.op == NcLexer::sGreaterthan_equalto)
-        {
-            LLVMHelper::insertComment("greaterThan_or_equal begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("sge", left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("sge", left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("greaterThan_or_equal end");
+        // }
+        // else if (b.op == NcLexer::sEqual)
+        // {
+        //     LLVMHelper::insertComment("equal begin");
 
-            LLVMHelper::insertComment("greaterThan_or_equal end");
-        }
-        else if (b.op == NcLexer::sEqual)
-        {
-            LLVMHelper::insertComment("equal begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("equal end");
+        // }
+        // else if (b.op == NcLexer::sNotEqual)
+        // {
+        //     LLVMHelper::insertComment("not-equal begin");
 
-            LLVMHelper::insertComment("equal end");
-        }
-        else if (b.op == NcLexer::sNotEqual)
-        {
-            LLVMHelper::insertComment("not-equal begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("not-equal end");
+        // }
+        // else if (b.op == NcLexer::sBitwiseAnd or b.op == NcLexer::rBitwiseAnd)
+        // {
+        //     LLVMHelper::insertComment("bit-and begin");
 
-            LLVMHelper::insertComment("not-equal end");
-        }
-        else if (b.op == NcLexer::sBitwiseAnd or b.op == NcLexer::rBitwiseAnd)
-        {
-            LLVMHelper::insertComment("bit-and begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::andI(left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::andI(left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("bit-and end");
+        // }
+        // else if (b.op == NcLexer::sBitwiseXor or b.op == NcLexer::rBitwiseXor)
+        // {
+        //     LLVMHelper::insertComment("bit-xor begin");
 
-            LLVMHelper::insertComment("bit-and end");
-        }
-        else if (b.op == NcLexer::sBitwiseXor or b.op == NcLexer::rBitwiseXor)
-        {
-            LLVMHelper::insertComment("bit-xor begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::xorI(left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::xorI(left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("bit-xor end");
+        // }
+        // else if (b.op == NcLexer::sBitwiseOr or b.op == NcLexer::rBitwiseOr)
+        // {
+        //     LLVMHelper::insertComment("bit-or begin");
 
-            LLVMHelper::insertComment("bit-xor end");
-        }
-        else if (b.op == NcLexer::sBitwiseOr or b.op == NcLexer::rBitwiseOr)
-        {
-            LLVMHelper::insertComment("bit-or begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::orI(left_expValue, right_expValue));
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::orI(left_expValue, right_expValue));
+        //     LLVMHelper::insertComment("bit-or end");
+        // }
+        // else if (b.op == NcLexer::sAnd or b.op == NcLexer::rAnd)
+        // {
+        //     LLVMHelper::insertComment("logical-and begin");
 
-            LLVMHelper::insertComment("bit-or end");
-        }
-        else if (b.op == NcLexer::sAnd or b.op == NcLexer::rAnd)
-        {
-            LLVMHelper::insertComment("logical-and begin");
+        //     LLVMIdentifier and2exp{ "and2exp", LLVMIdentifier::none };
+        //     LLVMIdentifier postAnd{ "postAnd", LLVMIdentifier::none };
+        //     LLVMIdentifier labelPredecessor{ LLVMHelper::getCurrentLabel() };
+        //     Value value0{ Constant{"0"}, left_expValue.type };
 
-            LLVMIdentifier and2exp{ "and2exp", LLVMIdentifier::none };
-            LLVMIdentifier postAnd{ "postAnd", LLVMIdentifier::none };
-            LLVMIdentifier labelPredecessor{ LLVMHelper::getCurrentLabel() };
-            Value value0{ Constant{"0"}, left_expValue.type };
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", left_expValue, value0));
+        //     LLVMHelper::brI(LLVMHelper::getValue(), postAnd, and2exp);
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("eq", left_expValue, value0));
-            LLVMHelper::brI(LLVMHelper::getValue(), postAnd, and2exp);
+        //     LLVMHelper::insertLabel(and2exp);
+        //     Expression_gen(*b.right_exp);
+        //     right_expValue = LLVMHelper::getValue();
 
-            LLVMHelper::insertLabel(and2exp);
-            Expression_gen(*b.right_exp);
-            right_expValue = LLVMHelper::getValue();
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", right_expValue, value0));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), right_expValue.type));
+        //     LLVMHelper::brI(postAnd);
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", right_expValue, value0));
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), right_expValue.type));
-            LLVMHelper::brI(postAnd);
+        //     LLVMHelper::insertLabel(postAnd);
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, 
+        //     LLVMHelper::phiI(ValueLabelList{ ValueLabelPair{value0, labelPredecessor}, ValueLabelPair{LLVMHelper::getValue(), and2exp} }));
 
-            LLVMHelper::insertLabel(postAnd);
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, 
-            LLVMHelper::phi(ValueLabelList{ ValueLabelPair{value0, labelPredecessor}, ValueLabelPair{LLVMHelper::getValue(), and2exp} }));
+        //     LLVMHelper::insertComment("logical-and end");
+        // }
+        // else if (b.op == NcLexer::sXor or b.op == NcLexer::rXor)
+        // {
+        //     LLVMHelper::insertComment("logical-xor begin");
 
-            LLVMHelper::insertComment("logical-and end");
-        }
-        else if (b.op == NcLexer::sOr or b.op == NcLexer::rOr)
-        {
-            LLVMHelper::insertComment("logical-or begin");
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", left_expValue, right_expValue));
 
-            LLVMIdentifier or2exp{ "or2exp", LLVMIdentifier::none };
-            LLVMIdentifier postOr{ "postor", LLVMIdentifier::none };
-            LLVMIdentifier labelPredecessor{ LLVMHelper::getCurrentLabel() };
-            Value value0{ Constant{"0"}, left_expValue.type };
+        //     LLVMHelper::insertComment("logical-xor end");
+        // }
+        // else if (b.op == NcLexer::sOr or b.op == NcLexer::rOr)
+        // {
+        //     LLVMHelper::insertComment("logical-or begin");
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", left_expValue, value0));
-            LLVMHelper::brI(LLVMHelper::getValue(), postOr, or2exp);
+        //     LLVMIdentifier or2exp{ "or2exp", LLVMIdentifier::none };
+        //     LLVMIdentifier postOr{ "postor", LLVMIdentifier::none };
+        //     LLVMIdentifier labelPredecessor{ LLVMHelper::getCurrentLabel() };
+        //     Value value0{ Constant{"0"}, left_expValue.type };
 
-            LLVMHelper::insertLabel(or2exp);
-            Expression_gen(*b.right_exp);
-            right_expValue = LLVMHelper::getValue();
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", left_expValue, value0));
+        //     LLVMHelper::brI(LLVMHelper::getValue(), postOr, or2exp);
 
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", right_expValue, value0));
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), right_expValue.type));
-            LLVMHelper::brI(postOr);
+        //     LLVMHelper::insertLabel(or2exp);
+        //     Expression_gen(*b.right_exp);
+        //     right_expValue = LLVMHelper::getValue();
 
-            LLVMHelper::insertLabel(postOr);
-            LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local},
-            LLVMHelper::phi(ValueLabelList{ ValueLabelPair{Value{Constant{"1"}, value0.type}, labelPredecessor}, ValueLabelPair{LLVMHelper::getValue(), or2exp} }));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::icmpI("ne", right_expValue, value0));
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local}, LLVMHelper::zextI(LLVMHelper::getValue(), right_expValue.type));
+        //     LLVMHelper::brI(postOr);
+
+        //     LLVMHelper::insertLabel(postOr);
+        //     LLVMHelper::defIdentifier(LLVMIdentifier{LLVMIdentifier::local},
+        //     LLVMHelper::phiI(ValueLabelList{ ValueLabelPair{Value{Constant{"1"}, value0.type}, labelPredecessor}, ValueLabelPair{LLVMHelper::getValue(), or2exp} }));
 
 
-            LLVMHelper::insertComment("logical-or end");
-        }
+        //     LLVMHelper::insertComment("logical-or end");
+        // }
+        // else if (b.op == NcLexer::sAssign)
+        // {
+
+        // }
+        // else if (b.op == NcLexer::sAdditionAssign)
+        // {
+
+        // }
+    
     }
-    void NcCodeGen::Literal_gen(Literal& l)
+
+    void NcCodeGen::literal_gen(Literal& literal)
     {
-        LLVMHelper::insertConst(l.l, LLVMType{l.ltype});
+        // LLVMHelper::insertConst(l.l, LLVMType{l.ltype});
     }
-    void NcCodeGen::Variable_gen([[maybe_unused]] Variable& v)
-    {}
-    void NcCodeGen::Type_gen([[maybe_unused]] Type& t){}
 
-    void NcCodeGen::VarDeclaration_gen([[maybe_unused]] VarDeclaration& vd){}
-
-    void NcCodeGen::VarDeclare_gen([[maybe_unused]] VarDeclare& vdec){}    
-
+    void NcCodeGen::identifier_gen([[maybe_unused]] Identifier& ident){}
+    void NcCodeGen::r_and_l_exp_gen(R_And_L_Exp& r_and_l_exp){}
+    void NcCodeGen::anyTypeListExp_gen(AnyTypeListExp& anyTypeListExp){}
+    void NcCodeGen::tempVarDecl_gen(TempVarDecl& tempVarDecl){}
 
 } // namespace Nc
