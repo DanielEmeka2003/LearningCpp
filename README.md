@@ -14,7 +14,7 @@ I also have a partially-implemented pl0 compiler that compiles down to the **C**
 
 ### 07/01/2024 Utf8 Finally
 I have wriiten a custom utf8 chracter class and also made a utf8 string class from std::basic_string<CharT, CharTraits> enable unicode support in my language.
-It can be found in file [myfunctions1.cpp](myfunctions1.cpp). _Fuck icu and boost, i made my own😎_.
+It can be found in file [myfunctions1.cpp](myfunctions1.cpp). **Fuck icu and boost, i made my own😎**.
 
 ### 05/03/2024 MORE DETAILS ON MY LANGUAGE
 My language contains or is going to contain various existing programming features and more:
@@ -25,7 +25,7 @@ My language contains or is going to contain various existing programming feature
 - compileTime ability to run code
 - generics in form of templates
 - match expressions
-- **Decimal floating point** implementation devoid of the inherent problems of the **IEE binary floating point**
+- **Decimal floating point** implementation devoid of the inherent problems of the **IEEE binary floating point**
 - Wide variety of types
 - Static and Strong typing, with no implicit conversions
 - Interface programming
@@ -40,7 +40,7 @@ My language contains or is going to contain various existing programming feature
 - expressivness
 - ability to imbed other languages to NC *a bit optimistic for now*
 - compiler attributes and so much more.
-**Languages like: _Python, Rust, Haskell, Lisp, C++, D and C_ insipre daily**
+**Languages like: _Python, Rust, Haskell, Lisp, Zig, C++, D and C_ have set the bar way too high, but i still aim to reach it**
 
 The files invloved in my programming language building journey
 + [NcLog.h](header/NcLog.h) _: contains class Nc::Log, responsible for error logging_
