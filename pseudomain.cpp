@@ -1481,7 +1481,8 @@ main()
         // i.info();
 
         // std::string{}.std::string::begin(); //did not know i could do this
-
+        const char* e = "Esther is my";
+        std::cout << "mem: " << (void*)e << " = " << (void*)"Esther is my" << '\n';
         // std::basic_string<char>::const_iterator
 
         // System::coutput.setPrecision(40);

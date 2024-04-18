@@ -24,8 +24,7 @@ namespace Nc
     {
         while (lexify() != TokenType::_eot){}
 
-        if (!m_log.isLogEmpty())
-        errorOutput();
+        if (!m_log.isLogEmpty()) errorOutput();
     }
     
     std::vector<Lexer::TokenData>& Lexer::getTokenList()
@@ -82,9 +81,9 @@ namespace Nc
         //clear the token string before a lexing operation begins
         m_tokenString.clear();
 
-        while (m_fileBuffer.at(m_filePosition).isBasicLatinWhiteSpace())
+        while (m_fileBuffer[m_filePosition].isBasicLatinWhiteSpace())
         {
-            if (m_fileBuffer.at(m_filePosition) == '\n'_u8)
+            if (m_fileBuffer[m_filePosition] == '\n'_u8)
             newLineFound();
 
             nextFilePosAndColumn();
@@ -93,13 +92,13 @@ namespace Nc
             return TokenType::_eot;
         }
             
-        if (acceptableUnicode(m_fileBuffer.at(m_filePosition)))
+        if (acceptableUnicode(m_fileBuffer[m_filePosition]))
         return tokenizeWords();
-        else if (m_fileBuffer.at(m_filePosition) == '\''_u8)
+        else if (m_fileBuffer[m_filePosition] == '\''_u8)
         return tokenizeCharLiterals();
-        else if (m_fileBuffer.at(m_filePosition) == '"'_u8)
+        else if (m_fileBuffer[m_filePosition] == '"'_u8)
         return tokenizeStrLiterals();
-        else if (m_fileBuffer.at(m_filePosition).isBasicLatinDigit())
+        else if (m_fileBuffer[m_filePosition].isBasicLatinDigit())
         return tokenizeNumbers();
         else
         {
@@ -117,7 +116,7 @@ namespace Nc
                 return TokenType::_eot;
                 
                 //keep the unrecongizned token for error purposes
-                m_tokenString.push_back(m_fileBuffer.at(m_filePosition));
+                m_tokenString.push_back(m_fileBuffer[m_filePosition]);
                 nextFilePosAndColumn(); //move the file position past the symbol
 
                 m_log.writews("unrecognized token [", m_tokenString, "]"), start_Log();
@@ -182,22 +181,21 @@ namespace Nc
 
     Lexer::TokenType Lexer::singleLineComment()
     {
-        if (m_fileBuffer.at(m_filePosition) == '`'_u8)
+        if (m_fileBuffer[m_filePosition] == '`'_u8)
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == '`'_u8)
+                if (m_fileBuffer[m_filePosition] == '`'_u8)
                 {
                     while (true)
                     {
-                        if (nextFilePosAndColumn(), m_fileBuffer.at(m_filePosition) == '\n'_u8)
+                        if (nextFilePosAndColumn(), m_fileBuffer[m_filePosition] == '\n'_u8)
                         {
                             newLineFound(), nextFilePosAndColumn();
                             return TokenType::_comment;
                         }
 
-                        if (m_isEndofFile)
-                        return TokenType::_eot;
+                        if (m_isEndofFile) return TokenType::_eot;
                     }
                 }
                 else prevFilePosAndColumn();
@@ -208,11 +206,11 @@ namespace Nc
 
     Lexer::TokenType Lexer::multiLineComment()
     {
-        if (m_fileBuffer.at(m_filePosition) == '`'_u8)
+        if (m_fileBuffer[m_filePosition] == '`'_u8)
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == '{'_u8)
+                if (m_fileBuffer[m_filePosition] == '{'_u8)
                 {   
                     auto savedAbsoluteColumn = m_absoluteColumn, savedLine = m_line; //for error purposes
                     while (true)
@@ -228,12 +226,12 @@ namespace Nc
 
                             return TokenType::_eot;
                         }
-                        else if (m_fileBuffer.at(m_filePosition) == '}'_u8 and (nextFilePosAndColumn(), m_fileBuffer.at(m_filePosition) == '`'_u8 and !m_isEndofFile))
+                        else if (m_fileBuffer[m_filePosition] == '}'_u8 and (nextFilePosAndColumn(), m_fileBuffer[m_filePosition] == '`'_u8 and !m_isEndofFile))
                         {
                             nextFilePosAndColumn(); //for moving past symbol[ ` ]
                             return TokenType::_comment;
                         }
-                        else if (!m_isEndofFile and m_fileBuffer.at(m_filePosition) == '\n'_u8)//it is directly under the second conditionally for a reason
+                        else if (!m_isEndofFile and m_fileBuffer[m_filePosition] == '\n'_u8)//it is directly under the second conditionally for a reason
                         newLineFound();
                     }
                 }
@@ -276,12 +274,12 @@ namespace Nc
         auto formerFilePos{m_filePosition};
         recordRelativeColumn(); //do not move from here
         
-        while(!m_isEndofFile and acceptableUnicode(m_fileBuffer.at(m_filePosition)))
-        { nextFilePosAndColumn(); }
+        while(!m_isEndofFile and acceptableUnicode(m_fileBuffer[m_filePosition]))
+        nextFilePosAndColumn();
         
         //extract the token to m_tokenString
         for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-        m_tokenString.push_back(m_fileBuffer.at(i));
+        m_tokenString.push_back(m_fileBuffer[i]);
 
         if (!m_isEndofFile)
         {
@@ -290,13 +288,13 @@ namespace Nc
             for (auto &&i : literalType)//lowercase the pontential character literal type
             i.basicLatinToLowerCase();
 
-            if (m_fileBuffer.at(m_filePosition) == '\''_u8)
+            if (m_fileBuffer[m_filePosition] == '\''_u8)
             {
-                return tokenizeCharLiterals(literalType);
+                return tokenizeCharLiterals(&literalType);
             }
-            else if (m_fileBuffer.at(m_filePosition) == '"'_u8)
+            else if (m_fileBuffer[m_filePosition] == '"'_u8)
             {
-                return tokenizeStrLiterals(literalType);
+                return tokenizeStrLiterals(&literalType);
             }
         }
         
@@ -357,12 +355,12 @@ namespace Nc
         auto formerFilePos{m_filePosition}; //maintain intial index
         recordRelativeColumn(); //do not move
 
-        while (!m_isEndofFile and (m_fileBuffer.at(m_filePosition).isBasicLatinAlphabetNumeral() or m_fileBuffer.at(m_filePosition) == '\''_u8 or m_fileBuffer.at(m_filePosition) == '.'_u8))
+        while (!m_isEndofFile and (m_fileBuffer[m_filePosition].isBasicLatinAlphabetNumeral() or m_fileBuffer[m_filePosition] == '\''_u8 or m_fileBuffer[m_filePosition] == '.'_u8))
         nextFilePosAndColumn();
         
         //extract the token to m_tokenString
         for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-        m_tokenString.push_back(m_fileBuffer.at(i));
+        m_tokenString.push_back(m_fileBuffer[i]);
 
         if (m_tokenString.contains('\''_u8))
         {
@@ -381,10 +379,11 @@ namespace Nc
         std::optional<TokenData> optionalTokenData{};
         std::uint32_t savedAbsoluteColumn{ m_absoluteColumn };
         std::uint32_t savedRelativeColumn{ m_relativeColumn };
-    
+        bool extract_exponent_once = false;
+
         while (true)
         {
-            if (m_fileBuffer[m_filePosition] == "⋿"_u8)
+            if (!extract_exponent_once and m_fileBuffer[m_filePosition] == "⋿"_u8)
             {
                 if (nextFilePosAndColumn(), m_fileBuffer[m_filePosition] == '+'_u8)
                 baseAndLiteralType.append("⋿+"_u8str), nextFilePosAndColumn(), savedAbsoluteColumn = m_absoluteColumn;
@@ -392,9 +391,11 @@ namespace Nc
                 baseAndLiteralType.append("⋿-"_u8str), nextFilePosAndColumn(), savedAbsoluteColumn = m_absoluteColumn;
                 else
                 baseAndLiteralType.push_back("⋿"_u8), savedAbsoluteColumn = m_absoluteColumn;
+
+                extract_exponent_once = true;
             }
 
-            if (m_isEndofFile or m_fileBuffer.at(m_filePosition).isBasicLatinWhiteSpace()) //the position of this loop terminating code is strategic, do not move
+            if (m_isEndofFile or m_fileBuffer[m_filePosition].isBasicLatinWhiteSpace()) //the position of this loop terminating code is strategic, do not move
             break;
 
             if (auto result = tokenizeSymbols(); result == TokenType::symbol)
@@ -405,14 +406,14 @@ namespace Nc
                 break;
             }
 
-            baseAndLiteralType.push_back(m_fileBuffer.at(m_filePosition)), nextFilePosAndColumn(), savedAbsoluteColumn = m_absoluteColumn;
+            baseAndLiteralType.push_back(m_fileBuffer[m_filePosition]), nextFilePosAndColumn(), savedAbsoluteColumn = m_absoluteColumn;
         }
         
         m_tokenString = savedTokenString, m_relativeColumn = savedRelativeColumn;
         
         auto split = [&baseAndLiteralType]
         {
-            if (auto result = std::ranges::find(baseAndLiteralType, '#'_u8); result != baseAndLiteralType.end())
+            if (auto result = std::ranges::find(baseAndLiteralType, '`'_u8); result != baseAndLiteralType.end())
             return std::pair{Myfcn::U8string{baseAndLiteralType.begin(), result}, Myfcn::U8string{result+1, baseAndLiteralType.end()}};
             else
             return std::pair{baseAndLiteralType, Myfcn::U8string{}};
@@ -446,19 +447,12 @@ namespace Nc
 
         auto isUnicodeBaseValid = [&base]
         {
-            if (std::ranges::all_of(base, [](Myfcn::U8char& x){
+            return std::ranges::all_of(base, [](Myfcn::U8char& x){
 
                 std::string unicode{ x.convertToUnicodeCodePoint() };
-                if (Myfcn::ManipulateStrAsBaseN::greaterThanOrEqual(unicode, "2080", 16) and Myfcn::ManipulateStrAsBaseN::lessThanOrEqual(unicode, "2089", 16))
-                return true;
-
-                return false;
+                return Myfcn::ManipulateStrAsBaseN::greaterThanOrEqual(unicode, "2080", 16) and Myfcn::ManipulateStrAsBaseN::lessThanOrEqual(unicode, "2089", 16);
             }
-            ))
-            {
-                return true;   
-            }
-            return false;
+            );
         };
         
         auto alteredBase = [&base]
@@ -488,19 +482,12 @@ namespace Nc
 
         auto isBaseValid = [&alteredBase]
         {
-            // if (alteredBase == 0 or alteredBase > 36)
-            if (Myfcn::ManipulateStrAsBaseN::equal(alteredBase, "0", 10) or Myfcn::ManipulateStrAsBaseN::greaterThan(alteredBase, "36", 10))
-            return false;
-
-            return true;
+            return !(Myfcn::ManipulateStrAsBaseN::equal(alteredBase, "0", 10) or Myfcn::ManipulateStrAsBaseN::greaterThan(alteredBase, "36", 10));
         };
 
         auto areBaseDigitsValid = [&]
         {
-            if ( Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(m_tokenString), static_cast<std::uint8_t>(std::stoi(alteredBase))) )
-            return true;
-            
-            return false;
+            return Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(m_tokenString), static_cast<std::uint8_t>(std::stoi(alteredBase)));
         };
 
         auto integerLiteralToBase10 = [&]
@@ -937,19 +924,12 @@ namespace Nc
 
         auto isUnicodeBaseValid = [&base]
         {
-            if (std::ranges::all_of(base, [](Myfcn::U8char& x){
+            return std::ranges::all_of(base, [](Myfcn::U8char& x){
 
                 std::string unicode{ x.convertToUnicodeCodePoint() };
-                if (Myfcn::ManipulateStrAsBaseN::greaterThanOrEqual(unicode, "2080", 16) and Myfcn::ManipulateStrAsBaseN::lessThanOrEqual(unicode, "2089", 16))
-                return true;
-
-                return false;
+                return Myfcn::ManipulateStrAsBaseN::greaterThanOrEqual(unicode, "2080", 16) and Myfcn::ManipulateStrAsBaseN::lessThanOrEqual(unicode, "2089", 16);
             }
-            ))
-            {
-                return true;   
-            }
-            return false;
+            );
         };
         
         auto alteredBase = [&base]
@@ -980,30 +960,20 @@ namespace Nc
         auto isBaseValid = [&alteredBase]
         {
             // if (alteredBase == 0 or alteredBase > 36)
-            if (Myfcn::ManipulateStrAsBaseN::equal(alteredBase, "0", 10) or Myfcn::ManipulateStrAsBaseN::greaterThan(alteredBase, "36", 10))
-            return false;
-
-            return true;
+            return !(Myfcn::ManipulateStrAsBaseN::equal(alteredBase, "0", 10) or Myfcn::ManipulateStrAsBaseN::greaterThan(alteredBase, "36", 10));
         };
 
         auto areBaseDigitsValid = [&]
         {
             if (auto found = std::ranges::find(m_tokenString, '.'_u8); found != m_tokenString.end())
             {
-                if ( 
-                    Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(Myfcn::convertU8StrToAsciiStr({m_tokenString.begin(), found}), static_cast<std::uint8_t>(std::stoi(alteredBase)))
+                return
+                Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(Myfcn::convertU8StrToAsciiStr({m_tokenString.begin(), found}), static_cast<std::uint8_t>(std::stoi(alteredBase)))
                 and
-                    Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(Myfcn::convertU8StrToAsciiStr({found + 1, m_tokenString.end()}), static_cast<std::uint8_t>(std::stoi(alteredBase)))
-                )
-                return true;
+                Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(Myfcn::convertU8StrToAsciiStr({found + 1, m_tokenString.end()}), static_cast<std::uint8_t>(std::stoi(alteredBase)));
             }
-            else
-            {
-                if ( Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(m_tokenString), static_cast<std::uint8_t>(std::stoi(alteredBase))) )
-                return true;
-            }
-
-            return false;
+            //else
+            return Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(m_tokenString), static_cast<std::uint8_t>(std::stoi(alteredBase)));
         };
 
         auto is_within_range = [&](const std::string& literal, Myfcn::U8string fp_min, Myfcn::U8string fp_max)
@@ -1055,7 +1025,7 @@ namespace Nc
                 spaceLog();
                 m_log.write("  only bases 1 - 36 are supported in NC; base options[₁₂₃₄₅₆₇₈₉]"), additionalLog();
 
-                shouldReturn = true;
+                result = TokenType::_miscellany;
             }
             else if (!areBaseDigitsValid())
             {
@@ -1078,7 +1048,7 @@ namespace Nc
                 m_log.write("] are allowed in base(", alteredBase, ')');
                 additionalLog();
 
-                shouldReturn = true;
+                result = TokenType::_miscellany;
             }
         }
         else
@@ -1087,7 +1057,7 @@ namespace Nc
             spaceLog();
             m_log.write("  try any valid combination of these[₁₂₃₄₅₆₇₈₉] instead; [NOTE] the valid combinations being from ₁ to ₃₆"), additionalLog();
 
-            shouldReturn = true;
+            result = TokenType::_miscellany;
         }
 
         if (!exponent.empty())
@@ -1101,7 +1071,7 @@ namespace Nc
                     m_log.write("  you're getting this error because the exponent of real-numbers must be base(10) regardless of the base it is tagged with"), additionalLog();
                     m_log.write("  oh, and in case you forgot, valid base(10) digits are from [0 - 9]"), additionalLog();
 
-                    shouldReturn = true;
+                    result = TokenType::_miscellany;
                 }
                 else if (Myfcn::ManipulateStrAsBaseN::greaterThanOrEqual(convertU8StrToAsciiStr(exponent), "2147483647", std::uint8_t(10)))
                 {
@@ -1110,7 +1080,7 @@ namespace Nc
                     else
                     m_log.writews("the exponent [", exponent, "] of real-number literal [", m_tokenString, "] is comically large, reduce it"), start_Log();
 
-                    shouldReturn = true;
+                    result = TokenType::_miscellany;
                 }
             }
             else
@@ -1118,7 +1088,7 @@ namespace Nc
                 m_log.write("base(10) digits where expected as the exponent in real-number literal [", m_tokenString, "] instead got this [", exponent, "]");
                 start_Log();
 
-                shouldReturn = true;
+                result = TokenType::_miscellany;
             }
         }
 
@@ -1379,7 +1349,7 @@ namespace Nc
         }
     }
 
-    Lexer::TokenType Lexer::tokenizeCharLiterals(const Myfcn::U8string& literalType)
+    Lexer::TokenType Lexer::tokenizeCharLiterals(const Myfcn::U8string const* literalType)
     {
         auto isCharacterWiseLiteralValid = [&]()
         {    
@@ -1405,7 +1375,7 @@ namespace Nc
             nextFilePosAndColumn(); //skip past the single quote that was found
             while (true)
             {
-                if (m_isEndofFile or m_fileBuffer.at(m_filePosition) == '\n'_u8)
+                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
                 {
                     if (m_isEndofFile)
                     m_log.write("unterminated junk character literal, expected this [ ' ] before eof(end-of-file)");
@@ -1417,13 +1387,13 @@ namespace Nc
                     m_log.write("  it is junk because of log(", m_log.getLogCounter(), ") above"), additionalLog();
                     return TokenType::_miscellany;
                 }
-                else if (m_fileBuffer.at(m_filePosition) == '\''_u8)
+                else if (m_fileBuffer[m_filePosition] == '\''_u8)
                 {
                     nextFilePosAndColumn(); //for extracting the loop terminating single quote too
                     break;
                 }
                     
-                if (m_fileBuffer.at(m_filePosition) == '\\'_u8) //for skipping potential escape code squences
+                if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
                 nextFilePosAndColumn();
                     
                 nextFilePosAndColumn();
@@ -1431,7 +1401,7 @@ namespace Nc
             
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer.at(i));
+            m_tokenString.push_back(m_fileBuffer[i]);
 
             return TokenType::_miscellany;
         }
@@ -1454,7 +1424,7 @@ namespace Nc
 
         if (literalType.starts_with('r'_u8))
         {
-            if (m_isEndofFile or m_fileBuffer.at(m_filePosition) != '\''_u8)
+            if (m_isEndofFile or m_fileBuffer[m_filePosition] != '\''_u8)
             {
                 m_log.write("missing second single quote [ ' ] denoting start of a raw character literal"), start_Log();
                 spaceLog();
@@ -1465,7 +1435,7 @@ namespace Nc
 
             while (true)
             {
-                if (m_isEndofFile or m_fileBuffer.at(m_filePosition) == '\n'_u8)
+                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
                 {
                     if (m_isEndofFile)
                     m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ '' ] before eof(end-of-file)");
@@ -1475,7 +1445,7 @@ namespace Nc
                     start_Log();
                     return TokenType::_miscellany;
                 }
-                else if (m_fileBuffer.at(m_filePosition) == '\''_u8 and ((nextFilePosAndColumn(), m_fileBuffer.at(m_filePosition)) == '\''_u8 and !m_isEndofFile))
+                else if (m_fileBuffer[m_filePosition] == '\''_u8 and ((nextFilePosAndColumn(), m_fileBuffer[m_filePosition]) == '\''_u8 and !m_isEndofFile))
                 {
                     nextFilePosAndColumn(1); //for extracting the loop terminating single quote
                     break;
@@ -1486,13 +1456,13 @@ namespace Nc
             
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer.at(i));
+            m_tokenString.push_back(m_fileBuffer[i]);
         }
         else
         {
             while (true)
             {
-                if (m_isEndofFile or m_fileBuffer.at(m_filePosition) == '\n'_u8)
+                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
                 {
                     if (m_isEndofFile)
                     m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ ' ] before eof(end-of-file)");
@@ -1502,13 +1472,13 @@ namespace Nc
                     start_Log();
                     return TokenType::_miscellany;
                 }
-                else if (m_fileBuffer.at(m_filePosition) == '\''_u8)
+                else if (m_fileBuffer[m_filePosition] == '\''_u8)
                 {
                     nextFilePosAndColumn(); //for extracting the loop terminating single quote too
                     break;
                 }
                     
-                if (m_fileBuffer.at(m_filePosition) == '\\'_u8) //for skipping potential escape code squences
+                if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
                 nextFilePosAndColumn();
                     
                 nextFilePosAndColumn();
@@ -1516,7 +1486,7 @@ namespace Nc
             
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer.at(i));
+            m_tokenString.push_back(m_fileBuffer[i]);
 
             bool shouldReturn{};
             for (auto i = m_tokenString.begin(); i != m_tokenString.end(); ++i)
@@ -1531,7 +1501,7 @@ namespace Nc
                     case 'U':
                         if (*++i != '[')
                         {
-                            shouldReturn = true;
+                            result = TokenType::_miscellany;
 
                             m_log.write("missing left square brace [ [ ] denoting start of escaped unicode code point entry"), start_Log();
                             spaceLog();
@@ -1550,7 +1520,7 @@ namespace Nc
 
                             if (i == m_tokenString.end())
                             {
-                                shouldReturn = true;
+                                result = TokenType::_miscellany;
 
                                 m_log.write("missing right square brace [ ] ] denoting end of escaped unicode code point entry");
                                 start_Log();
@@ -1572,7 +1542,7 @@ namespace Nc
                                     {
                                         if (!Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(u8str), 16))
                                         {
-                                            shouldReturn = true;
+                                            result = TokenType::_miscellany;
 
                                             m_log.writews("escaped unicode code point entry [", u8str, "] contains invalid base(16) digit(s)"), start_Log();
                                             spaceLog();
@@ -1582,14 +1552,14 @@ namespace Nc
                                         {
                                             if (literalType == lcharacterWise_u8 and Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "10ffff", 16))
                                             {
-                                                shouldReturn = true;
+                                                result = TokenType::_miscellany;
 
                                                 m_log.writews("in", stringedCharLiteral, "character literal, escaped unicode code point entry [", u8str, "] is greater than maximum unicode code-point 10FFFF₁₆");
                                                 start_Log();
                                             }
                                             else if (Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "7f", 16))
                                             {
-                                                shouldReturn = true;
+                                                result = TokenType::_miscellany;
 
                                                 m_log.writews("in", stringedCharLiteral, "character literal, escaped unicode code point entry [", u8str, "] is greater than maximum ascii code-point 7F₁₆");
                                                 start_Log();
@@ -1598,7 +1568,7 @@ namespace Nc
                                     }
                                     else
                                     {
-                                        shouldReturn = true;
+                                        result = TokenType::_miscellany;
 
                                         m_log.writews("escaped unicode code point entry contains junk [", u8str, "], expected base(16) digits instead");
                                         start_Log();
@@ -1609,7 +1579,7 @@ namespace Nc
                     break;
                     
                     default:
-                        shouldReturn = true;
+                        result = TokenType::_miscellany;
 
                         m_log.writews(stringedCharLiteral, "character literal [", m_tokenString, "], contains an invalid escape squence: [", *i, ']'), start_Log();
                         spaceLog();
@@ -1694,11 +1664,14 @@ namespace Nc
         return TokenType::literal;
     }
     
-    Lexer::TokenType Lexer::tokenizeStrLiterals(const Myfcn::U8string& literalType)
+    Lexer::TokenType Lexer::tokenizeStrLiterals(const Myfcn::U8string const* literalType_ptr)
     {
         auto isCharacterWiseLiteralValid = [&]()
-        {   
-            return literalType == lcharacterWise_a or literalType == lcharacterWise_u8 or literalType == lcharacterWise_ra or literalType == lcharacterWise_ru8 or literalType == lcharacterWise_p or literalType == lcharacterWise_rp;
+        {
+            if (literalType_ptr == nullptr or (*literalType_ptr == lcharacterWise_a or *literalType_ptr == lcharacterWise_u8 or *literalType_ptr == lcharacterWise_p))
+            return true;
+
+            return false;
         };
 
         if (!isCharacterWiseLiteralValid())
@@ -1709,18 +1682,16 @@ namespace Nc
             m_log.write("  ● [ a ] for ascii string literal"), additionalLog();
             m_log.write("  ● [ p ] for plain string literal"), additionalLog();
             m_log.write("  ● [ u8 ] for utf8 string literal"), additionalLog();
-            m_log.write("  ● [ ra ] for raw ascii string literal"), additionalLog();
-            m_log.write("  ● [ rp ] for raw plain string literal"), additionalLog();
-            m_log.write("  ● [ ru8 ] for raw utf8 string literal"), additionalLog();
             m_log.write("  [NOTE] default is [ p ] - plain string literal"), additionalLog();
 
             auto formerFilePos{m_filePosition};
+            if (literalType_ptr == nullptr)
             recordRelativeColumn(); //do not move
 
             nextFilePosAndColumn(); //skip past the single quote that was found
             while (true)
             {
-                if (m_isEndofFile or m_fileBuffer.at(m_filePosition) == '\n'_u8)
+                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
                 {
                     if (m_isEndofFile)
                     m_log.write("unterminated junk string literal, expected this [ ' ] before eof(end-of-file)");
@@ -1732,13 +1703,13 @@ namespace Nc
                     m_log.write("  it is junk because of log(", m_log.getLogCounter(), ") above"), additionalLog();
                     return TokenType::_miscellany;
                 }
-                else if (m_fileBuffer.at(m_filePosition) == '"'_u8)
+                else if (m_fileBuffer[m_filePosition] == '"'_u8)
                 {
                     nextFilePosAndColumn(); //for extracting the loop terminating single quote too
                     break;
                 }
                     
-                if (m_fileBuffer.at(m_filePosition) == '\\'_u8) //for skipping potential escape code squences
+                if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
                 nextFilePosAndColumn();
                     
                 nextFilePosAndColumn();
@@ -1746,30 +1717,33 @@ namespace Nc
             
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer.at(i));
+            m_tokenString.push_back(m_fileBuffer[i]);
 
             return TokenType::_miscellany;
         }
 
         auto stringedCharLiteral = [&]()
         {
-            if (literalType == lcharacterWise_a) return "ascii";
-            else if (literalType == lcharacterWise_p) return "plain";
-            else if (literalType == lcharacterWise_u8) return "utf8";
-            else if (literalType == lcharacterWise_ra) return "raw-ascii";
-            else if (literalType == lcharacterWise_rp) return "raw-plain";
-            else if (literalType == lcharacterWise_ru8) return "raw-utf8";
+            if (*literalType_ptr == lcharacterWise_a) return "ascii";
+            else if (*literalType_ptr == lcharacterWise_p) return "plain";
+            else if (*literalType_ptr == lcharacterWise_u8) return "utf8";
+            else if (*literalType_ptr == lcharacterWise_ra) return "raw-ascii";
+            else if (*literalType_ptr == lcharacterWise_rp) return "raw-plain";
+            else if (*literalType_ptr == lcharacterWise_ru8) return "raw-utf8";
             return "[undefined]";
         }();
 
         auto formerFilePos{m_filePosition};
-        recordRelativeColumn(); //do not move
+        if (literalType_ptr == nullptr) recordRelativeColumn(); //do not move
 
         nextFilePosAndColumn(); //skip past the single quote that was found
 
-        if (literalType.starts_with('r'_u8))
+        //set literalType_ptr to the default characterWise-literal which is [ p ]
+        literalType_ptr = &lcharacterWise_p;
+
+        if (literalType_ptr->starts_with('r'_u8))
         {
-            if (m_isEndofFile or m_fileBuffer.at(m_filePosition) != '\''_u8)
+            if (m_isEndofFile or m_fileBuffer[m_filePosition] != '\''_u8)
             {
                 m_log.write("missing second single quote [ ' ] denoting start of a raw string literal"), start_Log();
                 spaceLog();
@@ -1780,34 +1754,36 @@ namespace Nc
 
             while (true)
             {
-                if (m_isEndofFile or m_fileBuffer.at(m_filePosition) == '\n'_u8)
+                if (m_isEndofFile)
                 {
-                    if (m_isEndofFile)
-                    m_log.writews("unterminated", stringedCharLiteral, "string literal, expected this [ \"\" ] before eof(end-of-file)");
-                    else
-                    m_log.writews("unterminated", stringedCharLiteral, "string literal, expected this [ \"\" ] before newline");
-                    
-                    start_Log();
+                    m_log.writews("unterminated", stringedCharLiteral, "string literal, expected this [ \"\" ] before eof(end-of-file)"), start_Log();
                     return TokenType::_miscellany;
                 }
-                else if (m_fileBuffer.at(m_filePosition) == '"'_u8 and ((nextFilePosAndColumn(), m_fileBuffer.at(m_filePosition)) == '"'_u8 and !m_isEndofFile))
+                else if (m_fileBuffer[m_filePosition] == '"'_u8 and ((nextFilePosAndColumn(), m_fileBuffer[m_filePosition]) == '"'_u8 and !m_isEndofFile))
                 {
                     nextFilePosAndColumn(); //for extracting the loop terminating single quote
                     break;
                 }
+                else if (!m_isEndofFile and m_fileBuffer[m_filePosition] == '\n'_u8)//it is directly under the second conditionally for a reason
+                newLineFound();
 
                 nextFilePosAndColumn();
             }
             
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer.at(i));
+            {
+                if (m_fileBuffer[i] == '\n')
+                m_tokenString += std::string{'\\', 'n'};
+                else
+                m_tokenString.push_back(m_fileBuffer[i]);
+            }
         }
         else
         {
             while (true)
             {
-                if (m_isEndofFile or m_fileBuffer.at(m_filePosition) == '\n'_u8)
+                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
                 {
                     if (m_isEndofFile)
                     m_log.writews("unterminated", stringedCharLiteral, "string literal, expected this [ \" ] before eof(end-of-file)");
@@ -1817,13 +1793,13 @@ namespace Nc
                     start_Log();
                     return TokenType::_miscellany;
                 }
-                else if (m_fileBuffer.at(m_filePosition) == '"'_u8)
+                else if (m_fileBuffer[m_filePosition] == '"'_u8)
                 {
                     nextFilePosAndColumn(); //for extracting the loop terminating single quote too
                     break;
                 }
                     
-                if (m_fileBuffer.at(m_filePosition) == '\\'_u8) //for skipping potential escape code squences
+                if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
                 nextFilePosAndColumn();
                     
                 nextFilePosAndColumn();
@@ -1831,156 +1807,161 @@ namespace Nc
             
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer.at(i));
+            m_tokenString.push_back(m_fileBuffer[i]);
+        }
+        addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, *literalType_ptr);
+        
+        return TokenType::literal;
+    }
 
-            bool shouldReturn{};
-            for (auto i = m_tokenString.begin(); i != m_tokenString.end(); ++i)
+    Lexer::TokenType Lexer::validateNormalCharWiseLiterals(const char* charType, const char* stringedCharLiteral, const Myfcn::U8string& literalType)
+    {
+        TokenType result = TokenType::literal;
+
+        for (auto i = m_tokenString.begin(); i != m_tokenString.end(); ++i)
+        {
+            if (*i == '\\'_u8)
             {
-                if (*i == '\\'_u8)
+                switch (std::uint32_t(*++i))
                 {
-                    switch (std::uint32_t(*++i))
+                case 'z': case 'e': case 'b': case 'f': case 'n': case 'r': case 't': case 'v': case '\'': case '\"': case '\\': break;
+
+                case 'U': case 'u':
+                    if (*++i != '[')
                     {
-                    case 'a': case 'b': case 'f': case 'n': case 'r': case 't': case 'v': case '\'': case '\"': case '\\':
-                    break;
+                        result = TokenType::_miscellany;
 
-                    case 'U':
-                        if (*++i != '[')
+                        m_log.writews("the left square brace [ [ ] denoting start of escaped unicode code point entry is missing in", stringedCharLiteral, charType, "literal");
+                        start_Log(), spaceLog();
+                        m_log.write("  try this: U|u[<code-point>]; remmeber the base of the number is expected to be base(16)"), additionalLog();
+                    }
+                    else
+                    {
+                        Myfcn::U8string u8str{};
+                        while (++i != m_tokenString.end())
                         {
-                            shouldReturn = true;
+                            if (*i == ']'_u8)
+                            break;
+                                
+                            u8str.push_back(*i);
+                        }
 
-                            m_log.write("missing left square brace [ [ ] denoting start of escaped unicode code point entry"), start_Log();
-                            spaceLog();
-                            m_log.write("  try this: U[{any unicode code point}]; remmeber the base of the number is expected to be base(16)"), additionalLog();
+                        if (i == m_tokenString.end())
+                        {
+                            result = TokenType::_miscellany;
+
+                            // m_log.write("missing right square brace [ ] ] denoting end of escaped unicode code point entry in", stringedCharLiteral, charType, "literal");
+                            m_log.writews("the left square brace [ [ ] denoting end of escaped unicode code point entry is missing in", stringedCharLiteral, charType, "literal");
+                            start_Log();
+
+                            --i; //take i back to point before end so the for statement won't loop forever
                         }
                         else
                         {
-                            Myfcn::U8string u8str{};
-                            while (++i != m_tokenString.end())
+                            //trim any digit separator(') or whitespace if found
+                            if (std::ranges::any_of(u8str, [](Myfcn::U8char& x){ return x.isBasicLatinWhiteSpace() or x == '\''; }))
                             {
-                                if (*i == ']'_u8)
-                                break;
-                                
-                                u8str.push_back(*i);
+                                auto newEnd = std::remove_if(u8str.begin(), u8str.end(), [](Myfcn::U8char& x){ return x.isBasicLatinWhiteSpace() or x == '\''; });
+                                u8str.erase(newEnd, u8str.end());
                             }
 
-                            if (i == m_tokenString.end())
+                            if (!u8str.empty())
                             {
-                                shouldReturn = true;
-
-                                m_log.write("missing right square brace [ ] ] denoting end of escaped unicode code point entry"), start_Log();
-
-                                --i; //take i back to point before end so the for statement won't loop forever
-                            }
-                            else
-                            {
-                                //trim any digit separator or whitespace if found
-                                if (std::ranges::any_of(u8str, [](Myfcn::U8char& x){ return x.isBasicLatinWhiteSpace(); }))
+                                if (std::ranges::all_of(u8str, [](Myfcn::U8char& i){ if (i.isBasicLatinAlphabetNumeral()) return true; return false; }))
                                 {
-                                    auto newEnd = std::remove_if(u8str.begin(), u8str.end(), [](Myfcn::U8char& x){ return x.isBasicLatinWhiteSpace(); });
-                                    u8str.erase(newEnd, u8str.end());
-                                }
-
-                                if (!u8str.empty())
-                                {
-                                    if (std::ranges::all_of(u8str, [](Myfcn::U8char& i){ if (i.isBasicLatinAlphabetNumeral()) return true; return false; }))
+                                    if (!Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(u8str), 16))
                                     {
-                                        if (!Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(u8str), 16))
-                                        {
-                                            shouldReturn = true;
+                                        result = TokenType::_miscellany;
 
-                                            m_log.writews("escaped unicode code point entry [", u8str, "] contains invalid base(16) digit(s)"), start_Log();
-                                            spaceLog();
-                                            m_log.write("  try these digits instead: 1, 2, 3, 4, 5, 6, 7, 8, 9, A(a), B(b), C(c), D(d), E(e), F(f)"), additionalLog();
-                                        }
-                                        else
-                                        {
-                                            if (literalType == lcharacterWise_u8 and Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "10ffff", 16))
-                                            {
-                                                shouldReturn = true;
-
-                                                m_log.writews("in", stringedCharLiteral, "string literal, escaped unicode code point entry [", u8str, "] is greater than maximum unicode code-point 10FFFF₁₆");
-                                                start_Log();
-                                            }
-                                            else if (Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "7f", 16))
-                                            {
-                                                shouldReturn = true;
-
-                                                m_log.writews("in", stringedCharLiteral, "string literal, escaped unicode code point entry [", u8str, "] is greater than maximum ascii code-point 7F₁₆");
-                                                start_Log();
-                                            }
-                                        }
+                                        m_log.writews("in", stringedCharLiteral, charType, ", escaped unicode code point entry [", u8str, "] contains invalid base(16) digit(s)");
+                                        start_Log(), spaceLog();
+                                        m_log.write("  try these digits instead: 1, 2, 3, 4, 5, 6, 7, 8, 9, A(a), B(b), C(c), D(d), E(e), F(f)"), additionalLog();
                                     }
                                     else
                                     {
-                                        shouldReturn = true;
+                                        if (literalType == lcharacterWise_u8 and Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "10ffff", 16))
+                                        {
+                                            result = TokenType::_miscellany;
 
-                                        m_log.writews("escaped unicode code point entry contains junk [", u8str, "], expected base(16) digits instead"), start_Log();
+                                            m_log.writews("in", stringedCharLiteral, charType, "literal, escaped unicode code point entry [", u8str, "] is greater than maximum unicode code-point 10FFFF₁₆");
+                                            start_Log();
+                                        }
+                                        else if (charType == "character" and Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "7f", 16))
+                                        {
+                                            result = TokenType::_miscellany;
+
+                                            m_log.writews("in", stringedCharLiteral, charType, "literal, escaped unicode code point entry [", u8str, "] is greater than maximum ascii code-point 7F₁₆");
+                                            start_Log();
+                                        }
                                     }
+                                }
+                                else
+                                {
+                                    result = TokenType::_miscellany;
+
+                                    m_log.writews("in", stringedCharLiteral, charType, "literal, escaped unicode code point entry contains non-base(16) digits [", u8str, "]");
+                                    start_Log();
                                 }
                             }
                         }
-                    break;
-                    
-                    default:
-                        shouldReturn = true;
-
-                        m_log.writews(stringedCharLiteral, "string literal [", m_tokenString, "], contains an invalid escape squence: [", *i, ']'), start_Log();
-                        spaceLog();
-                        m_log.write("  try the below instead:"), additionalLog();
-                        m_log.write(R"(  ● [ b ] for backspace equivalent to \U[8])"), additionalLog();
-                        m_log.write(R"(  ● [ f ] for formfeed equivalent to \U[C])"), additionalLog();
-                        m_log.write(R"(  ● [ n ] for newline equivalent to \U[A])"), additionalLog();
-                        m_log.write(R"(  ● [ r ] for carraige-return equivalent to \U[D])"), additionalLog();
-                        m_log.write(R"(  ● [ t ] for horizontal-tab equivalent to \U[9])"), additionalLog();
-                        m_log.write(R"(  ● [ v ] for vertical tab equivalent to \U[B])"), additionalLog();
-                        m_log.write(R"(  ● [ " ] for double-quote equivalent to \U[22])"), additionalLog();
-                        m_log.write(R"(  ● [ ' ] for single-quote equivalent to \U[27])"), additionalLog();
-                        m_log.write(R"(  ● [ U ] for entry of unicode code-points)"), additionalLog();
-                        m_log.write("  obviously the usage is this: \\(EscapeSquence)"), additionalLog();
-                        break;
                     }
+                break;
+                    
+                default:
+                    result = TokenType::_miscellany;
+
+                    m_log.writews(stringedCharLiteral, "string literal [", m_tokenString, "], contains an invalid escape squence: [", *i, ']'), start_Log();
+                    spaceLog();
+                    m_log.write("  try the below instead:"), additionalLog();
+                    m_log.write(R"(  ● [ b ] for backspace equivalent to \U[8])"), additionalLog();
+                    m_log.write(R"(  ● [ e ] for escape equivalent to \U[1B])"), additionalLog();
+                    m_log.write(R"(  ● [ f ] for formfeed equivalent to \U[C])"), additionalLog();
+                    m_log.write(R"(  ● [ n ] for newline equivalent to \U[A])"), additionalLog();
+                    m_log.write(R"(  ● [ r ] for carraige-return equivalent to \U[D])"), additionalLog();
+                    m_log.write(R"(  ● [ t ] for horizontal-tab equivalent to \U[9])"), additionalLog();
+                    m_log.write(R"(  ● [ v ] for vertical tab equivalent to \U[B])"), additionalLog();
+                    m_log.write(R"(  ● [ " ] for double-quote equivalent to \U[22])"), additionalLog();
+                    m_log.write(R"(  ● [ ' ] for single-quote equivalent to \U[27])"), additionalLog();
+                    m_log.write(R"(  ● [ z ] for null-character equivalent to \U[0])"), additionalLog();
+                    m_log.write(R"(  ● [ U ] or [ u ] for entry of unicode code-point entry)"), additionalLog();
+                    m_log.write("  obviously the usage is this: \\(EscapeSquence)"), additionalLog();
+                    break;
                 }
             }
-
-            if (shouldReturn)
-            return TokenType::_miscellany;
         }
-    
-        addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, literalType);
-        
-        return TokenType::literal;
+        return result;
     }
 
     Lexer::TokenType Lexer::tokenizeSymbols()
     {
         recordRelativeColumn(); //do not move
 
-        if (m_fileBuffer.at(m_filePosition) == sMinus.front())
+        if (m_fileBuffer[m_filePosition] == sMinus.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sGreaterthan.front())
+                if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
                 m_tokenString.assign(sArrow), nextFilePosAndColumn() /*skip past the sGreaterthan token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                else if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sSubtractionAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sMinus.front())
+                else if (m_fileBuffer[m_filePosition] == sMinus.front())
                 m_tokenString.assign(sDecrement), nextFilePosAndColumn() /*skip past the second sMinus token*/;
                 else
                 m_tokenString.assign(sMinus);
             }
             else m_tokenString.assign(sMinus);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sLessthan.front())
+        else if (m_fileBuffer[m_filePosition] == sLessthan.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sLessthan_equalto), nextFilePosAndColumn() /*skip past the sEqual token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sLessthan.front())
+                else if (m_fileBuffer[m_filePosition] == sLessthan.front())
                 {
                     if (nextFilePosAndColumn(), !m_isEndofFile)
                     {
-                        if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                        if (m_fileBuffer[m_filePosition] == sEqual.front())
                         m_tokenString.assign(sBitwiseShiftLeftAssign), nextFilePosAndColumn();
                         else
                         m_tokenString.assign(sBitwiseShiftLeft);
@@ -1992,17 +1973,17 @@ namespace Nc
             }
             else m_tokenString.assign(sLessthan);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sGreaterthan.front())
+        else if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sGreaterthan_equalto), nextFilePosAndColumn() /*skip past the sEqual token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sGreaterthan.front())
+                else if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
                 {
                     if (nextFilePosAndColumn(), !m_isEndofFile)
                     {
-                        if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                        if (m_fileBuffer[m_filePosition] == sEqual.front())
                         m_tokenString.assign(sBitwiseShiftRightAssign), nextFilePosAndColumn();
                         else
                         m_tokenString.assign(sBitwiseShiftRight);
@@ -2014,135 +1995,135 @@ namespace Nc
             }
             else m_tokenString.assign(sGreaterthan);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sColon.front())
+        else if (m_fileBuffer[m_filePosition] == sColon.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sColon.front())
+                else if (m_fileBuffer[m_filePosition] == sColon.front())
                 m_tokenString.assign(sScopeResolution), nextFilePosAndColumn() /*skip past the sColon token*/;
                 else
                 m_tokenString.assign(sColon);
             }
             else m_tokenString.assign(sColon);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sNot.front())
+        else if (m_fileBuffer[m_filePosition] == sNot.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sNotEqual), nextFilePosAndColumn() /*skip past the sEqual token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sLcurly.front())
+                else if (m_fileBuffer[m_filePosition] == sLcurly.front())
                 m_tokenString.assign(sLinverseCurly), nextFilePosAndColumn() /*skip past the sLcurly token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sLparen.front())
+                else if (m_fileBuffer[m_filePosition] == sLparen.front())
                 m_tokenString.assign(sLinverseParen), nextFilePosAndColumn() /*skip past the sLinverseParen token*/;
                 else
                 m_tokenString.assign(sNot);
             }
             else m_tokenString.assign(sNot);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sBitwiseAnd.front())
+        else if (m_fileBuffer[m_filePosition] == sBitwiseAnd.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sBitwiseAnd.front())
+                if (m_fileBuffer[m_filePosition] == sBitwiseAnd.front())
                 m_tokenString.assign(sAnd), nextFilePosAndColumn() /*skip past the second sBitwiseAnd token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                else if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sBitwiseAndAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
                 else
                 m_tokenString.assign(sBitwiseAnd);
             }
             else m_tokenString.assign(sBitwiseAnd);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sBitwiseOr.front())
+        else if (m_fileBuffer[m_filePosition] == sBitwiseOr.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sBitwiseOr.front())
+                if (m_fileBuffer[m_filePosition] == sBitwiseOr.front())
                 m_tokenString.assign(sOr), nextFilePosAndColumn() /*skip past the second sBitwiseOr token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                else if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sBitwiseOrAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
                 else
                 m_tokenString.assign(sBitwiseOr);
             }
             else m_tokenString.assign(sBitwiseOr);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sBitwiseXor.front())
+        else if (m_fileBuffer[m_filePosition] == sBitwiseXor.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sBitwiseXor.front())
+                if (m_fileBuffer[m_filePosition] == sBitwiseXor.front())
                 m_tokenString.assign(sXor), nextFilePosAndColumn() /*skip past the second sBitwiseXor token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                else if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sBitwiseXorAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
                 else
                 m_tokenString.assign(sBitwiseXor);
             }
             else m_tokenString.assign(sBitwiseXor);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sPlus.front())
+        else if (m_fileBuffer[m_filePosition] == sPlus.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sAdditionAssign), nextFilePosAndColumn() /*skip past the SEqual token*/;
-                else if (m_fileBuffer.at(m_filePosition) == sPlus.front())
+                else if (m_fileBuffer[m_filePosition] == sPlus.front())
                 m_tokenString.assign(sIncrement), nextFilePosAndColumn() /*skip past the second sPlus token*/;
                 else
                 m_tokenString.assign(sPlus);
             }
             else m_tokenString.assign(sPlus);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sMultiply.front())
+        else if (m_fileBuffer[m_filePosition] == sMultiply.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sMultiplicationAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
                 else
                 m_tokenString.assign(sMultiply);
             }
             else m_tokenString.assign(sMultiply);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sDivide.front())
+        else if (m_fileBuffer[m_filePosition] == sDivide.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sDivisionAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
                 else
                 m_tokenString.assign(sDivide);
             }
             else m_tokenString.assign(sDivide);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sModuluo.front())
+        else if (m_fileBuffer[m_filePosition] == sModuluo.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sEqual.front())
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
                 m_tokenString.assign(sModuluoAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
                 else
                 m_tokenString.assign(sModuluo);
             }
             else m_tokenString.assign(sModuluo);
         }
-        else if (m_fileBuffer.at(m_filePosition) == sLhashedParen.front())
+        else if (m_fileBuffer[m_filePosition] == sLhashedParen.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sLparen.front())
+                if (m_fileBuffer[m_filePosition] == sLparen.front())
                 m_tokenString.assign(sLhashedParen), nextFilePosAndColumn() /*skip past the sLparen token*/;
                 else
                 return prevFilePosAndColumn(), TokenType::_miscellany; /*unextract the hash[#]*/
             }
             else return TokenType::_miscellany;
         }
-        else if (m_fileBuffer.at(m_filePosition) == sRcurly.front())
+        else if (m_fileBuffer[m_filePosition] == sRcurly.front())
         {
             if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (m_fileBuffer.at(m_filePosition) == sSemicolon.front())
+                if (m_fileBuffer[m_filePosition] == sSemicolon.front())
                 m_tokenString.assign(sRsemicolonCurly), nextFilePosAndColumn() /*skip past the sSemicolon token*/;
                 else
                 m_tokenString.assign(sRcurly);
@@ -2150,15 +2131,15 @@ namespace Nc
             else m_tokenString.assign(sRcurly);
         }
         else if (
-        m_fileBuffer.at(m_filePosition) == sLcurly.front() or m_fileBuffer.at(m_filePosition) == sLparen.front() or
-        m_fileBuffer.at(m_filePosition) == sRparen.front() or m_fileBuffer.at(m_filePosition) == sSemicolon.front() or
-        m_fileBuffer.at(m_filePosition) == sBitwiseNot.front() or m_fileBuffer.at(m_filePosition) == sComma.front() or
-        m_fileBuffer.at(m_filePosition) == sEqual.front() or m_fileBuffer.at(m_filePosition) == sQuestionMark.front() or
-        m_fileBuffer.at(m_filePosition) == sMemberOf.front() or m_fileBuffer.at(m_filePosition) == sExponention.front() or
-        m_fileBuffer.at(m_filePosition) == sCommercialAt.front() or m_fileBuffer.at(m_filePosition) == sAlternateLessthan_equalto.front() or
-        m_fileBuffer.at(m_filePosition) == sAlternateNotEqual.front() or m_fileBuffer.at(m_filePosition) == sAlternateGreaterthan_equalto.front()
+        m_fileBuffer[m_filePosition] == sLcurly.front() or m_fileBuffer[m_filePosition] == sLparen.front() or
+        m_fileBuffer[m_filePosition] == sRparen.front() or m_fileBuffer[m_filePosition] == sSemicolon.front() or
+        m_fileBuffer[m_filePosition] == sBitwiseNot.front() or m_fileBuffer[m_filePosition] == sComma.front() or
+        m_fileBuffer[m_filePosition] == sEqual.front() or m_fileBuffer[m_filePosition] == sQuestionMark.front() or
+        m_fileBuffer[m_filePosition] == sMemberOf.front() or m_fileBuffer[m_filePosition] == sExponention.front() or
+        m_fileBuffer[m_filePosition] == sCommercialAt.front() or m_fileBuffer[m_filePosition] == sAlternateLessthan_equalto.front() or
+        m_fileBuffer[m_filePosition] == sAlternateNotEqual.front() or m_fileBuffer[m_filePosition] == sAlternateGreaterthan_equalto.front()
         )
-        m_tokenString.push_back(m_fileBuffer.at(m_filePosition)), nextFilePosAndColumn() /*move the file position past the symbol*/;
+        m_tokenString.push_back(m_fileBuffer[m_filePosition]), nextFilePosAndColumn() /*move the file position past the symbol*/;
         else
         return TokenType::_miscellany;
         
@@ -2167,7 +2148,6 @@ namespace Nc
         return TokenType::symbol;
     }
 
-    
     void Lexer::start_Log()
     {
         m_log.log(true), m_isDeadZone = true;
@@ -2267,5 +2247,5 @@ namespace Nc
             throw std::invalid_argument{"parameter temp contains an invalid Lexer::TokenType enumerator"};
         }
     }
-
+    
 }// namespace Nc

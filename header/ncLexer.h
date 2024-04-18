@@ -303,8 +303,9 @@ namespace Nc
         void validateIntLiteral(Myfcn::U8string& base, Myfcn::U8string& literalType);
         void validateRealNumberLiteral(Myfcn::U8string& base_exp, Myfcn::U8string& literalType);
 
-        TokenType tokenizeCharLiterals(const Myfcn::U8string& literalType = lcharacterWise_p);
-        TokenType tokenizeStrLiterals(const Myfcn::U8string& literalType = lcharacterWise_p);
+        TokenType tokenizeCharLiterals(const Myfcn::U8string const* literalType_ptr = nullptr);
+        TokenType tokenizeStrLiterals(const Myfcn::U8string const* literalType_ptr = nullptr);
+        TokenType validateNormalCharWiseLiterals(const char* charType, const char* stringedCharLiteral, const Myfcn::U8string& literalType){}
 
         TokenType tokenizeSymbols();
 
