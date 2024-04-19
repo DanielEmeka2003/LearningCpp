@@ -91,7 +91,7 @@ namespace Nc
             if (m_isEndofFile)
             return TokenType::_eot;
         }
-            
+        
         if (acceptableUnicode(m_fileBuffer[m_filePosition]))
         return tokenizeWords();
         else if (m_fileBuffer[m_filePosition] == '\''_u8)
@@ -161,15 +161,16 @@ namespace Nc
         m_relativeColumn = m_absoluteColumn;
     }
 
-    void Lexer::addToTokenDataList(Myfcn::U8string& tokenString, std::uint32_t line, std::uint32_t absoluteColumn, std::uint32_t relativeColumn, bool isReserved, bool isIdentifier, Myfcn::U8string literalType, bool isSymbol)
+    void Lexer::addToTokenDataList(Myfcn::U8string& tokenString, std::optional<std::uint32_t> optLine, std::uint32_t line, std::uint32_t absoluteColumn, std::uint32_t relativeColumn, bool isReserved, bool isIdentifier, Myfcn::U8string literalType, bool isSymbol)
     {
         if (m_isDeadZone)
         return;
         
         //add the token to the list
         m_tokenDataList.push_back(TokenData{
-            .token{ std::move(tokenString) }, 
-            .line{ line }, 
+            .token{ std::move(tokenString) },
+            .optLine{ optLine },
+            .line{ line },
             .absoluteColumn{ absoluteColumn },
             .relativeColumn{ relativeColumn },
             .isReserved{ isReserved }, 
@@ -301,7 +302,7 @@ namespace Nc
         if (TokenType result{reservedWords()}; result != TokenType::_miscellany)
         return result;
 
-        addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, true);
+        addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, m_absoluteColumn, m_relativeColumn, false, true);
 
         return TokenType::identifier;
     }
@@ -327,22 +328,22 @@ namespace Nc
             m_tokenString == rNamespace_alias
         )
         {
-            addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, true);
+            addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, m_absoluteColumn, m_relativeColumn, true);
             return TokenType::reserved;
         }
         else if (m_tokenString == rTrue or m_tokenString == rFalse)
         {
-            addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, lbool, false);
+            addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, m_absoluteColumn, m_relativeColumn, false, false, lbool, false);
             return TokenType::literal;
         }
         else if (m_tokenString == rNullptr)
         {
-            addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, lnullptr, false);
+            addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, m_absoluteColumn, m_relativeColumn, false, false, lnullptr, false);
             return TokenType::literal;
         }
         else if (m_tokenString == rNone)
         {
-            addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, lnone, false);
+            addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, m_absoluteColumn, m_relativeColumn, false, false, lnone, false);
             return TokenType::literal;
         }
 
@@ -432,7 +433,7 @@ namespace Nc
         
         std::swap(savedAbsoluteColumn, m_absoluteColumn); //perform a reswap, which is very dum
 
-        addToTokenDataList(m_tokenString, m_line, savedAbsoluteColumn, savedRelativeColumn, false, false, literalType, false);
+        addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, savedAbsoluteColumn, savedRelativeColumn, false, false, literalType, false);
 
         if (optionalTokenData.has_value())
         m_tokenDataList.push_back(optionalTokenData.value());
@@ -1025,7 +1026,7 @@ namespace Nc
                 spaceLog();
                 m_log.write("  only bases 1 - 36 are supported in NC; base options[₁₂₃₄₅₆₇₈₉]"), additionalLog();
 
-                result = TokenType::_miscellany;
+                shouldReturn = true;
             }
             else if (!areBaseDigitsValid())
             {
@@ -1048,7 +1049,7 @@ namespace Nc
                 m_log.write("] are allowed in base(", alteredBase, ')');
                 additionalLog();
 
-                result = TokenType::_miscellany;
+                shouldReturn = true;
             }
         }
         else
@@ -1057,7 +1058,7 @@ namespace Nc
             spaceLog();
             m_log.write("  try any valid combination of these[₁₂₃₄₅₆₇₈₉] instead; [NOTE] the valid combinations being from ₁ to ₃₆"), additionalLog();
 
-            result = TokenType::_miscellany;
+            shouldReturn = true;
         }
 
         if (!exponent.empty())
@@ -1071,7 +1072,7 @@ namespace Nc
                     m_log.write("  you're getting this error because the exponent of real-numbers must be base(10) regardless of the base it is tagged with"), additionalLog();
                     m_log.write("  oh, and in case you forgot, valid base(10) digits are from [0 - 9]"), additionalLog();
 
-                    result = TokenType::_miscellany;
+                    shouldReturn = true;
                 }
                 else if (Myfcn::ManipulateStrAsBaseN::greaterThanOrEqual(convertU8StrToAsciiStr(exponent), "2147483647", std::uint8_t(10)))
                 {
@@ -1080,7 +1081,7 @@ namespace Nc
                     else
                     m_log.writews("the exponent [", exponent, "] of real-number literal [", m_tokenString, "] is comically large, reduce it"), start_Log();
 
-                    result = TokenType::_miscellany;
+                    shouldReturn = true;
                 }
             }
             else
@@ -1088,7 +1089,7 @@ namespace Nc
                 m_log.write("base(10) digits where expected as the exponent in real-number literal [", m_tokenString, "] instead got this [", exponent, "]");
                 start_Log();
 
-                result = TokenType::_miscellany;
+                shouldReturn = true;
             }
         }
 
@@ -1349,39 +1350,36 @@ namespace Nc
         }
     }
 
-    Lexer::TokenType Lexer::tokenizeCharLiterals(const Myfcn::U8string const* literalType)
+    Lexer::TokenType Lexer::tokenizeCharLiterals(const Myfcn::U8string* literalType_ptr)
     {
+        auto formerFilePos{m_filePosition};
+        if (literalType_ptr == nullptr) recordRelativeColumn(); //do not move
+
+        nextFilePosAndColumn(); //skip past the single quote that was found
+
         auto isCharacterWiseLiteralValid = [&]()
-        {    
-            return literalType == lcharacterWise_a or literalType == lcharacterWise_u8 or literalType == lcharacterWise_ra or literalType == lcharacterWise_ru8 or literalType == lcharacterWise_p or literalType == lcharacterWise_rp;
+        {
+            return literalType_ptr == nullptr or (*literalType_ptr == lcharacterWise_a or *literalType_ptr == lcharacterWise_u8 or *literalType_ptr == lcharacterWise_p);
         };
-        
+
         if (!isCharacterWiseLiteralValid())
         {
-            m_log.writews('[', literalType, "] is not a recognized character wise literal"), start_Log();
-            spaceLog();
+            m_log.writews('[', m_tokenString, "] is not a recognized character wise literal"), start_Log(), spaceLog();
             m_log.write("  try the below instead:"), additionalLog();
-            m_log.write("  ● [ a ] for ascii character literal"), additionalLog();
-            m_log.write("  ● [ p ] for plain character literal"), additionalLog();
-            m_log.write("  ● [ u8 ] for utf8 character literal"), additionalLog();
-            m_log.write("  ● [ ra ] for raw ascii character literal"), additionalLog();
-            m_log.write("  ● [ rp ] for raw plain character literal"), additionalLog();
-            m_log.write("  ● [ ru8 ] for raw utf8 character literal"), additionalLog();
-            m_log.write("  [NOTE] default is [ p ] - plain character literal"), additionalLog();
+            m_log.write("  ● [ a ] for ascii string literal"), additionalLog();
+            m_log.write("  ● [ p ] for plain string literal"), additionalLog();
+            m_log.write("  ● [ u8 ] for utf8 string literal"), additionalLog();
+            m_log.write("  [NOTE] default is [ p ] - plain string literal"), additionalLog();
 
-            auto formerFilePos{m_filePosition};
-            recordRelativeColumn(); //do not move
-
-            nextFilePosAndColumn(); //skip past the single quote that was found
             while (true)
             {
                 if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
                 {
-                    if (m_isEndofFile)
-                    m_log.write("unterminated junk character literal, expected this [ ' ] before eof(end-of-file)");
-                    else
-                    m_log.write("unterminated junk character literal, expected this [ ' ] before newline");
-                    
+                    m_log.writews("unterminated junk character literal, expected this [ \' ] before");
+
+                    if (m_isEndofFile) m_log.write("EOF(end_of_file)");
+                    else m_log.write("newline");
+                        
                     start_Log(), spaceLog();
 
                     m_log.write("  it is junk because of log(", m_log.getLogCounter(), ") above"), additionalLog();
@@ -1392,218 +1390,63 @@ namespace Nc
                     nextFilePosAndColumn(); //for extracting the loop terminating single quote too
                     break;
                 }
-                    
+                        
                 if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
                 nextFilePosAndColumn();
-                    
+                        
                 nextFilePosAndColumn();
             }  
-            
+                
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
             m_tokenString.push_back(m_fileBuffer[i]);
 
             return TokenType::_miscellany;
         }
+
+        //set literalType_ptr to the default characterWise-literal which is [ p ] if it is null
+        if (literalType_ptr == nullptr) literalType_ptr = &lcharacterWise_p;
 
         auto stringedCharLiteral = [&]()
         {
-            if (literalType == lcharacterWise_a) return "ascii";
-            else if (literalType == lcharacterWise_p) return "plain";
-            else if (literalType == lcharacterWise_u8) return "utf8";
-            else if (literalType == lcharacterWise_ra) return "raw-ascii";
-            else if (literalType == lcharacterWise_rp) return "raw-plain";
-            else if (literalType == lcharacterWise_ru8) return "raw-utf8";
+            if (*literalType_ptr == lcharacterWise_a) return "ascii";
+            else if (*literalType_ptr == lcharacterWise_p) return "plain";
+            else if (*literalType_ptr == lcharacterWise_u8) return "utf8";
             return "[undefined]";
         }();
 
-        auto formerFilePos{m_filePosition};
-        recordRelativeColumn(); //do not move
-
-        nextFilePosAndColumn(); //skip past the single quote that was found
-
-        if (literalType.starts_with('r'_u8))
+        while (true)
         {
-            if (m_isEndofFile or m_fileBuffer[m_filePosition] != '\''_u8)
+            if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
             {
-                m_log.write("missing second single quote [ ' ] denoting start of a raw character literal"), start_Log();
-                spaceLog();
-                m_log.write("  try this: [R]''{any unescaped text you want}''; where [R] can be either ra, rp or ru8; all case insensitive"), additionalLog();
-            }
-            else
-            nextFilePosAndColumn(); //for skipping past the second dobule quote
+                if (m_isEndofFile)
+                m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ \' ] before EOF(end_of_file)");
+                else
+                m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ \' ] before newline");
 
-            while (true)
+                start_Log();
+                return TokenType::_miscellany;
+            }
+            else if (m_fileBuffer[m_filePosition] == '\''_u8)
             {
-                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
-                {
-                    if (m_isEndofFile)
-                    m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ '' ] before eof(end-of-file)");
-                    else
-                    m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ '' ] before newline");
+                nextFilePosAndColumn(); //for extracting the loop terminating single quote too
+                break;
+            }
                     
-                    start_Log();
-                    return TokenType::_miscellany;
-                }
-                else if (m_fileBuffer[m_filePosition] == '\''_u8 and ((nextFilePosAndColumn(), m_fileBuffer[m_filePosition]) == '\''_u8 and !m_isEndofFile))
-                {
-                    nextFilePosAndColumn(1); //for extracting the loop terminating single quote
-                    break;
-                }
-
-                nextFilePosAndColumn();
-            }
-            
-            //extract the token to m_tokenString
-            for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer[i]);
+            if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
+            nextFilePosAndColumn();
+                    
+            nextFilePosAndColumn();
         }
-        else
-        {
-            while (true)
-            {
-                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
-                {
-                    if (m_isEndofFile)
-                    m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ ' ] before eof(end-of-file)");
-                    else
-                    m_log.writews("unterminated", stringedCharLiteral, "character literal, expected this [ ' ] before newline");
-
-                    start_Log();
-                    return TokenType::_miscellany;
-                }
-                else if (m_fileBuffer[m_filePosition] == '\''_u8)
-                {
-                    nextFilePosAndColumn(); //for extracting the loop terminating single quote too
-                    break;
-                }
-                    
-                if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
-                nextFilePosAndColumn();
-                    
-                nextFilePosAndColumn();
-            }
             
-            //extract the token to m_tokenString
-            for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer[i]);
+        //extract the token to m_tokenString
+        for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
+        m_tokenString.push_back(m_fileBuffer[i]);
 
-            bool shouldReturn{};
-            for (auto i = m_tokenString.begin(); i != m_tokenString.end(); ++i)
-            {
-                if (*i == '\\'_u8)
-                {
-                    switch (std::uint32_t(*++i))
-                    {
-                    case 'a': case 'b': case 'f': case 'n': case 'r': case 't': case 'v': case '\'': case '\"': case '\\':
-                    break;
+        if (validateNormalCharWiseLiterals(/*charType*/"character", /*stringedCharLiteral*/stringedCharLiteral, /*literalType*/*literalType_ptr) == TokenType::_miscellany)
+        return TokenType::_miscellany;
 
-                    case 'U':
-                        if (*++i != '[')
-                        {
-                            result = TokenType::_miscellany;
-
-                            m_log.write("missing left square brace [ [ ] denoting start of escaped unicode code point entry"), start_Log();
-                            spaceLog();
-                            m_log.write("  try this: U[{any unicode code point}]; remmeber the base of the number is expected to be base(16)"), additionalLog();
-                        }
-                        else
-                        {
-                            Myfcn::U8string u8str{};
-                            while (++i != m_tokenString.end())
-                            {
-                                if (*i == ']'_u8)
-                                break;
-                                
-                                u8str.push_back(*i);
-                            }
-
-                            if (i == m_tokenString.end())
-                            {
-                                result = TokenType::_miscellany;
-
-                                m_log.write("missing right square brace [ ] ] denoting end of escaped unicode code point entry");
-                                start_Log();
-
-                                --i; //take i back to point before end so the for statement won't loop forever
-                            }
-                            else
-                            {
-                                //trim any digit separator or whitespace if found
-                                if (std::ranges::any_of(u8str, [](Myfcn::U8char& x){ return x.isBasicLatinWhiteSpace(); }))
-                                {
-                                    auto newEnd = std::remove_if(u8str.begin(), u8str.end(), [](Myfcn::U8char& x){ return x.isBasicLatinWhiteSpace(); });
-                                    u8str.erase(newEnd, u8str.end());
-                                }
-
-                                if (!u8str.empty())
-                                {
-                                    if (std::ranges::all_of(u8str, [](Myfcn::U8char& i){ if (i.isBasicLatinAlphabetNumeral()) return true; return false; }))
-                                    {
-                                        if (!Myfcn::ManipulateStrAsBaseN::isValidBaseDigits(convertU8StrToAsciiStr(u8str), 16))
-                                        {
-                                            result = TokenType::_miscellany;
-
-                                            m_log.writews("escaped unicode code point entry [", u8str, "] contains invalid base(16) digit(s)"), start_Log();
-                                            spaceLog();
-                                            m_log.write("  try these digits instead: 1, 2, 3, 4, 5, 6, 7, 8, 9, A(a), B(b), C(c), D(d), E(e), F(f)"), additionalLog();
-                                        }
-                                        else
-                                        {
-                                            if (literalType == lcharacterWise_u8 and Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "10ffff", 16))
-                                            {
-                                                result = TokenType::_miscellany;
-
-                                                m_log.writews("in", stringedCharLiteral, "character literal, escaped unicode code point entry [", u8str, "] is greater than maximum unicode code-point 10FFFF₁₆");
-                                                start_Log();
-                                            }
-                                            else if (Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "7f", 16))
-                                            {
-                                                result = TokenType::_miscellany;
-
-                                                m_log.writews("in", stringedCharLiteral, "character literal, escaped unicode code point entry [", u8str, "] is greater than maximum ascii code-point 7F₁₆");
-                                                start_Log();
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        result = TokenType::_miscellany;
-
-                                        m_log.writews("escaped unicode code point entry contains junk [", u8str, "], expected base(16) digits instead");
-                                        start_Log();
-                                    }
-                                }
-                            }
-                        }
-                    break;
-                    
-                    default:
-                        result = TokenType::_miscellany;
-
-                        m_log.writews(stringedCharLiteral, "character literal [", m_tokenString, "], contains an invalid escape squence: [", *i, ']'), start_Log();
-                        spaceLog();
-                        m_log.write("  try the below instead:"), additionalLog();
-                        m_log.write(R"(  ● [ b ] for backspace equivalent to \U[8])"), additionalLog();
-                        m_log.write(R"(  ● [ f ] for formfeed equivalent to \U[C])"), additionalLog();
-                        m_log.write(R"(  ● [ n ] for newline equivalent to \U[A])"), additionalLog();
-                        m_log.write(R"(  ● [ r ] for carraige-return equivalent to \U[D])"), additionalLog();
-                        m_log.write(R"(  ● [ t ] for horizontal-tab equivalent to \U[9])"), additionalLog();
-                        m_log.write(R"(  ● [ v ] for vertical tab equivalent to \U[B])"), additionalLog();
-                        m_log.write(R"(  ● [ " ] for double-quote equivalent to \U[22])"), additionalLog();
-                        m_log.write(R"(  ● [ ' ] for single-quote equivalent to \U[27])"), additionalLog();
-                        m_log.write(R"(  ● [ U ] for entry of unicode code-points)"), additionalLog();
-                        m_log.write("  obviously the usage is this: \\(EscapeSquence)"), additionalLog();
-                        break;
-                    }
-                }
-            }
-
-            if (shouldReturn)
-            return TokenType::_miscellany;
-        }
-        
-        auto nonRawCharacter_size = [&]
+        auto character_size = [&]
         {   
             int size{};
             for (auto i = m_tokenString.begin(); i != m_tokenString.end(); i++)
@@ -1628,140 +1471,157 @@ namespace Nc
             return size - 2;
         }();
 
-        if (literalType.starts_with('r'_u8))
+        //size check
+        if (*literalType_ptr == lcharacterWise_u8)
         {
-            if (literalType == lcharacterWise_ru8)
-            {
-                if (m_tokenString.size() > 3) // '2' => because (')1 (char)2 (')3
-                m_log.writews("size of", stringedCharLiteral, "character literal [", m_tokenString, "] cannot be greater than 1"), start_Log();
-            }
-            else
-            {
-                if (std::ranges::any_of(m_tokenString, [](Myfcn::U8char& x){ return x.getByteEncoding() != Myfcn::U8char::ByteEncoding::one; }))
-                m_log.writews(stringedCharLiteral, "character literal [", m_tokenString, "] cannot have characters(s) greater than 1[byte] of encoding"), start_Log();
-                else if (m_tokenString.size() > 3) // '2' => because (')1 (char)2 (')3
-                m_log.writews("size of", stringedCharLiteral, "character literal [", m_tokenString, "] cannot be greater than 1"), start_Log();
-            }
+            if (character_size > 1)
+            m_log.writews("size of", stringedCharLiteral ,"character literal [", m_tokenString, "] cannot be greater than 1"), start_Log();
         }
         else
         {
-            if (literalType == lcharacterWise_u8)
-            {
-                if (nonRawCharacter_size > 1)
-                m_log.writews("size of", stringedCharLiteral ,"character literal [", m_tokenString, "] cannot be greater than 1"), start_Log();
-            }
-            else
-            {
-                if (std::ranges::any_of(m_tokenString, [](Myfcn::U8char& x){ return x.getByteEncoding() != Myfcn::U8char::ByteEncoding::one; }))
-                m_log.writews(stringedCharLiteral, "character literal [", m_tokenString, "] cannot have characters(s) greater than 1[byte] of encoding"), start_Log();
-                else if (nonRawCharacter_size > 1)
-                m_log.writews("size of", stringedCharLiteral, "character literal [", m_tokenString, "] cannot be greater than 1"), start_Log();
-            }
+            if (std::ranges::any_of(m_tokenString, [](Myfcn::U8char& x){ return x.getByteEncoding() != Myfcn::U8char::ByteEncoding::one; }))
+            m_log.writews(stringedCharLiteral, "character literal [", m_tokenString, "] cannot have characters(s) greater than 1[byte] of encoding"), start_Log();
+            else if (character_size > 1)
+            m_log.writews("size of", stringedCharLiteral, "character literal [", m_tokenString, "] cannot be greater than 1"), start_Log();
         }
-
-        addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, literalType);
+        
+        addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, m_absoluteColumn, m_relativeColumn, false, false, *literalType_ptr);
 
         return TokenType::literal;
     }
     
-    Lexer::TokenType Lexer::tokenizeStrLiterals(const Myfcn::U8string const* literalType_ptr)
+    Lexer::TokenType Lexer::tokenizeStrLiterals(const Myfcn::U8string* literalType_ptr)
     {
+        auto formerFilePos{m_filePosition};
+        bool isRaw = false;
+        std::optional<std::uint32_t> optLine{};
+        if (literalType_ptr == nullptr) recordRelativeColumn(); //do not move
+
+        nextFilePosAndColumn(); //skip past the double quote that was found
+
+        //raw string literal string check
+        if ((!m_isEndofFile and m_fileBuffer[m_filePosition] == '"'_u8) and (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == '"'_u8))
+        isRaw = true;
+        else prevFilePosAndColumn(m_filePosition - formerFilePos);/*if failed tack the filePosition back to the character past the initial double quote*/
+
         auto isCharacterWiseLiteralValid = [&]()
         {
-            if (literalType_ptr == nullptr or (*literalType_ptr == lcharacterWise_a or *literalType_ptr == lcharacterWise_u8 or *literalType_ptr == lcharacterWise_p))
-            return true;
-
-            return false;
+            return literalType_ptr == nullptr or (*literalType_ptr == lcharacterWise_a or *literalType_ptr == lcharacterWise_u8 or *literalType_ptr == lcharacterWise_p);
         };
 
         if (!isCharacterWiseLiteralValid())
         {
-            m_log.writews('[', m_tokenString, "] is not a recognized character wise literal"), start_Log();
-            spaceLog();
+            m_log.writews('[', m_tokenString, "] is not a recognized character wise literal"), start_Log(), spaceLog();
             m_log.write("  try the below instead:"), additionalLog();
             m_log.write("  ● [ a ] for ascii string literal"), additionalLog();
             m_log.write("  ● [ p ] for plain string literal"), additionalLog();
             m_log.write("  ● [ u8 ] for utf8 string literal"), additionalLog();
             m_log.write("  [NOTE] default is [ p ] - plain string literal"), additionalLog();
 
-            auto formerFilePos{m_filePosition};
-            if (literalType_ptr == nullptr)
-            recordRelativeColumn(); //do not move
-
-            nextFilePosAndColumn(); //skip past the single quote that was found
-            while (true)
+            if (isRaw)
             {
-                if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
+                while (true)
                 {
                     if (m_isEndofFile)
-                    m_log.write("unterminated junk string literal, expected this [ ' ] before eof(end-of-file)");
-                    else
-                    m_log.write("unterminated junk string literal, expected this [ ' ] before newline");
-                    
-                    start_Log(), spaceLog();
+                    {
+                        m_log.writews("unterminated junk raw string literal, expected this [ \"\"\" ] before EOF(end_of_file)"), start_Log(), spaceLog();
+                        m_log.write("  it is junk because of log(", m_log.getLogCounter(), ") above"), additionalLog();
+                        return TokenType::_miscellany;
+                    }
+                    else if
+                    (
+                        m_fileBuffer[m_filePosition] == '"'_u8
+                        and
+                        (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == '"'_u8)
+                        and
+                        (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == '"'_u8)
+                    )
+                    {
+                        nextFilePosAndColumn(); //for extracting the loop terminating double quote
+                        break;
+                    }
+                    else if (!m_isEndofFile and m_fileBuffer[m_filePosition] == '\n'_u8)//it is directly under the second conditionally for a reason
+                    newLineFound();
 
-                    m_log.write("  it is junk because of log(", m_log.getLogCounter(), ") above"), additionalLog();
-                    return TokenType::_miscellany;
+                    nextFilePosAndColumn();
                 }
-                else if (m_fileBuffer[m_filePosition] == '"'_u8)
+                
+                //extract the token to m_tokenString
+                for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
                 {
-                    nextFilePosAndColumn(); //for extracting the loop terminating single quote too
-                    break;
+                    if (m_fileBuffer[i] == '\n')
+                    m_tokenString += std::string{'\\', 'n'};
+                    else
+                    m_tokenString.push_back(m_fileBuffer[i]);
                 }
-                    
-                if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
-                nextFilePosAndColumn();
-                    
-                nextFilePosAndColumn();
-            }  
-            
-            //extract the token to m_tokenString
-            for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            m_tokenString.push_back(m_fileBuffer[i]);
+            }
+            else
+            {
+                while (true)
+                {
+                    if (m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
+                    {
+                        m_log.writews("unterminated junk string literal, expected this [ \" ] before");
+
+                        if (m_isEndofFile) m_log.write("EOF(end_of_file)");
+                        else m_log.write("newline");
+                        
+                        start_Log(), spaceLog();
+
+                        m_log.write("  it is junk because of log(", m_log.getLogCounter(), ") above"), additionalLog();
+                        return TokenType::_miscellany;
+                    }
+                    else if (m_fileBuffer[m_filePosition] == '"'_u8)
+                    {
+                        nextFilePosAndColumn(); //for extracting the loop terminating single quote too
+                        break;
+                    }
+                        
+                    if (m_fileBuffer[m_filePosition] == '\\'_u8) //for skipping potential escape code squences
+                    nextFilePosAndColumn();
+                        
+                    nextFilePosAndColumn();
+                }  
+                
+                //extract the token to m_tokenString
+                for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
+                m_tokenString.push_back(m_fileBuffer[i]);
+            }
 
             return TokenType::_miscellany;
         }
+
+        //set literalType_ptr to the default characterWise-literal which is [ p ] if it is null
+        if (literalType_ptr == nullptr) literalType_ptr = &lcharacterWise_p;
 
         auto stringedCharLiteral = [&]()
         {
             if (*literalType_ptr == lcharacterWise_a) return "ascii";
             else if (*literalType_ptr == lcharacterWise_p) return "plain";
             else if (*literalType_ptr == lcharacterWise_u8) return "utf8";
-            else if (*literalType_ptr == lcharacterWise_ra) return "raw-ascii";
-            else if (*literalType_ptr == lcharacterWise_rp) return "raw-plain";
-            else if (*literalType_ptr == lcharacterWise_ru8) return "raw-utf8";
             return "[undefined]";
         }();
 
-        auto formerFilePos{m_filePosition};
-        if (literalType_ptr == nullptr) recordRelativeColumn(); //do not move
-
-        nextFilePosAndColumn(); //skip past the single quote that was found
-
-        //set literalType_ptr to the default characterWise-literal which is [ p ]
-        literalType_ptr = &lcharacterWise_p;
-
-        if (literalType_ptr->starts_with('r'_u8))
-        {
-            if (m_isEndofFile or m_fileBuffer[m_filePosition] != '\''_u8)
-            {
-                m_log.write("missing second single quote [ ' ] denoting start of a raw string literal"), start_Log();
-                spaceLog();
-                m_log.write("  try this: [R]\"\"{any unescaped text you want}\"\"; where [R] can be either ra, rp or ru8; all case insensitive"), additionalLog();
-            }
-            else
-            nextFilePosAndColumn(); //for skipping past the second dobule quote
-
+        if (isRaw)
+        {   
+            auto startLine = m_line;
             while (true)
             {
                 if (m_isEndofFile)
                 {
-                    m_log.writews("unterminated", stringedCharLiteral, "string literal, expected this [ \"\" ] before eof(end-of-file)"), start_Log();
+                    m_log.writews("unterminated", stringedCharLiteral, "string literal, expected this [ \"\"\" ] before EOF(end_of_file)"), start_Log();
                     return TokenType::_miscellany;
                 }
-                else if (m_fileBuffer[m_filePosition] == '"'_u8 and ((nextFilePosAndColumn(), m_fileBuffer[m_filePosition]) == '"'_u8 and !m_isEndofFile))
+                else if
+                (
+                    m_fileBuffer[m_filePosition] == '"'_u8
+                    and
+                    (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == '"'_u8)
+                    and
+                    (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == '"'_u8)
+                )
                 {
-                    nextFilePosAndColumn(); //for extracting the loop terminating single quote
+                    nextFilePosAndColumn(); //for extracting the loop terminating double quote
                     break;
                 }
                 else if (!m_isEndofFile and m_fileBuffer[m_filePosition] == '\n'_u8)//it is directly under the second conditionally for a reason
@@ -1769,6 +1629,8 @@ namespace Nc
 
                 nextFilePosAndColumn();
             }
+            //if the raw string is multiline, set the optional-line
+            if (startLine != m_line) optLine = startLine;
             
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
@@ -1808,8 +1670,11 @@ namespace Nc
             //extract the token to m_tokenString
             for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
             m_tokenString.push_back(m_fileBuffer[i]);
+
+            validateNormalCharWiseLiterals(/*charType*/"string", /*stringedCharLiteral*/stringedCharLiteral, /*literalType*/*literalType_ptr);
         }
-        addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, *literalType_ptr);
+
+        addToTokenDataList(m_tokenString, optLine, m_line, m_absoluteColumn, m_relativeColumn, false, false, *literalType_ptr);
         
         return TokenType::literal;
     }
@@ -1886,7 +1751,7 @@ namespace Nc
                                             m_log.writews("in", stringedCharLiteral, charType, "literal, escaped unicode code point entry [", u8str, "] is greater than maximum unicode code-point 10FFFF₁₆");
                                             start_Log();
                                         }
-                                        else if (charType == "character" and Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "7f", 16))
+                                        else if ((void*)charType == (void*)"character" and Myfcn::ManipulateStrAsBaseN::greaterThan(convertU8StrToAsciiStr(u8str), "7f", 16))
                                         {
                                             result = TokenType::_miscellany;
 
@@ -1910,7 +1775,7 @@ namespace Nc
                 default:
                     result = TokenType::_miscellany;
 
-                    m_log.writews(stringedCharLiteral, "string literal [", m_tokenString, "], contains an invalid escape squence: [", *i, ']'), start_Log();
+                    m_log.writews(stringedCharLiteral, charType, "literal [", m_tokenString, "], contains an invalid escape squence: [", *i, ']'), start_Log();
                     spaceLog();
                     m_log.write("  try the below instead:"), additionalLog();
                     m_log.write(R"(  ● [ b ] for backspace equivalent to \U[8])"), additionalLog();
@@ -1923,12 +1788,13 @@ namespace Nc
                     m_log.write(R"(  ● [ " ] for double-quote equivalent to \U[22])"), additionalLog();
                     m_log.write(R"(  ● [ ' ] for single-quote equivalent to \U[27])"), additionalLog();
                     m_log.write(R"(  ● [ z ] for null-character equivalent to \U[0])"), additionalLog();
-                    m_log.write(R"(  ● [ U ] or [ u ] for entry of unicode code-point entry)"), additionalLog();
+                    m_log.write(R"(  ● [ U ] or [ u ] for entry of unicode code-point entry => \U[<code-point>])"), additionalLog();
                     m_log.write("  obviously the usage is this: \\(EscapeSquence)"), additionalLog();
                     break;
                 }
             }
         }
+        
         return result;
     }
 
@@ -2143,7 +2009,7 @@ namespace Nc
         else
         return TokenType::_miscellany;
         
-        addToTokenDataList(m_tokenString, m_line, m_absoluteColumn, m_relativeColumn, false, false, {}, true);
+        addToTokenDataList(m_tokenString, std::optional<std::uint32_t>{}, m_line, m_absoluteColumn, m_relativeColumn, false, false, {}, true);
 
         return TokenType::symbol;
     }

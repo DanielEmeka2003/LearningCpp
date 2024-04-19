@@ -69,15 +69,15 @@ main([[maybe_unused]] int argc, [[maybe_unused]] char* argv[])
         
         System::coutput.boolalpha();
         for (auto &&i : lex.getTokenList())
-        System::coutput.writews_endl(i.token, i.line, i.relativeColumn, i.absoluteColumn, i.isReserved, i.isIdentifier, i.literalType, i.isSymbol);
+        System::coutput.writews_endl(i.token, i.optLine.value_or(0), i.line, i.relativeColumn, i.absoluteColumn, i.isReserved, i.isIdentifier, i.literalType, i.isSymbol);
         
         System::coutput.write_endl("\n\n");
+        std::exit(0);
 
-        Nc::Parser parse{lex};
+        Nc::Parser parse{lex};//change the parser so it can reference the lexer
         parse.logBoxStyle(Nc::Log::BoxLineStyle::bold);
         parse.parseTokenList();
 
-        std::exit(0);
         System::coutput.writewl(parse.getAST().operator Nc::Root &());
         
         // Nc::NcCodeGen codegen{ std::move(parse.getAST()) };

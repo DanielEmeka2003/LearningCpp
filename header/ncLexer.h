@@ -58,9 +58,6 @@ namespace Nc
     static inline const Myfcn::U8string lcharacterWise_a{"a"_u8str};
     static inline const Myfcn::U8string lcharacterWise_u8{"u8"_u8str};
     static inline const Myfcn::U8string lcharacterWise_p{"p"_u8str};
-    static inline const Myfcn::U8string lcharacterWise_ra{"ra"_u8str};
-    static inline const Myfcn::U8string lcharacterWise_ru8{"ru8"_u8str};
-    static inline const Myfcn::U8string lcharacterWise_rp{"rp"_u8str};
 
     /*Reserved*/
 
@@ -243,6 +240,7 @@ namespace Nc
     struct TokenData
     {
         Myfcn::U8string token{};
+        std::optional<std::uint32_t> optLine{};
         std::uint32_t line{};
         std::uint32_t absoluteColumn{};
         std::uint32_t relativeColumn{};
@@ -291,7 +289,7 @@ namespace Nc
         void nextFilePosAndColumn(std::uint32_t number = 1);
         void prevFilePosAndColumn(std::uint32_t number = 1);
         void recordRelativeColumn();
-        void addToTokenDataList(Myfcn::U8string& tokenString, std::uint32_t line, std::uint32_t absoluteColumn, std::uint32_t relativeColumn, bool isReserved = false, bool isIdentifier = false, Myfcn::U8string literalType = {}, bool isSymbol = false);
+        void addToTokenDataList(Myfcn::U8string& tokenString, std::optional<std::uint32_t> optLine, std::uint32_t line, std::uint32_t absoluteColumn, std::uint32_t relativeColumn, bool isReserved = false, bool isIdentifier = false, Myfcn::U8string literalType = {}, bool isSymbol = false);
 
         TokenType singleLineComment();
         TokenType multiLineComment();
@@ -303,9 +301,9 @@ namespace Nc
         void validateIntLiteral(Myfcn::U8string& base, Myfcn::U8string& literalType);
         void validateRealNumberLiteral(Myfcn::U8string& base_exp, Myfcn::U8string& literalType);
 
-        TokenType tokenizeCharLiterals(const Myfcn::U8string const* literalType_ptr = nullptr);
-        TokenType tokenizeStrLiterals(const Myfcn::U8string const* literalType_ptr = nullptr);
-        TokenType validateNormalCharWiseLiterals(const char* charType, const char* stringedCharLiteral, const Myfcn::U8string& literalType){}
+        TokenType tokenizeCharLiterals(const Myfcn::U8string* literalType_ptr = nullptr);
+        TokenType tokenizeStrLiterals(const Myfcn::U8string* literalType_ptr = nullptr);
+        TokenType validateNormalCharWiseLiterals(const char* charType, const char* stringedCharLiteral, const Myfcn::U8string& literalType);
 
         TokenType tokenizeSymbols();
 

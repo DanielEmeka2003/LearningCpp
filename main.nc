@@ -1,9 +1,11 @@
+""" daniel is so awesome """
+
 jester() void {  }
 
 sum()
 {
     `{ multi-line comment }`
-    ``single line comment ⟨⟩
+    ``single line comment ⟨⟩ `% - %` `!
 
     for none : (default, ≠, 23)
     io::stdout.write("emeka")

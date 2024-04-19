@@ -165,7 +165,7 @@ namespace Nc
         Result prefix_exp(const FailureCase& fc = FailureCase{false, {}, {}});
         Result postfix_exp(const FailureCase& fc = FailureCase{false, {}, {}});
         Result primary_exp(const FailureCase& fc = FailureCase{false, {}, {}});
-        Result special_ident(std::vector<Myfcn::U8string_view> reservedInputs){}
+        Result special_ident(std::vector<Myfcn::U8string_view> reservedInputs);
         Result tempVarDecl(const FailureCase& fc = FailureCase{false, {}, {}});
         Result anyTypeList_exp(const FailureCase& fc = FailureCase{false, {}, {}});
         Result expression_list(const FailureCase& fc = FailureCase{false, {}, {}});
