@@ -7,16 +7,15 @@
 
 #include "outputstream.h"
 
-namespace System
+namespace io
 {
-
     /*Pre-defined class template instantiations*/
 
-    inline Streams::OutputStream coutput{ &std::cout };
-    inline Streams::OutputStream cerror{ &std::cerr };
+    inline Streams::OutputStream cout{ &(std::cout << std::boolalpha) };
+    inline Streams::OutputStream cerr{ &(std::cerr << std::boolalpha) };
 
-    inline Streams::OutputStream wcoutput{ &std::wcout };
-    inline Streams::OutputStream wcerror{ &std::wcerr };
+    inline Streams::OutputStream wcout{ &(std::wcout << std::boolalpha) };
+    inline Streams::OutputStream wcerr{ &(std::wcerr << std::boolalpha) };
     
     /*std::basic_ostream function template manipulators implemented as function pointers*/
 
@@ -27,7 +26,6 @@ namespace System
     template <typename CharT>
     std::basic_ostream<CharT>& (&flush_v)(std::basic_ostream<CharT>&) = std::flush<CharT, std::char_traits<CharT>>;
 
-
     /*std::basic_ostream function template manipulators implemented as function pointers full instantiations*/
     
     inline std::basic_ostream<char>& (&endl_v_c)(std::basic_ostream<char>&) = std::endl<char, std::char_traits<char>>;
@@ -37,11 +35,7 @@ namespace System
     
     inline std::basic_ostream<wchar_t>& (&endl_v_wc)(std::basic_ostream<wchar_t>&) = std::endl<wchar_t, std::char_traits<wchar_t>>;
     inline std::basic_ostream<wchar_t>& (&ends_v_wc)(std::basic_ostream<wchar_t>&) = std::ends<wchar_t, std::char_traits<wchar_t>>;
-    inline std::basic_ostream<wchar_t>& (&flush_v_wc)(std::basic_ostream<wchar_t>&) = std::flush<wchar_t, std::char_traits<wchar_t>>;
-
-
-
-    
+    inline std::basic_ostream<wchar_t>& (&flush_v_wc)(std::basic_ostream<wchar_t>&) = std::flush<wchar_t, std::char_traits<wchar_t>>;    
 } // namespace Streams::System
 
 

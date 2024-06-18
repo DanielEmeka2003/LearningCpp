@@ -84,7 +84,7 @@ namespace Pl0
                     if (m_inputFile.at(m_filePosition) != +Token::EQUAL)
                     {
                         m_error.empty_str();
-                        m_error.writews_endl("unknown token type:", "[\"", m_inputFile.at(m_filePosition), "\"]");
+                        m_error.writews_nl("unknown token type:", "[\"", m_inputFile.at(m_filePosition), "\"]");
                         m_error.write("try \" := \" for assigning values to a variable");
                         errorOutput();
                     }
@@ -235,13 +235,13 @@ namespace Pl0
 
     void PL0Lexer::errorOutput()
     {
-        System::coutput.write_endl("───────────────────────────────────────────────────────────────────────────────────────────────────");
-        System::cerror.writews_endl("[TOKEN ERROR]", m_error.get_str());
-        System::cerror.writewt("");
-        System::cerror.writews_endl("Line:", m_line, "Column:", m_column);
-        System::cerror.write_endl("");
-        System::cerror.write_endl("/Compilation exited with an error/");
-        System::coutput.write_endl("───────────────────────────────────────────────────────────────────────────────────────────────────");
+        io::cerr.write_nl("───────────────────────────────────────────────────────────────────────────────────────────────────");
+        io::cerr.writews_nl("[TOKEN ERROR]", m_error.get_str());
+        io::cerr.writewt("");
+        io::cerr.writews_nl("Line:", m_line, "Column:", m_column);
+        io::cerr.write_nl("");
+        io::cerr.write_nl("/Compilation exited with an error/");
+        io::cerr.write_nl("───────────────────────────────────────────────────────────────────────────────────────────────────");
         std::exit(EXIT_FAILURE);
     }
 } // namespace Myfcn

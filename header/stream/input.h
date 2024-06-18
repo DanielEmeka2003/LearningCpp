@@ -6,12 +6,12 @@
 #include <iostream>
 #include "inputstream.h"
 
-namespace System
+namespace io
 {
     /*Instantiations*/
     
-    inline Streams::InputStream cinput{ &std::cin };
-    inline Streams::InputStream wcinput{ &std::wcin };
+    inline Streams::InputStream cin{ &std::cin };
+    inline Streams::InputStream wcin{ &std::wcin };
 
     template <typename CharT>
     std::basic_istream<CharT>& (&ws_v) (std::basic_istream<CharT>&) = std::ws<CharT, std::char_traits<CharT>>;

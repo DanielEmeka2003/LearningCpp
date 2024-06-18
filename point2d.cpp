@@ -4,10 +4,9 @@
 
 #include "point2d.h"
 
-namespace Myfcn
+namespace misc
 {
-    Point2d::Point2d(float x, float y): m_x{x}, m_y{y}
-    {}
+    Point2d::Point2d(float x, float y): m_x{x}, m_y{y} {}
 
     Point2d Point2d::getAdjacentPoint(Direction direction)
     {

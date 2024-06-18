@@ -139,6 +139,14 @@
                 "main.nc"
             ],
             "stopAtEntry": true
+        },
+        {
+            "cwd": "/home/emeka/Documents/LearningCpp",
+            "binaryPath": "/home/emeka/Documents/LearningCpp/main",
+            "binaryArgs": [
+                "main.nc"
+            ],
+            "stopAtEntry": true
         }
     ],
     "C_Cpp.default.intelliSenseMode": "windows-gcc-x86",
@@ -161,8 +169,9 @@
     "editor.tabCompletion": "onlySnippets",
     "emmet.showSuggestionsAsSnippets": true,
     "C_Cpp.suggestSnippets": true,
-    "editor.fontWeight": "normal",
+    "editor.fontWeight": "510",
     "editor.fontSize": 15,
     "python.analysis.typeCheckingMode": "basic",
+    "editor.fontFamily": "consolas, \"cascadia code\", monospace",
 }
 

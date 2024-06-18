@@ -1,3 +1,4 @@
+"""
 class D:
     def __init__(self, a: int, b: str):
         self.a = a
@@ -37,3 +38,7 @@ while True:
 
     ieeeFP.calculateFRange(number_of_mantissa, max_exp, exp_bias)
     ieeeFP.print()
+"""
+
+import turtle as resource
+

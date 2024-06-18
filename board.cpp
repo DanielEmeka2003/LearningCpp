@@ -30,7 +30,7 @@ namespace fiftheenpuzzle
         }
     }
 
-    Myfcn::Point2d Board::toPoint2d(BoardTile n) const
+    misc::Point2d Board::toPoint2d(BoardTile n) const
     {
         for (size_t i{0}; i < m_board.size(); i++)
         {
@@ -45,7 +45,7 @@ namespace fiftheenpuzzle
         return {-100.f, -100.f};
     }
 
-    std::optional<Myfcn::Point2d> Board::slideTile(Myfcn::Point2d::Direction direction)
+    std::optional<misc::Point2d> Board::slideTile(misc::Point2d::Direction direction)
     {
         //Locate the empty tile.
         Tile e_t{*this};
@@ -54,21 +54,21 @@ namespace fiftheenpuzzle
         auto emptyTilePosition{e_t.getTilePosition()};
 
         //Get the adjacent position/point, in the opposite direction of the given direction, from the empty tile.
-        Myfcn::Point2d adjacentPoint{};
+        misc::Point2d adjacentPoint{};
 
         switch (direction)
         {
-        case Myfcn::Point2d::Direction::up: 
-        adjacentPoint = emptyTilePosition.getAdjacentPoint(Myfcn::Point2d::Direction::down); 
+        case misc::Point2d::Direction::up: 
+        adjacentPoint = emptyTilePosition.getAdjacentPoint(misc::Point2d::Direction::down); 
         break;
-        case Myfcn::Point2d::Direction::down: 
-        adjacentPoint = emptyTilePosition.getAdjacentPoint(Myfcn::Point2d::Direction::up); 
+        case misc::Point2d::Direction::down: 
+        adjacentPoint = emptyTilePosition.getAdjacentPoint(misc::Point2d::Direction::up); 
         break;
-        case Myfcn::Point2d::Direction::left: 
-        adjacentPoint = emptyTilePosition.getAdjacentPoint(Myfcn::Point2d::Direction::right); 
+        case misc::Point2d::Direction::left: 
+        adjacentPoint = emptyTilePosition.getAdjacentPoint(misc::Point2d::Direction::right); 
         break;
-        case Myfcn::Point2d::Direction::right: 
-        adjacentPoint = emptyTilePosition.getAdjacentPoint(Myfcn::Point2d::Direction::left); 
+        case misc::Point2d::Direction::right: 
+        adjacentPoint = emptyTilePosition.getAdjacentPoint(misc::Point2d::Direction::left); 
         break;
         }
 
@@ -83,14 +83,14 @@ namespace fiftheenpuzzle
 
     Board& Board::randomize()
     {
-        using namespace Myfcn;
+        using namespace misc;
 
         constexpr size_t maxNumberOfRandomization{1000};
 
         for (size_t i = 0; i < maxNumberOfRandomization; i++)
         {
             //Get a random direction to slide tiles in.
-            auto randomOutput{ Random::get(static_cast<std::int64_t>(Point2d::Direction::up), static_cast<std::int64_t>(Point2d::Direction::right)) };
+            auto randomOutput{ random::get(static_cast<std::int64_t>(Point2d::Direction::up), static_cast<std::int64_t>(Point2d::Direction::right)) };
             Point2d::Direction randomDirection{ static_cast<Point2d::Direction>(randomOutput) };
             //Slide a tile.
             auto maybeTilePosition{slideTile(randomDirection)};
@@ -131,7 +131,7 @@ namespace fiftheenpuzzle
         return true;
     }
 
-    bool Board::isPointValid(const Myfcn::Point2d& point) const
+    bool Board::isPointValid(const misc::Point2d& point) const
     {
         float x{point.getX()};
         float y{point.getY()};
@@ -173,6 +173,7 @@ namespace fiftheenpuzzle
     }
 
     /*--------------------------------------Tile------------------------------------------*/
+    
     Tile::Tile(Board& board, Board::BoardTile boardTile): m_boardTile{boardTile}, m_tilePosition{board.toPoint2d(boardTile)}
     {
         //Peforms a switch of the tile's position to get the correct index.
@@ -183,10 +184,10 @@ namespace fiftheenpuzzle
         m_ptr_tile = &(board.m_board.at(outer_i).at(inner_i));
     }
 
-    Tile::Tile(Board& board, const Myfcn::Point2d& tilePosition): m_tilePosition{tilePosition}
+    Tile::Tile(Board& board, const misc::Point2d& tilePosition): m_tilePosition{tilePosition}
     {
         if ( !(board.isPointValid(m_tilePosition)) )
-        throw std::invalid_argument{"In constructor Tile::Tile(Board, Myfcn::Point2d), parameter tilePosition is invalid"};
+        throw std::invalid_argument{"In constructor Tile::Tile(Board, misc::Point2d), parameter tilePosition is invalid"};
         
         //Peforms a switch of the tile's position to get the correct index.
         size_t outer_i{static_cast<size_t>(m_tilePosition.getY())};
@@ -214,7 +215,7 @@ namespace fiftheenpuzzle
         return static_cast<int>(m_boardTile);
     }
 
-    const Myfcn::Point2d& Tile::getTilePosition() const
+    const misc::Point2d& Tile::getTilePosition() const
     {
         return m_tilePosition;
     }

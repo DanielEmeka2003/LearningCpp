@@ -5,7 +5,7 @@
 
 #include <iostream>
 
-namespace Myfcn
+namespace misc
 {
     class Point2d
     {

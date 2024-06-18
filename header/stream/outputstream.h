@@ -117,7 +117,7 @@ namespace Streams
         template <typename Arg1, typename... Args>
         void writewl(const Arg1& arg1, const Args&... args);
 
-        /*writews_endl - write with spacing and end in a newline.
+        /*writews_nl - write with spacing and end in a newline.
         Takes in a variable amount of arguments and outputs each individual argument with the space character appended after it,
         expect the last argument in a *variable list* of arguments,
         and ends the write with the new line character (as far as those arguments have overloaded the insertion operator[operator<<]
@@ -127,9 +127,9 @@ namespace Streams
         this function first clears the std::ios_base::iostate to std::ios_base::goodbit and throws exception std::runtime_error.
         [Miscellany] :  sets m_isWritten.*/
         template <typename Arg1, typename... Args>
-        void writews_endl(const Arg1& arg1, const Args&... args);
+        void writews_nl(const Arg1& arg1, const Args&... args);
 
-        /*writewt_endl - write with tabing and end in a newline.
+        /*writewt_nl - write with tabing and end in a newline.
         Takes in a variable amount of arguments and writes each individual argument with the tab character appended after it,
         expect the last argument in a *variable list* of arguments,
         and ends the write with the new line character (as far as those arguments have overloaded the insertion operator[operator<<]
@@ -139,9 +139,9 @@ namespace Streams
         this function first clears the std::ios_base::iostate to std::ios_base::goodbit and throws exception std::runtime_error.
         [Miscellany] :  sets m_isWritten.*/
         template <typename Arg1, typename... Args>
-        void writewt_endl(const Arg1& arg1, const Args&... args);
+        void writewt_nl(const Arg1& arg1, const Args&... args);
 
-        /*write_endl - write and end in a newline.
+        /*write_nl - write and end in a newline.
         Takes in a variable amount of arguments and writes them as they were, then ends the write in a newline
         (as far as those arguments have overloaded the insertion operator[operator<<] to work with it).
 
@@ -149,7 +149,7 @@ namespace Streams
         this function first clears the std::ios_base::iostate to std::ios_base::goodbit and throws exception std::runtime_error.
         [Miscellany] :  sets m_isWritten.*/
         template <typename Arg1, typename... Args>
-        void write_endl(const Arg1& arg1, const Args&... args);
+        void write_nl(const Arg1& arg1, const Args&... args);
 
         /*Returns a reference to the output stream object given.(Preferred)*/
         constexpr std::basic_ostream<CharT>& get() noexcept;
@@ -258,15 +258,15 @@ namespace Streams
         /*An overload of writewl that takes no argument.
         Does no writing but is essential to stopping the writing operation while recording the time the operation stopped.*/
         void writewl();
-        /*An overload of writews_endl that takes no argument.
-        Does no writing but is essential to stopping the writing operation and calls write_endl for implementing the rest.*/
-        void writews_endl();
-        /*An overload of writewt_endl that takes no argument.
-        Does no writing but is essential to stopping the writing operation and calls write_endl for implementing the rest.*/
-        void writewt_endl();
+        /*An overload of writews_nl that takes no argument.
+        Does no writing but is essential to stopping the writing operation and calls write_nl for implementing the rest.*/
+        void writews_nl();
+        /*An overload of writewt_nl that takes no argument.
+        Does no writing but is essential to stopping the writing operation and calls write_nl for implementing the rest.*/
+        void writewt_nl();
         /*Inserts a newline character to the output stream while implementing m_isWritten and recording the time writing operations
-        stopped. Also called by both writews_endl and writewt_endl overloads that take no arguments.*/
-        void write_endl();
+        stopped. Also called by both writews_nl and writewt_nl overloads that take no arguments.*/
+        void write_nl();
         /*Checks if m_out is nullptr and throws an exception.*/
         void check_m_out();
 
@@ -463,7 +463,7 @@ namespace Streams
 
     template <typename CharT>
     template <typename Arg1, typename... Args>
-    void OutputStream<CharT>::writews_endl(const Arg1& arg1, const Args&... args)
+    void OutputStream<CharT>::writews_nl(const Arg1& arg1, const Args&... args)
     {
         check_m_out();
 
@@ -509,12 +509,12 @@ namespace Streams
             badbitCheck();
         }
 
-        writews_endl(args...);  
+        writews_nl(args...);  
     }
 
     template <typename CharT>
     template <typename Arg1, typename... Args>
-    void OutputStream<CharT>::writewt_endl(const Arg1& arg1, const Args&... args)
+    void OutputStream<CharT>::writewt_nl(const Arg1& arg1, const Args&... args)
     {
         check_m_out();
 
@@ -560,12 +560,12 @@ namespace Streams
             badbitCheck();
         }
         
-        writewt_endl(args...);
+        writewt_nl(args...);
     }
 
     template <typename CharT>
     template <typename Arg1, typename... Args>
-    void OutputStream<CharT>::write_endl(const Arg1& arg1, const Args&... args)
+    void OutputStream<CharT>::write_nl(const Arg1& arg1, const Args&... args)
     {
         check_m_out();
 
@@ -587,7 +587,7 @@ namespace Streams
             badbitCheck();
         }
 
-        write_endl(args...);
+        write_nl(args...);
     }
 
     template <typename CharT>
@@ -845,7 +845,7 @@ namespace Streams
         write#(3); would equal 3.
 
         [Note] Check the implementation of the overload that takes in a variable amount of arguments to understand more clearly.
-        Appicable to any overload of a format function that takes no arguments, expect write_endl.*/
+        Appicable to any overload of a format function that takes no arguments, expect write_nl.*/
         m_writeEndTime = std::chrono::system_clock::now();
         m_isWriteFcnUsed = true;
     }
@@ -867,21 +867,21 @@ namespace Streams
     }
 
     template <typename CharT>
-    void OutputStream<CharT>::writews_endl()
+    void OutputStream<CharT>::writews_nl()
     { 
         m_isFirstArg1 = true;
-        write_endl();
+        write_nl();
     }
 
     template <typename CharT>
-    void OutputStream<CharT>::writewt_endl()
+    void OutputStream<CharT>::writewt_nl()
     { 
         m_isFirstArg1 = true;
-        write_endl();
+        write_nl();
     }
 
     template <typename CharT>
-    void OutputStream<CharT>::write_endl()
+    void OutputStream<CharT>::write_nl()
     {
         if (m_isWritten)
         m_out->put(m_out->widen('\n'));

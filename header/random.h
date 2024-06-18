@@ -8,7 +8,7 @@
 #include <cstdint>
 
 
-namespace Myfcn::Random
+namespace misc::random
 {
     namespace clock = std::chrono;
     using mtType = std::mt19937::result_type; 
@@ -17,9 +17,8 @@ namespace Myfcn::Random
     inline std::mt19937 init()
     {
         std::random_device rd{};
-
-        std::seed_seq ss
-        {rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd(), static_cast<mtType>(clock::steady_clock::now().time_since_epoch().count())};
+        
+        std::seed_seq ss {rd(), rd(), rd(), rd(), rd(), rd(), rd(), rd(), static_cast<std::random_device::result_type>(clock::steady_clock::now().time_since_epoch().count())};
         
         return std::mt19937{ ss }; 
     }

@@ -2,7 +2,7 @@
 #include <chrono>
 
 #include "fiftheenpuzzle.h"
-#include "myfunctions1.h"
+#include "misc_utility.h"
 #include "stream/output.h"
 
 using namespace std::chrono_literals;
@@ -12,33 +12,31 @@ namespace fiftheenpuzzle
     //Introduction to the fiftheenpuzzle game.
     void intro()
     {
-        System::coutput.write_endl("");
-        System::coutput.writewl("Welcome to FiftheenPuzzle");
+        io::cout.write_nl("");
+        io::cout.writewl("Welcome to FiftheenPuzzle");
 
-        System::coutput.writewl("w: slide tile up.", "s: slide tile down.", "a: slide tile left.", "d: right tile right.", "q: quit game.");
-        System::coutput.write_endl("");
+        io::cout.writewl("w: slide tile up.", "s: slide tile down.", "a: slide tile left.", "d: right tile right.", "q: quit game.");
+        io::cout.write_nl("");
     }
 
     void randomizeBoard(Board& b)
     {
         for (std::chrono::seconds s = 0s; s < 4s; ++s)
-        {
-            System::coutput.writewl("Randomizing Board......");
-            std::this_thread::sleep_for(2s);
-        }
+        io::cout.writewl("Randomizing Board......"), std::this_thread::sleep_for(2s);
+        
         b.randomize();
     }
 
     //Performs input actions.
-    void inputActions(Board& b, const std::optional<Myfcn::Point2d>& maybeTilePosition)
+    void inputActions(Board& b, const std::optional<misc::Point2d>& maybeTilePosition)
     {
         if (maybeTilePosition.has_value())
         {
-            Tile e_t{b}, u_t{b, *maybeTilePosition};
+            Tile e_t{b}, u_t{b, maybeTilePosition.value()};
             e_t.swap(u_t);
         }
-        System::coutput.writewl(b);
-        System::coutput.write_endl("");
+        io::cout.writewl(b);
+        io::cout.write_nl("");
     }
 
     //Asks For Play again choice.
@@ -47,7 +45,7 @@ namespace fiftheenpuzzle
         char choice{};
         while (true)
         {
-            choice = Myfcn::getInput<char>("Want to play again(y/n)? ");
+            choice = misc::getInput<char>("Want to play again(y/n)? ");
             switch (choice)
             {
             case 'y':
@@ -68,12 +66,12 @@ namespace fiftheenpuzzle
 
             Board b{};
 
-            System::coutput.writewl(b);
-            System::coutput.write_endl("");
+            io::cout.writewl(b);
+            io::cout.write_nl("");
 
             randomizeBoard(b);
-            System::coutput.writewl(b);
-            System::coutput.write_endl("");
+            io::cout.writewl(b);
+            io::cout.write_nl("");
             
             bool is_solved{false};
             char userinput{};
@@ -82,9 +80,9 @@ namespace fiftheenpuzzle
 
             while (!is_solved)
             {
-                using namespace Myfcn;
+                using namespace misc;
 
-                userinput = Myfcn::getInput<char>("[ w/a/d/q ]? ");
+                userinput = misc::getInput<char>("[ w/a/d/q ]? ");
 
                 switch (userinput)
                 {
@@ -92,7 +90,7 @@ namespace fiftheenpuzzle
                 case 's': inputActions(b, b.slideTile(Point2d::Direction::down)); break;
                 case 'a': inputActions(b, b.slideTile(Point2d::Direction::left)); break;
                 case 'd': inputActions(b, b.slideTile(Point2d::Direction::right)); break;
-                case 'q': System::coutput.write_endl("GoodBye!"); return;
+                case 'q': io::cout.write_nl("GoodBye!"); return;
                 }
 
                 /*Since it is impossible for the puzzle to be solved under a max of [n < 15], where n is the numer of tries/moves.
@@ -103,9 +101,9 @@ namespace fiftheenpuzzle
                     //Check for a win condition.
                     if (b == Board{})
                     {
-                        System::coutput.writewl("The Puzzle is Solved!", "Congratulations.");
-                        System::coutput.write_endl("");
-                        System::coutput.write_endl("");
+                        io::cout.writewl("The Puzzle is Solved!", "Congratulations.");
+                        io::cout.write_nl("");
+                        io::cout.write_nl("");
                         is_solved = true;
                     }
                 }
@@ -115,7 +113,7 @@ namespace fiftheenpuzzle
             userinput = playAgainChoice();
             if (userinput == 'n' or userinput == 'N')
             {
-                System::coutput.write_endl("Goodbye!");
+                io::cout.write_nl("Goodbye!");
                 break;
             }
             else

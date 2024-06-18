@@ -2,79 +2,33 @@
     "tasks": [
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe build active file -> Debug Configuration",
-            "command": "C:\\Program Files\\mingw64\\bin\\g++.exe",
-            "args": [
-                "-Iheader",
-                "-I\"C:/Program Files/Boost\"",
-                "-fdiagnostics-color=always",
-                "-g",
-                "-ggdb",
-                "-Wenum-compare",
-                "-std=c++23",
-                "${fileDirname}\\${fileBasenameNoExtension}.cpp", 
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
-            ],
+            "label": "make-build-config",
+            "command": "make",
+            "args": [],
             "options": {
                 "cwd": "${fileDirname}"
             },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": ["relative", "${workspaceFolder}"],
-                "pattern": {
-                  "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                  "file": 1,
-                  "line": 2,
-                  "column": 3,
-                  "severity": 4,
-                  "message": 5
-                }
-            },  
-            
+            "problemMatcher": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
-            "detail": "Debug Configuration."
+            "detail": "Debug Configuration"
         },
         {
             "type": "cppbuild",
-            "label": "C/C++: g++.exe build active file -> Release Configuration",
-            "command": "C:\\Program Files\\mingw64\\bin\\g++.exe",
-            "args": [
-                "-Iheader",
-                "-I\"C:/Program Files/Boost\"",
-                "-O2",
-                "-DNDEBUG",
-                "-pedantic-errors",
-                "-Wenum-compare",
-                "-std=c++23",
-                "${fileDirname}\\${fileBasenameNoExtension}.cpp",
-                "-o",
-                "${fileDirname}\\${fileBasenameNoExtension}.exe"
-            ],
+            "label": "build-config",
+            "command": "g++",
+            "args": [ "-std=c++23", "-g", "-ggdb", "-pedantic-errors", "-Wall", "-Werror", "-Wenum-compare", "-Iheader", "-I/usr/local/boost_1_85_0", "${file}", "-o", "${fileBasenameNoExtension}" ],
             "options": {
                 "cwd": "${fileDirname}"
             },
-            "problemMatcher": {
-                "owner": "cpp",
-                "fileLocation": ["relative", "${workspaceFolder}"],
-                "pattern": {
-                  "regexp": "^(.*):(\\d+):(\\d+):\\s+(warning|error):\\s+(.*)$",
-                  "file": 1,
-                  "line": 2,
-                  "column": 3,
-                  "severity": 4,
-                  "message": 5
-                }
-            },  
-            
+            "problemMatcher": [],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
             },
-            "detail": "Release Configuration."
+            "detail": "Debug Configuration(2)"
         }
     ],
     "version": "2.0.0"

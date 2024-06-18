@@ -37,7 +37,6 @@ namespace Streams
 
         constexpr std::basic_ifstream<CharT>& operator*() noexcept;
 
-        void open(const char* filename, std::ios_base::openmode mode = std::ios_base::in);
         void open(const std::filesystem::path::value_type* filename, std::ios_base::openmode mode = std::ios_base::in);
         void open(const std::string& filename, std::ios_base::openmode mode = std::ios_base::in);
         void open(const std::filesystem::path& filename, std::ios_base::openmode mode = std::ios_base::in);
@@ -68,10 +67,6 @@ namespace Streams
     template <typename CharT>
     constexpr std::basic_ifstream<CharT>& FileInputStream<CharT>::operator*() noexcept
     { return m_ifstream; }
-
-    template <typename CharT>
-    void FileInputStream<CharT>::open( const char* filename, std::ios_base::openmode mode)
-    { m_ifstream.is_open()? (m_ifstream.close(), m_ifstream.open(filename, mode)) : (m_ifstream.open(filename, mode)); }
 
     template <typename CharT>
     void FileInputStream<CharT>::open( const std::filesystem::path::value_type* filename, std::ios_base::openmode mode)

@@ -1,21 +1,27 @@
 
 # .PHONY used to indicate a certain target is not a file
-
+system = linux
 includes = -Iheader -I"C:/Program Files/Boost"
 libs = 
-cxx = g++.exe
+cxx = g++
 #cxxflags = -std=c++23 -pedantic-errors -Wall -Weffc++ -Wextra -Wconversion -Wsign-conversion -Werror -Wshadow -Wenum-compare
 cxxflags = -std=c++23 -pedantic-errors -Wall -Werror -Wenum-compare
 configurationflags = debug
 preprocessorflags = -E
 compile = -c
 target = main
-obj_files = main.o myfunctions1.o
-target_dependacies = header/myfunctions1.h
+obj_files = main.o misc_utility.o
+target_dependacies = header/misc_utility.h
 rm = -del
 subsystem = sfml
+
+# defines the name of the program you wish to compile
 program_name = ncc
 
+ifeq ($(system), linux)
+includes = -Iheader -I/usr/local/boost_1_85_0
+rm = -rm
+endif
 
 ifeq ($(configurationflags), debug)
 configurationflags = -g -ggdb
@@ -23,84 +29,58 @@ else
 configurationflags =  -O2 -DNDEBUG
 endif
 
-ifeq ($(program_name), blackjack)
-obj_files += card.o player.o dealer.o blackjack.o
-#target_dependacies
-endif
-ifeq ($(program_name), hi_lo)
-obj_files += hi_lo.o
-#target_dependacies
-endif
+
 ifeq ($(program_name), fiftheenpuzzle)
-obj_files += point2d.o board.o fiftheenpuzzle.o
-target_dependacies += header/board.h header/point2d.h header/random.h header/fiftheenpuzzle.h
+obj_files += point2d.o board.o fiftheenpuzzle.o u8char.o
+target_dependacies += header/board.h header/point2d.h header/random.h header/fiftheenpuzzle.h header/u8char.h
 endif
-ifeq ($(program_name), filediscoveryinput)
+
+ifeq ($(program_name), filediscoveryinput) #deprecated
 obj_files += filediscoveryinput.o
 #target_dependacies
 endif
+
 ifeq ($(program_name), pl0c)
 obj_files += readfile.o pl0_lexer.o pl0_parser.o
 #target_dependacies
 endif
+
 ifeq ($(program_name), ncc)
-obj_files += ncLexer.o ncParser.o ncAst.o
-target_dependacies += header/readfile.h header/drawboxaroundtext.h header/ncLexer.h header/ncLog.h header/ncParser.h header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
+obj_files += ncLexer.o ncParser.o
+target_dependacies += header/ncLexer.h header/ncLog.h header/ncParser.h header/misc_utility.h header/u8char.h
 endif
 
-all: intro $(target).exe
+#taget definitions start here:
 
-nccTest:
-	main.exe main.nc && gcc -m32 assembly.s -o asm && asm.exe
+all: intro $(target)
+
+nccTest: #target is no longer used
+	main main.nc && gcc -m32 assembly.s -o asm && asm
 
 intro:
-	echo [make.exe running]; Program Expected: $(program_name)
+	@echo "\033[33;1;52mmake running\nCompiling package: { $(program_name) }\n───────────────────────────────────\033[0m"
 
-#Base Targets────────────────────────────────────────────────────────────────────────
-$(target).exe: $(obj_files)
+#Base Targets───────────────────────────────────────────────────────────────────────
+$(target): $(obj_files)
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) -o $(target) $(obj_files)
 
 $(target).o: $(target).cpp $(target_dependacies)
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) $(target).cpp 
 
-myfunctions1.o: myfunctions1.cpp header/myfunctions1.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) myfunctions1.cpp
+misc_utility.o: misc_utility.cpp header/misc_utility.h
+	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) misc_utility.cpp
 #Base Targets────────────────────────────────────────────────────────────────────────
 
 
-timer.o: timer.cpp header/timer.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) timer.cpp
-
 point2d.o: point2d.cpp header/point2d.h 
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) point2d.cpp
-
-
-# Hi_lo object files────────────────────────────────────────────────────────────────────────
-hi_lo.o: hi_lo.cpp header/random.h header/myfunctions1.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) hi_lo.cpp
-# Hi_lo object files────────────────────────────────────────────────────────────────────────
-
-
-# BlackJack object files────────────────────────────────────────────────────────────────────────
-card.o: card.cpp header/card.h header/random.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) card.cpp
-
-player.o: player.cpp header/player.h header/card.h header/myfunctions1.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) player.cpp
-
-dealer.o: dealer.cpp header/dealer.h header/player.h header/card.h header/myfunctions1.h
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) dealer.cpp
-
-blackjack.o: blackjack.cpp header/blackjack.h header/dealer.h header/player.h header/card.h header/myfunctions1.h 
-	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) blackjack.cpp
-# BlackJack object files────────────────────────────────────────────────────────────────────────
 
 
 #FiftheenPuzzle object files────────────────────────────────────────────────────────────────────────
 board.o: board.cpp header/board.h header/point2d.h header/random.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) board.cpp
 
-fiftheenpuzzle.o: fiftheenpuzzle.cpp header/myfunctions1.h header/fiftheenpuzzle.h header/board.h header/point2d.h
+fiftheenpuzzle.o: fiftheenpuzzle.cpp header/misc_utility.h header/fiftheenpuzzle.h header/board.h header/point2d.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) fiftheenpuzzle.cpp
 #FiftheenPuzzle object files────────────────────────────────────────────────────────────────────────
 
@@ -121,16 +101,16 @@ pl0_parser.o: pl0_parser.cpp header/pl0_parser.h header/pl0_lexer.h
 
 
 #ncc────────────────────────────────────────────────────────────────────────
-ncLexer.o: ncLexer.cpp header/ncLexer.h header/ncLog.h header/drawboxaroundtext.h header/myfunctions1.h
+ncLexer.o: ncLexer.cpp header/ncLexer.h header/ncLog.h header/misc_utility.h header/u8char.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncLexer.cpp
 
-ncParser.o: ncParser.cpp header/ncParser.h header/ncLexer.h  header/ncLog.h header/drawboxaroundtext.h header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
+ncParser.o: ncParser.cpp header/ncParser.h header/ncLexer.h  header/ncLog.h header/misc_utility.h header/u8char.h #header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncParser.cpp
 
-ncCodeGen.o: ncCodeGen.cpp header/ncCodeGen.h header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
+ncCodeGen.o: ncCodeGen.cpp header/ncCodeGen.h header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h header/u8char.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncCodeGen.cpp
 
-ncAst.o: ncAst.cpp header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h
+ncAst.o: ncAst.cpp header/ncAst.h header/ncNonTerminal.h header/ncTerminal.h header/u8char.h
 	$(cxx) $(includes) $(configurationflags) $(cxxflags) $(compile) ncAst.cpp
 #ncc────────────────────────────────────────────────────────────────────────
 
@@ -141,7 +121,7 @@ subsystem:
 .PHONY : clean
 
 clean:
-	$(rm) *.o $(target).exe
+	$(rm) *.o $(target)
 
 
 # Unimportant targets
@@ -153,4 +133,3 @@ checkVersion:
 
 .cpp: .cpp.o
 	$(cxx) $(cxxflags) $(compile) $(target) *.o
-
