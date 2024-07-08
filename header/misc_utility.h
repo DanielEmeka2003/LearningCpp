@@ -69,12 +69,13 @@ namespace nc_misc
     std::string convertIntegerBaseNToBase10(const std::string& x, std::uint8_t base);
 
     void denormalize_realNum(std::string& realNum);
-    std::string denormalize_realNum(const std::string& realNum, ImmutableLref);
+    std::string denormalize_realNum(std::string realNum, ImmutableLref);
     
     void normalize_realNum(std::string& realNum);
-    std::string normalize_realNum(const std::string& realNum, ImmutableLref);
+    std::string normalize_realNum(std::string realNum, ImmutableLref);
 
-    std::string approximate_base10_real(const std::string& realNum, std::uint32_t desired_digits);
+    void approximate_base10_real(std::string& realNum, std::uint32_t desired_digits);
+    std::string approximate_base10_real(const std::string& realNum, std::uint32_t desired_digits, ImmutableLref);
 
     std::string convertRealBaseNToBase10(const std::string& realNum, std::uint8_t base);
     std::string convertRealBase10ToBaseN(const std::string& realNum, std::uint8_t base);

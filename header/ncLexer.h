@@ -102,6 +102,8 @@ namespace Nc
     static inline const U8string rNcType{"ncType"_u8str};
     static inline const U8string rTypeinfo{"typeinfo"_u8str};
     static inline const U8string rVoid{"void"_u8str};
+    static inline const U8string rUnamed_pt{"unamed_pt"_u8str};
+    static inline const U8string rUnamed_st{"unamed_st"_u8str};
     /*----------------------------------------------------------------*/
 
     static inline const U8string rGuess{"guess"_u8str};
@@ -120,22 +122,16 @@ namespace Nc
     static inline const U8string rNot{"not"_u8str};
     static inline const U8string rXor{"xor"_u8str};
     static inline const U8string rOdd{"odd"_u8str};
-    static inline const U8string rOutput{"output"_u8str};
-    static inline const U8string rInput{"input"_u8str};
-    static inline const U8string rNullptr{"nullptr"_u8str};
     static inline const U8string rNone{"none"_u8str};
     static inline const U8string rDefault{"default"_u8str};
     static inline const U8string rEnum{"enum"_u8str};
-    static inline const U8string rNamespace{"namespace"_u8str};
+    static inline const U8string rName_space{"name_space"_u8str};
     static inline const U8string rTypeof{"typeof"_u8str};
     static inline const U8string rMatch{"match"_u8str};
-    static inline const U8string rPanic{"panic"_u8str};
     static inline const U8string rCatch{"catch"_u8str};
     static inline const U8string rRaise{"raise"_u8str};
-    static inline const U8string rMv{"mv"_u8str};
     static inline const U8string rCp{"cp"_u8str};
-    static inline const U8string rImut_lref{"imut_lref"_u8str};
-    static inline const U8string rMut_lref{"mut_lref"_u8str};
+    static inline const U8string rImut{"imut"_u8str};
     static inline const U8string rAlias{"alias"_u8str};
     static inline const U8string rR_l{"r_l"_u8str};
     static inline const U8string rTcast{"tcast"_u8str};
@@ -151,22 +147,25 @@ namespace Nc
     static inline const U8string rNxor_eq{"nxor_eq"_u8str};
     static inline const U8string rNamed_pt{"named_pt"_u8str};
     static inline const U8string rNamed_st{"named_st"_u8str};
-    static inline const U8string rUnamed_pt{"unamed_pt"_u8str};
-    static inline const U8string rUnamed_st{"unamed_st"_u8str};
     static inline const U8string rCase{"case"_u8str};
     static inline const U8string rIter{"iter"_u8str};
     static inline const U8string rIter_no_end{"iter_no_end"_u8str};
     static inline const U8string rType{"type"_u8str};
-    static inline const U8string rFromType{"fromType"_u8str};
     static inline const U8string rVarg_start{"_v"_u8str};
     static inline const U8string rVarg_end{"v_"_u8str};
     static inline const U8string rFn{"fn"_u8str};
+    static inline const U8string rGoto{"goto"_u8str};
+    static inline const U8string rLabel{"label"_u8str};
+    static inline const U8string rDefer{"defer"_u8str};
+    static inline const U8string rMem{"mem"_u8str};
+    static inline const U8string rType_space{"type_space"_u8str};
+    static inline const U8string rMe{"me"_u8str};
 
     /*Symbol*/
     
     static inline const U8string sArrow{"->"_u8str};
-    static inline const U8string sAssign{":="_u8str};
-    static inline const U8string sEqual{'='_u8};
+    static inline const U8string sAssign{'='_u8};
+    static inline const U8string sEqual{"=="_u8str};
     static inline const U8string sNotEqual{"!="_u8str};
     static inline const U8string sLcurly{'{'_u8};
     static inline const U8string sRcurly{'}'_u8};
@@ -213,16 +212,16 @@ namespace Nc
     static inline const U8string sAlternateDivide{"÷"_u8};
     static inline const U8string sAlternateDivideAssign{"÷="_u8str};
     static inline const U8string sDivideRemainder{"/%"_u8str};
-    static inline const U8string sInitAssign{"::="_u8str};
+    static inline const U8string sInitAssign{":="_u8str};
     static inline const U8string sAmperSand{'&'_u8};
     static inline const U8string sPipe{'|'_u8};
-    static inline const U8string sDollarSign{'$'_u8};
     static inline const U8string sExponentionAssign{"^="_u8str};
     static inline const U8string sReverseMinusAssign{"=-"_u8str};
     static inline const U8string sReverseDivideAssign{"=/"_u8str};
     static inline const U8string sReverseRemainderAssign{"=%"_u8str};
     static inline const U8string sReverseAlternateDivideAssign{"=÷"_u8str};
-    static inline const U8string sHashedLparen{"#("_u8str};
+    static inline const U8string sHashedLsquare{"#["_u8str};
+    static inline const U8string sDollarSignLparen{"$("_u8str};
     
     
     static inline const U8string int8Max{"127"_u8str};

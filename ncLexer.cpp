@@ -203,7 +203,7 @@ namespace Nc
                 m_tokenString.push_back(m_fileBuffer[m_filePosition]);
                 nextFilePosAndColumn(); //move the file position past the symbol
 
-                m_log.write("Unrecognized token \033[48;2;10;6;26;31;1m", m_tokenString, "\033[0m"), start_log();
+                m_log.write("Unrecognized token \033[31;1m", m_tokenString, "\033[0m"), start_log();
                 spaceLog();
                 
                 m_log.write("   Unicode & utf8 code point: \033[1m", m_tokenString.front().convertToUnicodeCodePoint(), "\033[0m & \033[1m", m_tokenString.front().convertToUtf8CodePoint(), "\033[0m");
@@ -317,7 +317,7 @@ namespace Nc
                 {
                     if (nextFilePosAndColumn(), multiLineDocComment()/*to support of multi-line nesting*/, m_isEndofFile)
                     {
-                        m_log.write("Unterminated mutiline comment, expected this \033[48;2;10;6;26;32;1m*/\033[0m before EOF(end of file)");
+                        m_log.write("Unterminated mutiline comment, expected this \033[32;1m*/\033[0m before EOF(end of file)");
                         savedLine == m_line? start_log() : start_multiLineLog(savedLine, m_relativeColumn);
                         
                         return TokenType::_eot;
@@ -348,7 +348,7 @@ namespace Nc
                 {
                     if (nextFilePosAndColumn(), multiLineDocComment()/*to support of multi-line nesting*/, m_isEndofFile)
                     {
-                        m_log.write("Unterminated mutiline comment, expected this \033[48;2;10;6;26;32;1m}`\033[0m before EOF(end of file)");
+                        m_log.write("Unterminated mutiline comment, expected this \033[32;1m}`\033[0m before EOF(end of file)");
                         savedLine == m_line? start_log() : start_multiLineLog(savedLine, m_relativeColumn);
                         
                         return TokenType::_eot;
@@ -432,17 +432,16 @@ namespace Nc
             m_tokenString == rGive or m_tokenString == rGuess or m_tokenString == rBreak or m_tokenString == rContinue or m_tokenString == rIf or
             m_tokenString == rElse or m_tokenString == rDo or m_tokenString == rWhile or m_tokenString == rFor or m_tokenString == rAnd or
             m_tokenString == rOr or m_tokenString == rNot or m_tokenString == rXor or m_tokenString == rAnd or m_tokenString == rOr or
-            m_tokenString == rNot or m_tokenString == rXor or m_tokenString == rOdd or m_tokenString == rOutput or m_tokenString == rInput or
-            m_tokenString == rDefault or m_tokenString == rEnum or m_tokenString == rNamespace or m_tokenString == rTypeof or
-            m_tokenString == rMatch or m_tokenString == rPanic or m_tokenString == rCatch or m_tokenString == rRaise or m_tokenString == rMv or
-            m_tokenString == rCp or m_tokenString == rImut_lref or m_tokenString == rMut_lref or
-            m_tokenString == rAlias or m_tokenString == rR_l or m_tokenString == rTcast or
-            m_tokenString == rBcast or m_tokenString == rNand or m_tokenString == rNor or m_tokenString == rNxor or m_tokenString == rAnd_eq or
-            m_tokenString == rOr_eq or m_tokenString == rXor_eq or m_tokenString == rNand_eq or m_tokenString == rNor_eq or
-            m_tokenString == rNxor_eq or m_tokenString == rNamed_pt or m_tokenString == rNamed_st or m_tokenString == rUnamed_pt or
-            m_tokenString == rUnamed_st or m_tokenString == rCase or m_tokenString == rIter or m_tokenString == rIter_no_end or
-            m_tokenString == rNullptr or m_tokenString == rNone or m_tokenString == rType or m_tokenString == rFromType or
-            m_tokenString == rVarg_start or m_tokenString == rVarg_end or m_tokenString == rFn
+            m_tokenString == rNot or m_tokenString == rXor or m_tokenString == rOdd or m_tokenString == rDefault or m_tokenString == rEnum or
+            m_tokenString == rName_space or m_tokenString == rTypeof or m_tokenString == rMatch or m_tokenString == rCatch or
+            m_tokenString == rRaise or m_tokenString == rCp or m_tokenString == rImut or m_tokenString == rAlias or m_tokenString == rR_l or
+            m_tokenString == rTcast or m_tokenString == rBcast or m_tokenString == rNand or m_tokenString == rNor or m_tokenString == rNxor or
+            m_tokenString == rAnd_eq or m_tokenString == rOr_eq or m_tokenString == rXor_eq or m_tokenString == rNand_eq or
+            m_tokenString == rNor_eq or m_tokenString == rNxor_eq or m_tokenString == rNamed_pt or m_tokenString == rNamed_st or
+            m_tokenString == rUnamed_pt or m_tokenString == rUnamed_st or m_tokenString == rCase or m_tokenString == rIter or
+            m_tokenString == rNone or m_tokenString == rType or m_tokenString == rVarg_start or m_tokenString == rVarg_end or
+            m_tokenString == rFn or m_tokenString == rGoto or m_tokenString == rLabel or m_tokenString == rDefer or
+            m_tokenString == rMem or m_tokenString == rType_space or m_tokenString == rMe
         )
         {
             addToTokenDataList(std::optional<std::uint32_t>{}, m_line, true);
@@ -554,7 +553,7 @@ namespace Nc
             if (m_tokenString.ends_with('\''_u8))
             {
                 auto absoluteColumn = m_relativeColumn + integer_literal_size;
-                m_log.write("The digit seperator \033[48;2;10;6;26;33;1m'\033[0m should not end a number literal"), start_log(absoluteColumn - 1, absoluteColumn, m_line);
+                m_log.write("The digit seperator \033[33;1m'\033[0m should not end a number literal"), start_log(absoluteColumn - 1, absoluteColumn, m_line);
             }
             
             // remove the number seperator
@@ -625,7 +624,7 @@ namespace Nc
 
             if (!isBaseWithinRange())
             {
-                m_log.write("Integer number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is tagged with a base that is not supported in nc");
+                m_log.write("Integer number literal \033[33;1m", m_tokenString, "\033[0m is tagged with a base that is not supported in nc");
                 
                 auto relativeColumn = m_relativeColumn + integer_literal_size;
                 start_log(relativeColumn, relativeColumn + base.size(), m_line), spaceLog();
@@ -637,10 +636,10 @@ namespace Nc
 
             if (!areBaseDigitsValid())
             {
-                m_log.write("Integer number literal contains invalid base(\033[48;2;10;6;26;33;1m", baseDigitsAsStr, "\033[0m) digit(s)");
+                m_log.write("Integer number literal contains invalid base(\033[33;1m", baseDigitsAsStr, "\033[0m) digit(s)");
                 start_log(m_relativeColumn, m_relativeColumn + integer_literal_size, m_line), spaceLog();
 
-                m_log.write("   Only digits \033[48;2;10;6;26;32;1m");
+                m_log.write("   Only digits \033[32;1m");
                 
                 for (auto i = 0, j = 0; i < baseDigitsAsInt; ++i)
                 {
@@ -652,13 +651,13 @@ namespace Nc
                     if (i != baseDigitsAsInt - 1)
                     m_log.write(',', ' ');
                 }
-                m_log.write("\033[0m are allowed in base(\033[48;2;10;6;26;33;1m", baseDigitsAsStr, "\033[0m)"), additionalLog();
+                m_log.write("\033[0m are allowed in base(\033[33;1m", baseDigitsAsStr, "\033[0m)"), additionalLog();
                 return TokenType::_miscellany;
             }
         }
         else
         {
-            m_log.write("Integer number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is tagged with a junk base");
+            m_log.write("Integer number literal \033[33;1m", m_tokenString, "\033[0m is tagged with a junk base");
             
             auto relativeColumn = m_relativeColumn + integer_literal_size;
             start_log(relativeColumn, relativeColumn + base.size(), m_line), spaceLog();
@@ -675,12 +674,12 @@ namespace Nc
             start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
             if (baseDigitsAsStr == "10")
-            m_log.write("   Nc maximum integer value: \033[48;2;10;6;26;32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint1024Max, "₁₀\033[0m"), additionalLog();
+            m_log.write("   Nc maximum integer value: \033[32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[32;1m", uint1024Max, "₁₀\033[0m"), additionalLog();
             else
             {
-                m_log.write("   Nc maximum integer value: \033[48;2;10;6;26;32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint1024Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint1024Max), base, "\033[0m");
+                m_log.write("   Nc maximum integer value: \033[32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[32;1m", uint1024Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint1024Max), base, "\033[0m");
                 additionalLog();
-                m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                 additionalLog();
             }
 
@@ -724,12 +723,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   8-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁸⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int8Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   8-bit signed integer maximum positive value: \033[32;1m(2⁸⁻¹ - 1)₁₀\033[0m or \033[32;1m", int8Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   8-bit signed integer maximum positive value: \003[40;32;1m(2⁸⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int8Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(int8Max), base, "\033[0m");
+                        m_log.write("   8-bit signed integer maximum positive value: \003[40;32;1m(2⁸⁻¹ - 1)₁₀\033[0m or \033[32;1m", int8Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(int8Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -742,12 +741,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   16-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹⁶⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int16Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   16-bit signed integer maximum positive value: \033[32;1m(2¹⁶⁻¹ - 1)₁₀\033[0m or \033[32;1m", int16Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   16-bit signed integer maximum positive value: \003[40;32;1m(2¹⁶⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int16Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(int16Max), base, "\033[0m");
+                        m_log.write("   16-bit signed integer maximum positive value: \003[40;32;1m(2¹⁶⁻¹ - 1)₁₀\033[0m or \033[32;1m", int16Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(int16Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -760,12 +759,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   32-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2³²⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int32Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   32-bit signed integer maximum positive value: \033[32;1m(2³²⁻¹ - 1)₁₀\033[0m or \033[32;1m", int32Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   32-bit signed integer maximum positive value: \003[40;32;1m(2³²⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int32Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(int32Max), base, "\033[0m");
+                        m_log.write("   32-bit signed integer maximum positive value: \003[40;32;1m(2³²⁻¹ - 1)₁₀\033[0m or \033[32;1m", int32Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(int32Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -778,12 +777,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   64-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁶⁴⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int64Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   64-bit signed integer maximum positive value: \033[32;1m(2⁶⁴⁻¹ - 1)₁₀\033[0m or \033[32;1m", int64Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   64-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁶⁴⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int64Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(int64Max), base, "\033[0m");
+                        m_log.write("   64-bit signed integer maximum positive value: \033[32;1m(2⁶⁴⁻¹ - 1)₁₀\033[0m or \033[32;1m", int64Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(int64Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -796,12 +795,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   128-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹²⁸⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int128Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   128-bit signed integer maximum positive value: \033[32;1m(2¹²⁸⁻¹ - 1)₁₀\033[0m or \033[32;1m", int128Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   128-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹²⁸⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int128Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(int128Max), base, "\033[0m");
+                        m_log.write("   128-bit signed integer maximum positive value: \033[32;1m(2¹²⁸⁻¹ - 1)₁₀\033[0m or \033[32;1m", int128Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(int128Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -814,12 +813,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   256-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2²⁵⁶⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int256Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   256-bit signed integer maximum positive value: \033[32;1m(2²⁵⁶⁻¹ - 1)₁₀\033[0m or \033[32;1m", int256Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   256-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2²⁵⁶⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int256Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(int256Max), base, "\033[0m");
+                        m_log.write("   256-bit signed integer maximum positive value: \033[32;1m(2²⁵⁶⁻¹ - 1)₁₀\033[0m or \033[32;1m", int256Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(int256Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -832,12 +831,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   512-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁵¹²⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int512Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   512-bit signed integer maximum positive value: \033[32;1m(2⁵¹²⁻¹ - 1)₁₀\033[0m or \033[32;1m", int512Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   512-bit signed integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁵¹²⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", int512Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(int512Max), base, "\033[0m");
+                        m_log.write("   512-bit signed integer maximum positive value: \033[32;1m(2⁵¹²⁻¹ - 1)₁₀\033[0m or \033[32;1m", int512Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(int512Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -850,12 +849,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   1024-bit signed integer maximum positive value: \033[48;2;10;6;26;;32;1m(2¹⁰²⁴⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;;32;1m", int1024Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   1024-bit signed integer maximum positive value: \033[;32;1m(2¹⁰²⁴⁻¹ - 1)₁₀\033[0m or \033[;32;1m", int1024Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   1024-bit signed integer maximum positive value: \033[48;2;10;6;26;;32;1m(2¹⁰²⁴⁻¹ - 1)₁₀\033[0m or \033[48;2;10;6;26;;32;1m", int1024Max, "₁₀\033[0m or \033[48;2;10;6;26;;32;1m", integerLiteralToBaseN(int1024Max), base, "\033[0m");
+                        m_log.write("   1024-bit signed integer maximum positive value: \033[;32;1m(2¹⁰²⁴⁻¹ - 1)₁₀\033[0m or \033[;32;1m", int1024Max, "₁₀\033[0m or \033[;32;1m", integerLiteralToBaseN(int1024Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -868,12 +867,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   8-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁸ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint8Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   8-bit unsigned integer maximum positive value: \033[32;1m(2⁸ - 1)₁₀\033[0m or \033[32;1m", uint8Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   8-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁸ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint8Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint8Max), base, "\033[0m");
+                        m_log.write("   8-bit unsigned integer maximum positive value: \033[32;1m(2⁸ - 1)₁₀\033[0m or \033[32;1m", uint8Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint8Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -886,12 +885,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   16-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹⁶ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint16Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   16-bit unsigned integer maximum positive value: \033[32;1m(2¹⁶ - 1)₁₀\033[0m or \033[32;1m", uint16Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   16-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹⁶ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint16Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint16Max), base, "\033[0m");
+                        m_log.write("   16-bit unsigned integer maximum positive value: \033[32;1m(2¹⁶ - 1)₁₀\033[0m or \033[32;1m", uint16Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint16Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -904,12 +903,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   32-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2³² - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint32Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   32-bit unsigned integer maximum positive value: \033[32;1m(2³² - 1)₁₀\033[0m or \033[32;1m", uint32Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   32-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2³² - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint32Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint32Max), base, "\033[0m");
+                        m_log.write("   32-bit unsigned integer maximum positive value: \033[32;1m(2³² - 1)₁₀\033[0m or \033[32;1m", uint32Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint32Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -922,12 +921,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   64-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁶⁴ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint64Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   64-bit unsigned integer maximum positive value: \033[32;1m(2⁶⁴ - 1)₁₀\033[0m or \033[32;1m", uint64Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   64-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁶⁴ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint64Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint64Max), base, "\033[0m");
+                        m_log.write("   64-bit unsigned integer maximum positive value: \033[32;1m(2⁶⁴ - 1)₁₀\033[0m or \033[32;1m", uint64Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint64Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -940,12 +939,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   128-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹²⁸ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint128Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   128-bit unsigned integer maximum positive value: \033[32;1m(2¹²⁸ - 1)₁₀\033[0m or \033[32;1m", uint128Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   128-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹²⁸ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint128Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint128Max), base, "\033[0m");
+                        m_log.write("   128-bit unsigned integer maximum positive value: \033[32;1m(2¹²⁸ - 1)₁₀\033[0m or \033[32;1m", uint128Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint128Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -958,12 +957,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   256-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2²⁵⁶ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint256Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   256-bit unsigned integer maximum positive value: \033[32;1m(2²⁵⁶ - 1)₁₀\033[0m or \033[32;1m", uint256Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   256-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2²⁵⁶ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint256Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint256Max), base, "\033[0m");
+                        m_log.write("   256-bit unsigned integer maximum positive value: \033[32;1m(2²⁵⁶ - 1)₁₀\033[0m or \033[32;1m", uint256Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint256Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -976,12 +975,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   512-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁵¹² - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint512Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   512-bit unsigned integer maximum positive value: \033[32;1m(2⁵¹² - 1)₁₀\033[0m or \033[32;1m", uint512Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   512-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2⁵¹² - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint512Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint512Max), base, "\033[0m");
+                        m_log.write("   512-bit unsigned integer maximum positive value: \033[32;1m(2⁵¹² - 1)₁₀\033[0m or \033[32;1m", uint512Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint512Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -994,12 +993,12 @@ namespace Nc
                     start_log(m_relativeColumn, m_relativeColumn + integer_literal_size + base.size(), m_line), spaceLog();
 
                     if (baseDigitsAsStr == "10")
-                    m_log.write("   1024-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint1024Max, "₁₀\033[0m"), additionalLog();
+                    m_log.write("   1024-bit unsigned integer maximum positive value: \033[32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[32;1m", uint1024Max, "₁₀\033[0m"), additionalLog();
                     else
                     {
-                        m_log.write("   1024-bit unsigned integer maximum positive value: \033[48;2;10;6;26;32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[48;2;10;6;26;32;1m", uint1024Max, "₁₀\033[0m or \033[48;2;10;6;26;32;1m", integerLiteralToBaseN(uint1024Max), base, "\033[0m");
+                        m_log.write("   1024-bit unsigned integer maximum positive value: \033[32;1m(2¹⁰²⁴ - 1)₁₀\033[0m or \033[32;1m", uint1024Max, "₁₀\033[0m or \033[32;1m", integerLiteralToBaseN(uint1024Max), base, "\033[0m");
                         additionalLog();
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the integer literal by the way: \033[48;2;10;6;26;31;1m", literalToBase10, "₁₀\033[0m");
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the integer literal by the way: \033[31;1m", literalToBase10, "₁₀\033[0m");
                         additionalLog();
                     }
                 }
@@ -1008,14 +1007,14 @@ namespace Nc
             {
                 if (literalType == lt_b16 or literalType == lt_b32 or literalType == lt_b128 or literalType == lt_d32 or literalType == lt_d64 or literalType == lt_d128 or literalType == lt_d256 or literalType == lt_d512)
                 {
-                    m_log.write("Integer number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is tagged with a real number literal-type instead of an integer literal-type");
+                    m_log.write("Integer number literal \033[33;1m", m_tokenString, "\033[0m is tagged with a real number literal-type instead of an integer literal-type");
                     
                     auto relativeColumn = m_relativeColumn + integer_literal_size + base.size() + 1/*plsu[`]*/;
                     start_log(relativeColumn, relativeColumn + literalType.size(), m_line), spaceLog();
 
                     m_log.write("   Try the below instead:"), additionalLog();
-                    m_log.write("   ● \033[48;2;10;6;26;33;1mi8, i16, i32, i64, i128, i256, i512 or i1024\033[0m for signed integers"), additionalLog();
-                    m_log.write("   ● \033[48;2;10;6;26;33;1mui8, ui16, ui32, ui64, ui128, ui256, ui512 or ui1024\033[0m for unsigned integers"), additionalLog();
+                    m_log.write("   ● \033[33;1mi8, i16, i32, i64, i128, i256, i512 or i1024\033[0m for signed integers"), additionalLog();
+                    m_log.write("   ● \033[33;1mui8, ui16, ui32, ui64, ui128, ui256, ui512 or ui1024\033[0m for unsigned integers"), additionalLog();
                     m_log.write("   Note: they are all case sensitive"), additionalLog();
                 }
                 else
@@ -1034,7 +1033,7 @@ namespace Nc
 
                     if (!isLiteralTypeNameValidUnicodeCharacter)
                     {
-                        m_log.write("Integer number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is tagged with a literalType that contains invalid nc unicode characters");
+                        m_log.write("Integer number literal \033[33;1m", m_tokenString, "\033[0m is tagged with a literalType that contains invalid nc unicode characters");
                         
                         auto relativeColumn = m_relativeColumn + integer_literal_size + base.size() + 1/*plsu[`]*/;
                         start_log(relativeColumn, relativeColumn + literalType.size(), m_line);
@@ -1055,7 +1054,7 @@ namespace Nc
             if (m_tokenString.ends_with('\''_u8))
             {
                 auto absoluteColumn = m_relativeColumn + real_literal_size;
-                m_log.write("The digit seperator \033[48;2;10;6;26;33;1m'\033[0m should not end a number literal"), start_log(absoluteColumn - 1, absoluteColumn, m_line);
+                m_log.write("The digit seperator \033[33;1m'\033[0m should not end a number literal"), start_log(absoluteColumn - 1, absoluteColumn, m_line);
             }
             
             // remove the number seperator
@@ -1088,11 +1087,11 @@ namespace Nc
 
                 if(exponent.empty()) //log an error when the exponent indicator is specified but no exponent is found
                 {
-                    m_log.write("In real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, the exponent indicator(@) was found with no exponent");
+                    m_log.write("In real number literal \033[33;1m", m_tokenString, "\033[0m, the exponent indicator(@) was found with no exponent");
                     
                     auto absoluteColumn = m_relativeColumn + real_literal_size + base_exp.size();
                     start_log(absoluteColumn - 2, absoluteColumn, m_line), spaceLog();
-                    m_log.write("   At least one exponent digit should be after symbol \033[48;2;10;6;26;33;1m+\033[0m"), additionalLog();
+                    m_log.write("   At least one exponent digit should be after symbol \033[33;1m+\033[0m"), additionalLog();
                 }
             }
             else if (exponent.starts_with('-'_u8))
@@ -1101,18 +1100,18 @@ namespace Nc
 
                 if(exponent.empty()) //log an error when the exponent indicator is specified but no exponent is found
                 {
-                    m_log.write("In real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, the exponent indicator(@) was found with no exponent");
+                    m_log.write("In real number literal \033[33;1m", m_tokenString, "\033[0m, the exponent indicator(@) was found with no exponent");
                     
                     auto absoluteColumn = m_relativeColumn + real_literal_size + base_exp.size();
                     start_log(absoluteColumn - 2, absoluteColumn, m_line), spaceLog();
-                    m_log.write("   At least one exponent digit should be after symbol \033[48;2;10;6;26;33;1m-\033[0m"), additionalLog();
+                    m_log.write("   At least one exponent digit should be after symbol \033[33;1m-\033[0m"), additionalLog();
                 }
             }
             else
             {
                 if(exponent.empty()) //log an error when the exponent indicator is specified but no exponent is found
                 {
-                    m_log.write("In real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, the exponent indicator(@) was found with no exponent");
+                    m_log.write("In real number literal \033[33;1m", m_tokenString, "\033[0m, the exponent indicator(@) was found with no exponent");
                     
                     auto absoluteColumn = m_relativeColumn + real_literal_size + base_exp.size();
                     start_log(absoluteColumn - 2, absoluteColumn, m_line);
@@ -1224,13 +1223,13 @@ namespace Nc
         auto printRealNumberCorrectly_u8 = [&](U8string_view realNumber, U8string_view base)
         {
             auto exponent_indicator_it = std::ranges::find(realNumber, '@'_u8);
-            m_log.write("\033[48;2;10;6;26;32;1m", U8string_view{realNumber.begin(), exponent_indicator_it}, base, U8string_view{exponent_indicator_it, realNumber.end()}, "\033[0m");
+            m_log.write("\033[32;1m", U8string_view{realNumber.begin(), exponent_indicator_it}, base, U8string_view{exponent_indicator_it, realNumber.end()}, "\033[0m");
         };
 
         auto printRealNumberCorrectly_ascii = [&](std::string_view realNumber, U8string_view base)
         {
             auto exponent_indicator_it = std::ranges::find(realNumber, '@'_u8);
-            m_log.write("\033[48;2;10;6;26;32;1m", std::string_view{realNumber.begin(), exponent_indicator_it}, base, std::string_view{exponent_indicator_it, realNumber.end()}, "\033[0m");
+            m_log.write("\033[32;1m", std::string_view{realNumber.begin(), exponent_indicator_it}, base, std::string_view{exponent_indicator_it, realNumber.end()}, "\033[0m");
         };
 
         // [&literalType]{ for (auto &&i : literalType) i = u8_misc::basicLatinToLowerCase(i); }();
@@ -1242,7 +1241,7 @@ namespace Nc
 
             if (!isBaseWithinRange())
             {
-                m_log.write("Real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is tagged with a base that is not supported in nc");
+                m_log.write("Real number literal \033[33;1m", m_tokenString, "\033[0m is tagged with a base that is not supported in nc");
                 
                 auto relativeColumn = m_relativeColumn + real_literal_size;
                 start_log(relativeColumn, relativeColumn + base.size(), m_line), spaceLog();
@@ -1256,10 +1255,10 @@ namespace Nc
 
                 if (!areRealBaseDigitsValid())
                 {
-                    m_log.write("Real number literal contains invalid base(\033[48;2;10;6;26;33;1m", baseDigitsAsStr, "\033[0m) digit(s)");
+                    m_log.write("Real number literal contains invalid base(\033[33;1m", baseDigitsAsStr, "\033[0m) digit(s)");
                     start_log(m_relativeColumn, m_relativeColumn + real_literal_size, m_line), spaceLog();
 
-                    m_log.write("   Only digits \033[48;2;10;6;26;32;1m");
+                    m_log.write("   Only digits \033[32;1m");
                     
                     for (auto i = 0, j = 0; i < baseDigitsAsInt; ++i)
                     {
@@ -1271,7 +1270,7 @@ namespace Nc
                         if (i != baseDigitsAsInt - 1)
                         m_log.write(',', ' ');
                     }
-                    m_log.write("\033[0m are allowed in base(\033[48;2;10;6;26;33;1m", baseDigitsAsStr, "\033[0m)"), additionalLog();
+                    m_log.write("\033[0m are allowed in base(\033[33;1m", baseDigitsAsStr, "\033[0m)"), additionalLog();
                     
                     shouldReturn = true;
                 }
@@ -1279,7 +1278,7 @@ namespace Nc
         }
         else
         {
-            m_log.write("Real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is tagged with a junk base");
+            m_log.write("Real number literal \033[33;1m", m_tokenString, "\033[0m is tagged with a junk base");
             
             auto relativeColumn = m_relativeColumn + real_literal_size;
             start_log(relativeColumn, relativeColumn + base.size(), m_line), spaceLog();
@@ -1295,32 +1294,32 @@ namespace Nc
             {
                 if (!nc_misc::areBaseDigitsValid(ascii_exponent, std::uint8_t(10)))
                 {
-                    m_log.write("The exponent of real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, contains invalid base(\033[48;2;10;6;26;33;1m10\033[0m) digit(s)");
+                    m_log.write("The exponent of real number literal \033[33;1m", m_tokenString, "\033[0m, contains invalid base(\033[33;1m10\033[0m) digit(s)");
                     
                     auto relativeColumn = m_relativeColumn + real_literal_size + base.size() + 1/*plus the exponent indicator*/;
                     start_log(relativeColumn, relativeColumn + exponent.size(), m_line), spaceLog();
-                    m_log.write("   You're getting this error because the exponent of real-numbers must be base(\033[48;2;10;6;26;33;1m10\033[0m) regardless of the base it is tagged with"), additionalLog();
+                    m_log.write("   You're getting this error because the exponent of real-numbers must be base(\033[33;1m10\033[0m) regardless of the base it is tagged with"), additionalLog();
 
                     shouldReturn = true;
                 }
-                else if (nc_misc::integer_gt_eq(ascii_exponent, "20000"/*since the highest possible exponent is 16'384*/))
+                else if (nc_misc::integer_gt(ascii_exponent, "16384"/*since the highest possible exponent is 16'384*/))
                 {
                     if (isExponentNegative)
-                    m_log.write("The exponent of real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is way too small, increase it");
+                    m_log.write("The exponent of real number literal \033[33;1m", m_tokenString, "\033[0m is way too small, increase it");
                     else
-                    m_log.write("The exponent of real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is comically large, reduce it");
+                    m_log.write("The exponent of real number literal \033[33;1m", m_tokenString, "\033[0m is comically large, reduce it");
 
                     auto relativeColumn = m_relativeColumn + real_literal_size + base.size() + 1/*plus the exponent indicator*/;
                     start_log(relativeColumn, relativeColumn + exponent.size(), m_line), spaceLog();
 
-                    m_log.write("   This is because the highest/lowest possible exponent in nc is \033[48;2;10;6;26;32;1m±16384₁₀\033[0m"), additionalLog();
+                    m_log.write("   This is because the highest/lowest possible exponent in nc is \033[32;1m±16384₁₀\033[0m"), additionalLog();
 
                     shouldReturn = true;
                 }
             }
             else
             {
-                m_log.write("Base(\033[48;2;10;6;26;33;1m10\033[0m) digits where expected as the exponent in real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m instead got this \033[48;2;10;6;26;31;1m", exponent, "\033[0m");
+                m_log.write("Base(\033[33;1m10\033[0m) digits where expected as the exponent in real number literal \033[33;1m", m_tokenString, "\033[0m instead got this \033[31;1m", exponent, "\033[0m");
                 
                 auto relativeColumn = m_relativeColumn + real_literal_size + base.size() + 1/*plus the exponent indicator*/;
                 start_log(relativeColumn, relativeColumn + exponent.size(), m_line);
@@ -1387,7 +1386,7 @@ namespace Nc
                 printRealNumberCorrectly_ascii(convertFpToBaseN(dec512fpMax), base), m_log.write(')');
                 additionalLog();
                 
-                m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(tempBase10Token, "₁₀"_u8str);
+                m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(tempBase10Token, "₁₀"_u8str);
                 additionalLog();
             }
             return TokenType::_miscellany;
@@ -1431,11 +1430,11 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(bin16fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
 
-                    m_log.write("   Where \033[48;2;10;6;26;33;1mmax\033[0m is the largest normal number and \033[48;2;10;6;26;33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
+                    m_log.write("   Where \033[33;1mmax\033[0m is the largest normal number and \033[33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
                     additionalLog();
                 }
             }
@@ -1460,11 +1459,11 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(bin32fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
 
-                    m_log.write("   Where \033[48;2;10;6;26;33;1mmax\033[0m is the largest normal number and \033[48;2;10;6;26;33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
+                    m_log.write("   Where \033[33;1mmax\033[0m is the largest normal number and \033[33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
                     additionalLog();
                 }
             }
@@ -1489,11 +1488,11 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(bin64fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
 
-                    m_log.write("   Where \033[48;2;10;6;26;33;1mmax\033[0m is the largest normal number and \033[48;2;10;6;26;33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
+                    m_log.write("   Where \033[33;1mmax\033[0m is the largest normal number and \033[33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
                     additionalLog();
                 }
             }
@@ -1518,11 +1517,11 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(bin128fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
 
-                    m_log.write("   Where \033[48;2;10;6;26;33;1mmax\033[0m is the largest normal number and \033[48;2;10;6;26;33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
+                    m_log.write("   Where \033[33;1mmax\033[0m is the largest normal number and \033[33;1mmin\033[0m is the smallest denormal number for that binary floating point format");
                     additionalLog();
                 }
             }
@@ -1550,7 +1549,7 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(dec32fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
                 }
@@ -1579,7 +1578,7 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(dec64fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
                 }
@@ -1608,7 +1607,7 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(dec128fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
                 }
@@ -1637,7 +1636,7 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(dec256fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
                 }
@@ -1666,7 +1665,7 @@ namespace Nc
                         printRealNumberCorrectly_ascii(convertFpToBaseN(dec512fpMax), base), m_log.write(')');
                         additionalLog();
                         
-                        m_log.write("   Here's the base(\033[48;2;10;6;26;33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
+                        m_log.write("   Here's the base(\033[33;1m10\033[0m) equivalent of the real number literal normalized and approximated by the way: "), printRealNumberCorrectly_ascii(operable_base10Token, "₁₀"_u8str);
                         additionalLog();
                     }
                 }
@@ -1680,8 +1679,8 @@ namespace Nc
                     start_log(relativeColumn, relativeColumn + literalType.size(), m_line), spaceLog();
                 
                     m_log.write("   Try the below instead:"), additionalLog();
-                    m_log.write("   ● \033[48;2;10;6;26;33;1mb16, b32, b64 or b128\033[0m for IEEE binary floating point numbers"), additionalLog();
-                    m_log.write("   ● \033[48;2;10;6;26;33;1md32, d64, d128, d256, d512\033[0m for NC implementation of decimal floating point numbers"), additionalLog();
+                    m_log.write("   ● \033[33;1mb16, b32, b64 or b128\033[0m for IEEE binary floating point numbers"), additionalLog();
+                    m_log.write("   ● \033[33;1md32, d64, d128, d256, d512\033[0m for NC implementation of decimal floating point numbers"), additionalLog();
                     m_log.write("   Note: they are all case sensitive"), additionalLog();
                 }
                 else
@@ -1700,7 +1699,7 @@ namespace Nc
 
                     if (!isLiteralTypeNameValidUnicodeCharacter)
                     {
-                        m_log.write("Real number literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m is tagged with a literalType that contains invalid nc unicode characters");
+                        m_log.write("Real number literal \033[33;1m", m_tokenString, "\033[0m is tagged with a literalType that contains invalid nc unicode characters");
                         
                         auto relativeColumn = m_relativeColumn + real_literal_size + base_exp.size() + 1/*plsu[`]*/;
                         start_log(relativeColumn, relativeColumn + literalType.size(), m_line);
@@ -1738,8 +1737,8 @@ namespace Nc
             if (nextFilePosAndColumn(), m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
             {
                 m_isEndofFile? m_log.write("") : m_log.write("");
-                m_log.writews("Unterminated", literalTypeName_plus_characterWiseType, "literal, expected this \033[48;2;10;6;26;32;1m'\033[0m before ");
-                m_isEndofFile? m_log.write("\033[48;2;10;6;26;31;1mEOF(end_of_file)\033[0m") : m_log.write("\n");
+                m_log.writews("Unterminated", literalTypeName_plus_characterWiseType, "literal, expected this \033[32;1m'\033[0m before ");
+                m_isEndofFile? m_log.write("\033[31;1mEOF(end_of_file)\033[0m") : m_log.write("\n");
 
                 start_log();
                 return TokenType::_miscellany;
@@ -1763,7 +1762,7 @@ namespace Nc
                     
                     if (m_isEndofFile)
                     {
-                        m_log.write("Expected this \033[48;2;10;6;26;32;1m{\033[0m to begin the escape sequence for raw character entry, before \033[48;2;10;6;26;31;1mEOF(end_of_file)\033[0m");
+                        m_log.write("Expected this \033[32;1m{\033[0m to begin the escape sequence for raw character entry, before \033[31;1mEOF(end_of_file)\033[0m");
                         start_log();
                     }
                     else if (m_fileBuffer[m_filePosition] == '{'_u8)
@@ -1773,12 +1772,12 @@ namespace Nc
                             if (cummulative_next(), m_isEndofFile or m_fileBuffer[m_filePosition] == '\n'_u8)
                             {
                                 m_isEndofFile? m_log.write("") : m_log.write("");
-                                m_log.write("Unterminated raw character escape sequence, expected this \033[48;2;10;6;26;32;1m}");
+                                m_log.write("Unterminated raw character escape sequence, expected this \033[32;1m}");
 
                                 for (auto i = 0u; i < hashTag_number; i++) m_log.write('#');
 
                                 m_isEndofFile?
-                                m_log.write("\033[0m before \033[48;2;10;6;26;31;1mEOF(end_of_file)\033[0m") : m_log.write("\033[0m before \n");
+                                m_log.write("\033[0m before \033[31;1mEOF(end_of_file)\033[0m") : m_log.write("\033[0m before \n");
                                 
                                 start_log();
                                 break;
@@ -1804,7 +1803,7 @@ namespace Nc
                     }
                     else
                     {
-                        m_log.write("Expected this \033[48;2;10;6;26;32;1m{\033[0m to begin the escape sequence for raw character entry, instead of this \033[48;2;10;6;26;31;1m", m_fileBuffer[m_filePosition], "\033[0m");
+                        m_log.write("Expected this \033[32;1m{\033[0m to begin the escape sequence for raw character entry, instead of this \033[31;1m", m_fileBuffer[m_filePosition], "\033[0m");
                         
                         bool shouldNewLineBeConsidered = m_fileBuffer[m_filePosition] == '\n'_u8;
                         start_log(/*relativeColumn*/ m_absoluteColumn, /*absoluteColumn*/ m_absoluteColumn + 1, /*line*/ m_line, shouldNewLineBeConsidered);
@@ -1875,7 +1874,7 @@ namespace Nc
 
         //size check
         if (isCharacterSize_gt_1)
-        m_log.write("Size of ", literalTypeName_plus_characterWiseType ," literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m cannot be greater than 1"), start_log();
+        m_log.write("Size of ", literalTypeName_plus_characterWiseType ," literal \033[33;1m", m_tokenString, "\033[0m cannot be greater than 1"), start_log();
         
         auto beginText = [&]()
         {
@@ -1885,7 +1884,7 @@ namespace Nc
 
         if ((*literalType_ptr == lt_characterWise_a or *literalType_ptr == lt_characterWise_p) and std::ranges::any_of(m_tokenString, [](U8char& x){ return x.getByteEncoding() != U8char::ByteEncoding::one; }))
         {
-            m_log.write(beginText(), " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m cannot have characters greater than 1-byte of encoding");
+            m_log.write(beginText(), " literal \033[33;1m", m_tokenString, "\033[0m cannot have characters greater than 1-byte of encoding");
             start_log();
         }
         
@@ -1926,7 +1925,7 @@ namespace Nc
         {
             if (nextFilePosAndColumn(), m_isEndofFile)
             {
-                m_log.writews("Unterminated", literalTypeName_plus_characterWiseType, "literal, expected this \033[48;2;10;6;26;32;1m\"\033[0m before \033[48;2;10;6;26;31;1mEOF(end_of_file)\033[0m");
+                m_log.writews("Unterminated", literalTypeName_plus_characterWiseType, "literal, expected this \033[32;1m\"\033[0m before \033[31;1mEOF(end_of_file)\033[0m");
                 start_line == m_line? start_log() : start_multiLineLog(start_line, m_relativeColumn);
 
                 return TokenType::_miscellany;
@@ -1950,7 +1949,7 @@ namespace Nc
                     
                     if (m_isEndofFile)
                     {
-                        m_log.write("Expected this \033[48;2;10;6;26;32;1m{\033[0m to begin the escape sequence for raw string entry, before \033[48;2;10;6;26;31;1mEOF(end_of_file)\033[0m");
+                        m_log.write("Expected this \033[32;1m{\033[0m to begin the escape sequence for raw string entry, before \033[31;1mEOF(end_of_file)\033[0m");
                         start_line == m_line? start_log() : start_multiLineLog(start_line, m_relativeColumn);
                     }
                     else if (m_fileBuffer[m_filePosition] == '{'_u8)
@@ -1959,11 +1958,11 @@ namespace Nc
                         {
                             if (cummulative_next(), m_isEndofFile)
                             {
-                                m_log.write("Unterminated raw string escape sequence, expected this \033[48;2;10;6;26;32;1m}");
+                                m_log.write("Unterminated raw string escape sequence, expected this \033[32;1m}");
 
                                 for (auto i = 0u; i < hashTag_number; i++) m_log.write('#');
 
-                                m_log.write("\033[0m before \033[48;2;10;6;26;31;1mEOF(end_of_file)\033[0m");
+                                m_log.write("\033[0m before \033[31;1mEOF(end_of_file)\033[0m");
                                 
                                 start_line == m_line? start_log() : start_multiLineLog(start_line, m_relativeColumn);
                                 break;
@@ -1992,7 +1991,7 @@ namespace Nc
                     }
                     else
                     {
-                        m_log.write("Expected this \033[48;2;10;6;26;32;1m{\033[0m to begin the escape sequence for raw string entry, instead of this \033[48;2;10;6;26;31;1m", m_fileBuffer[m_filePosition], "\033[0m");
+                        m_log.write("Expected this \033[32;1m{\033[0m to begin the escape sequence for raw string entry, instead of this \033[31;1m", m_fileBuffer[m_filePosition], "\033[0m");
                         
                         bool shouldNewLineBeConsidered = m_fileBuffer[m_filePosition] == '\n'_u8;
                         start_log(/*relativeColumn*/ m_absoluteColumn, /*absoluteColumn*/ m_absoluteColumn + 1, /*line*/ m_line, shouldNewLineBeConsidered);
@@ -2170,7 +2169,7 @@ namespace Nc
 
                         if (integer_literal.starts_with('\''_u8))
                         {
-                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, the digit seperator \033[48;2;10;6;26;33;1m'\033[0m should not start an escaped unicode code-point entry");
+                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[33;1m", m_tokenString, "\033[0m, the digit seperator \033[33;1m'\033[0m should not start an escaped unicode code-point entry");
 
                             init_newLineStore();
                             
@@ -2179,7 +2178,7 @@ namespace Nc
                         }
                         else if (integer_literal.ends_with('\''_u8))
                         {
-                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, the digit seperator \033[48;2;10;6;26;33;1m'\033[0m should not end an escaped unicode code-point entry");
+                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[33;1m", m_tokenString, "\033[0m, the digit seperator \033[33;1m'\033[0m should not end an escaped unicode code-point entry");
 
                             init_newLineStore();
                             
@@ -2201,7 +2200,7 @@ namespace Nc
                         //isBaseWithinRange
                         if (!(nc_misc::integer_gt_eq(baseDigitsAsStr, "2") and nc_misc::integer_lt_eq(baseDigitsAsStr, "36")))
                         {
-                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry \033[48;2;10;6;26;33;1m", integer_literal, "\033[0m is tagged with a base that is not supported in nc");
+                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry \033[33;1m", integer_literal, "\033[0m is tagged with a base that is not supported in nc");
 
                             init_newLineStore();
                             
@@ -2214,14 +2213,14 @@ namespace Nc
                         //areBaseDigitsValid
                         else if (!nc_misc::areBaseDigitsValid(ascii_integer_literal, baseDigitsAsInteger))
                         {
-                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry contains invalid base(\033[48;2;10;6;26;33;1m", baseDigitsAsStr, "\033[0m) digit(s)");
+                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry contains invalid base(\033[33;1m", baseDigitsAsStr, "\033[0m) digit(s)");
                             
                             init_newLineStore();
                             
                             auto line_column = calc_line_and_column(integer_start_i);
                             start_log(/*relativeColumn:*/ line_column.second, /*absoluteColumn*/ line_column.second + original_integer_size, line_column.first), spaceLog();
 
-                            m_log.write("   Only digits \033[48;2;10;6;26;32;1m");
+                            m_log.write("   Only digits \033[32;1m");
                             
                             for (auto i = 0, j = 0; i < baseDigitsAsInteger; ++i)
                             {
@@ -2243,7 +2242,7 @@ namespace Nc
                             
                             if (nc_misc::integer_gt(ascii_integer_literal, convertedMaxCodePoint))
                             {
-                                m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry is greater than the maximum unicode code-point");
+                                m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry is greater than the maximum unicode code-point");
                                 
                                 init_newLineStore();
                                 
@@ -2251,9 +2250,9 @@ namespace Nc
                                 start_log(/*relativeColumn:*/ line_column.second, /*absoluteColumn*/ line_column.second + original_integer_size, line_column.first), spaceLog();
 
                                 if (baseDigitsAsStr == "16")
-                                m_log.write("   Maximum unicode code-point: \033[48;2;10;6;26;32;1m10FFFF₁₆\033[0m"), additionalLog();
+                                m_log.write("   Maximum unicode code-point: \033[32;1m10FFFF₁₆\033[0m"), additionalLog();
                                 else
-                                m_log.write("   Maximum unicode code-point: \033[48;2;10;6;26;32;1m10FFFF₁₆\033[0m or \033[48;2;10;6;26;32;1m", convertedMaxCodePoint, base, "\033[0m"), additionalLog();
+                                m_log.write("   Maximum unicode code-point: \033[32;1m10FFFF₁₆\033[0m or \033[32;1m", convertedMaxCodePoint, base, "\033[0m"), additionalLog();
                                 
                                 result = TokenType::_miscellany;
                             }
@@ -2261,7 +2260,7 @@ namespace Nc
                             {
                                 if (convertedMaxCodePoint = baseDigitsAsStr == "16"? "7F" : nc_misc::convertIntegerBase10ToBaseN(0x7F/*127u*/, baseDigitsAsInteger), nc_misc::integer_gt(ascii_integer_literal, convertedMaxCodePoint))
                                 {
-                                    m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, escaped unicode code point entry is greater than the maximum basic-latin(ascii) code-point");
+                                    m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[33;1m", m_tokenString, "\033[0m, escaped unicode code point entry is greater than the maximum basic-latin(ascii) code-point");
                                     
                                     init_newLineStore();
                                     
@@ -2269,9 +2268,9 @@ namespace Nc
                                     start_log(/*relativeColumn:*/ line_column.second, /*absoluteColumn*/ line_column.second + original_integer_size, line_column.first);
 
                                     if (baseDigitsAsStr == "16")
-                                    m_log.write("   Maximum basic-latin(ascii) code-point: \033[48;2;10;6;26;32;1m10FFFF₁₆\033[0m"), additionalLog();
+                                    m_log.write("   Maximum basic-latin(ascii) code-point: \033[32;1m10FFFF₁₆\033[0m"), additionalLog();
                                     else
-                                    m_log.write("   Maximum basic-latin(ascii) code-point: \033[48;2;10;6;26;32;1m10FFFF₁₆\033[0m or \033[48;2;10;6;26;32;1m", convertedMaxCodePoint, base, "\033[0m"), additionalLog();
+                                    m_log.write("   Maximum basic-latin(ascii) code-point: \033[32;1m10FFFF₁₆\033[0m or \033[32;1m", convertedMaxCodePoint, base, "\033[0m"), additionalLog();
 
                                     result = TokenType::_miscellany;
                                 }
@@ -2282,7 +2281,7 @@ namespace Nc
                         closing_square_brace_check:
                         if (m_tokenString[i] != ']'_u8)
                         {
-                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry is unterminated, expected this \033[48;2;10;6;26;32;1m]\033[0m instead of this \033[48;2;10;6;26;31;1m", m_tokenString[i], "\033[0m");
+                            m_log.write("In ", literalTypeName_plus_characterWiseType, " literal \033[33;1m", m_tokenString, "\033[0m, escaped unicode code-point entry is unterminated, expected this \033[32;1m]\033[0m instead of this \033[31;1m", m_tokenString[i], "\033[0m");
 
                             init_newLineStore();
                             
@@ -2299,7 +2298,7 @@ namespace Nc
                 default:
                 {
                     result = TokenType::_miscellany;
-                    m_log.write(beginText(), " literal \033[48;2;10;6;26;33;1m", m_tokenString, "\033[0m contains invalid escape squence: \033[48;2;10;6;26;31;1m", m_tokenString[i], "\033[0m");
+                    m_log.write(beginText(), " literal \033[33;1m", m_tokenString, "\033[0m contains invalid escape squence: \033[31;1m", m_tokenString[i], "\033[0m");
                     
                     init_newLineStore();
                     
@@ -2314,22 +2313,22 @@ namespace Nc
                         print_escapeSequence_list_once_pair.first = true, print_escapeSequence_list_once_pair.second = m_log.getLogCounter() - 1uz;
 
                         m_log.write("   Try the below instead:"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1mb[0m for backspace equivalent to \[8])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1me[0m for escape equivalent to \[1B])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1mf[0m for formfeed equivalent to \[C])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1mn[0m for new-line equivalent to \[A])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1mr[0m for carraige-return equivalent to \[D])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1mt[0m for horizontal-tabulation equivalent to \[9])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1mv[0m for vertical tabulation equivalent to \[B])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1m"[0m for quotation-mark(dobule-quote) equivalent to \[22])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1m'[0m for apostrophe(single-quote) equivalent to \[27])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1m0[0m for null equivalent to \[0])"), additionalLog();
-                        m_log.write(R"(   ● [48;2;10;6;26;32;1m[[0m for unicode code-point entry, with its terminator being [48;2;10;6;26;32;1m][0m. The unicode code-point entry follows the same rules as valid nc integer literal, meaning that they are base agnostic and support digit separators with the exception that the default base is [48;2;10;6;26;32;1m16[0m not [48;2;10;6;26;32;1m10[0m, example: [48;2;10;6;26;32;1m\[2a][0m, [48;2;10;6;26;32;1m\[42₁₀][0m, [48;2;10;6;26;32;1m\[1F₂₇][0m, [48;2;10;6;26;32;1m\[10'10'10₂][0m, etc)"), additionalLog();
-                        m_log.write(R"(   ● Variable length [48;2;10;6;26;32;1m#[0m followed by [48;2;10;6;26;32;1m{[0m for raw string/character entry(for disabling escape-sequences), with is terminator being [48;2;10;6;26;32;1m}[0m followed by the same [48;2;10;6;26;32;1m#[0m length, example: [48;2;10;6;26;32;1m\#{\p '}#[0m, [48;2;10;6;26;32;1m\##{ }# }##[0m, [48;2;10;6;26;32;1m\#####{ }### }#####[0m, etc. This method of raw string entry was inspired by the rust programming language - i.e this [48;2;10;6;26;32;1mr#"\k""""\p"#[0m - but instead of being standalone, it's embedded)"), additionalLog();
+                        m_log.write(R"(   ● [32;1mb[0m for backspace equivalent to \[8])"), additionalLog();
+                        m_log.write(R"(   ● [32;1me[0m for escape equivalent to \[1B])"), additionalLog();
+                        m_log.write(R"(   ● [32;1mf[0m for formfeed equivalent to \[C])"), additionalLog();
+                        m_log.write(R"(   ● [32;1mn[0m for new-line equivalent to \[A])"), additionalLog();
+                        m_log.write(R"(   ● [32;1mr[0m for carraige-return equivalent to \[D])"), additionalLog();
+                        m_log.write(R"(   ● [32;1mt[0m for horizontal-tabulation equivalent to \[9])"), additionalLog();
+                        m_log.write(R"(   ● [32;1mv[0m for vertical tabulation equivalent to \[B])"), additionalLog();
+                        m_log.write(R"(   ● [32;1m"[0m for quotation-mark(dobule-quote) equivalent to \[22])"), additionalLog();
+                        m_log.write(R"(   ● [32;1m'[0m for apostrophe(single-quote) equivalent to \[27])"), additionalLog();
+                        m_log.write(R"(   ● [32;1m0[0m for null equivalent to \[0])"), additionalLog();
+                        m_log.write(R"(   ● [32;1m[[0m for unicode code-point entry, with its terminator being [32;1m][0m. The unicode code-point entry follows the same rules as valid nc integer literal, meaning that they are base agnostic and support digit separators with the exception that the default base is [32;1m16[0m not [32;1m10[0m, example: [32;1m\[2a][0m, [32;1m\[42₁₀][0m, [32;1m\[1F₂₇][0m, [32;1m\[10'10'10₂][0m, etc)"), additionalLog();
+                        m_log.write(R"(   ● Variable length [32;1m#[0m followed by [32;1m{[0m for raw string/character entry(for disabling escape-sequences), with is terminator being [32;1m}[0m followed by the same [32;1m#[0m length, example: [32;1m\#{\p '}#[0m, [32;1m\##{ }# }##[0m, [32;1m\#####{ }### }#####[0m, etc. This method of raw string entry was inspired by the rust programming language - i.e this [32;1mr#"\k""""\p"#[0m - but instead of being standalone, it's embedded)"), additionalLog();
                         m_log.write("   Obviously the usage is this: \\<escape-squence>"), additionalLog();
                     }
                     else
-                    m_log.write("   The list of valid nc escape-sequences are already listed in log(\033[48;2;10;6;26;33;1m", print_escapeSequence_list_once_pair.second, "\033[0m) starting from the 5th line"), additionalLog();
+                    m_log.write("   The list of valid nc escape-sequences are already listed in log(\033[33;1m", print_escapeSequence_list_once_pair.second, "\033[0m) starting from the 5th line"), additionalLog();
                     
                     break;
                 }
@@ -2346,160 +2345,253 @@ namespace Nc
 
         if (m_fileBuffer[m_filePosition] == sMinus.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sGreaterthan.front())
-            m_tokenString.assign(sArrow), nextFilePosAndColumn() /*skip past the sGreaterthan token*/;
-            else if (m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sMinusAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
-            else if (m_fileBuffer[m_filePosition] == sMinus.front())
-            m_tokenString.assign(sDecrement), nextFilePosAndColumn() /*skip past the second sMinus token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
+                m_tokenString.assign(sArrow);
+                else if (m_fileBuffer[m_filePosition] == sAssign.front())
+                m_tokenString.assign(sMinusAssign);
+                else if (m_fileBuffer[m_filePosition] == sMinus.front())
+                m_tokenString.assign(sDecrement);
+                else
+                m_tokenString.assign(sMinus), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sMinus);
         }
         else if (m_fileBuffer[m_filePosition] == sLessthan.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sLessThan_equalTo), nextFilePosAndColumn() /*skip past the sEqual token*/;
-            else if (m_fileBuffer[m_filePosition] == sLessthan.front())
+            if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-                m_tokenString.assign(sShiftLeftAssign), nextFilePosAndColumn();
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
+                m_tokenString.assign(sLessThan_equalTo);
                 else if (m_fileBuffer[m_filePosition] == sLessthan.front())
                 {
-                    if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-                    m_tokenString.assign(sRotateLeftAssign), nextFilePosAndColumn();
+                    if (nextFilePosAndColumn(), !m_isEndofFile)
+                    {
+                        if (m_fileBuffer[m_filePosition] == sAssign.front())
+                        m_tokenString.assign(sShiftLeftAssign);
+                        else if (m_fileBuffer[m_filePosition] == sLessthan.front())
+                        {
+                            if (nextFilePosAndColumn(), !m_isEndofFile)
+                            {
+                                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                                m_tokenString.assign(sRotateLeftAssign);
+                                else
+                                m_tokenString.assign(sRotateLeft), prevFilePosAndColumn();
+                            }
+                            else
+                            m_tokenString.assign(sRotateLeft);
+                        }
+                        else
+                        m_tokenString.assign(sShiftLeft), prevFilePosAndColumn();
+                    }
                     else
-                    m_tokenString.assign(sRotateLeft);
+                    m_tokenString.assign(sShiftLeft);
                 }
                 else
-                m_tokenString.assign(sShiftLeft);
+                m_tokenString.assign(sLessthan), prevFilePosAndColumn();
             }
             else
             m_tokenString.assign(sLessthan);
         }
         else if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sGreaterThan_equalTo), nextFilePosAndColumn() /*skip past the sEqual token*/;
-            else if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
+            if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-                m_tokenString.assign(sShiftRightAssign), nextFilePosAndColumn();
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
+                m_tokenString.assign(sGreaterThan_equalTo);
                 else if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
                 {
-                    if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-                    m_tokenString.assign(sRotateRightAssign), nextFilePosAndColumn();
+                    if (nextFilePosAndColumn(), !m_isEndofFile)
+                    {
+                        if (m_fileBuffer[m_filePosition] == sAssign.front())
+                        m_tokenString.assign(sShiftRightAssign);
+                        else if (m_fileBuffer[m_filePosition] == sGreaterthan.front())
+                        {
+                            if (nextFilePosAndColumn(), !m_isEndofFile)
+                            {
+                                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                                m_tokenString.assign(sRotateRightAssign);
+                                else
+                                m_tokenString.assign(sRotateRight), prevFilePosAndColumn();
+                            }
+                            else
+                            m_tokenString.assign(sRotateRight);
+                        }
+                        else
+                        m_tokenString.assign(sShiftRight), prevFilePosAndColumn();
+                    }
                     else
-                    m_tokenString.assign(sRotateRight);
+                    m_tokenString.assign(sShiftRight);
                 }
                 else
-                m_tokenString.assign(sShiftRight);
+                m_tokenString.assign(sGreaterthan), prevFilePosAndColumn();
             }
             else
             m_tokenString.assign(sGreaterthan);
         }
         else if (m_fileBuffer[m_filePosition] == sColon.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
-            else if (m_fileBuffer[m_filePosition] == sColon.front())
+            if (nextFilePosAndColumn(), !m_isEndofFile)
             {
-                if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-                m_tokenString.assign(sInitAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
-                else
+                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                m_tokenString.assign(sInitAssign);
+                else if (m_fileBuffer[m_filePosition] == sColon.front())
                 m_tokenString.assign(sScopeResolution);
+                else
+                m_tokenString.assign(sColon), prevFilePosAndColumn();
             }
             else
             m_tokenString.assign(sColon);
         }
         else if (m_fileBuffer[m_filePosition] == sNot.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sNotEqual), nextFilePosAndColumn() /*skip past the sEqual token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
+                m_tokenString.assign(sNotEqual);
+                else
+                m_tokenString.assign(sNot), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sNot);
         }
         else if (m_fileBuffer[m_filePosition] == sPlus.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sPlusAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
-            else if (m_fileBuffer[m_filePosition] == sPlus.front())
-            m_tokenString.assign(sIncrement), nextFilePosAndColumn() /*skip past the second sPlus token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                m_tokenString.assign(sPlusAssign);
+                else if (m_fileBuffer[m_filePosition] == sPlus.front())
+                m_tokenString.assign(sIncrement);
+                else
+                m_tokenString.assign(sPlus), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sPlus);
         }
         else if (m_fileBuffer[m_filePosition] == sAlternateDivide.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sAlternateDivideAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sEqual.front())
+                m_tokenString.assign(sAlternateDivideAssign);
+                else
+                m_tokenString.assign(sAlternateDivide), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sAlternateDivide);
         }
         else if (m_fileBuffer[m_filePosition] == sMultiply.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sMultiplyAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                m_tokenString.assign(sMultiplyAssign);
+                else
+                m_tokenString.assign(sMultiply), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sMultiply);
         }
         else if (m_fileBuffer[m_filePosition] == sDivide.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sDivideAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
-            else if (m_fileBuffer[m_filePosition] == sRemainder.front())
-            m_tokenString.assign(sDivideRemainder), nextFilePosAndColumn() /*skip past the sRemainder token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                m_tokenString.assign(sDivideAssign);
+                else if (m_fileBuffer[m_filePosition] == sRemainder.front())
+                m_tokenString.assign(sDivideRemainder);
+                else
+                m_tokenString.assign(sDivide), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sDivide);
         }
         else if (m_fileBuffer[m_filePosition] == sRemainder.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sRemainderAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                m_tokenString.assign(sRemainderAssign);
+                else
+                m_tokenString.assign(sRemainder), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sRemainder);
         }
         else if (m_fileBuffer[m_filePosition] == sExponention.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sEqual.front())
-            m_tokenString.assign(sExponentionAssign), nextFilePosAndColumn() /*skip past the sEqual token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sAssign.front())
+                m_tokenString.assign(sExponentionAssign);
+                else
+                m_tokenString.assign(sExponention), prevFilePosAndColumn();
+            }
             else
             m_tokenString.assign(sExponention);
         }
-        else if (m_fileBuffer[m_filePosition] == sEqual.front())
+        else if (m_fileBuffer[m_filePosition] == sAssign.front())
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sMinus.front())
-            m_tokenString.assign(sReverseMinusAssign), nextFilePosAndColumn() /*skip past the sMinus token*/;
-            else if (m_fileBuffer[m_filePosition] == sDivide.front())
-            m_tokenString.assign(sReverseDivideAssign), nextFilePosAndColumn() /*skip past the sDivide token*/;
-            else if (m_fileBuffer[m_filePosition] == sRemainder.front())
-            m_tokenString.assign(sReverseRemainderAssign), nextFilePosAndColumn() /*skip past the sRemainder token*/;
-            else if (m_fileBuffer[m_filePosition] == sAlternateDivide.front())
-            m_tokenString.assign(sReverseAlternateDivideAssign), nextFilePosAndColumn() /*skip past the sAlternateDivide token*/;
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sMinus.front())
+                m_tokenString.assign(sReverseMinusAssign);
+                else if (m_fileBuffer[m_filePosition] == sDivide.front())
+                m_tokenString.assign(sReverseDivideAssign);
+                else if (m_fileBuffer[m_filePosition] == sRemainder.front())
+                m_tokenString.assign(sReverseRemainderAssign);
+                else if (m_fileBuffer[m_filePosition] == sAlternateDivide.front())
+                m_tokenString.assign(sReverseAlternateDivideAssign);
+                else if (m_fileBuffer[m_filePosition] == sEqual.front())
+                m_tokenString.assign(sEqual);
+                else
+                m_tokenString.assign(sAssign), prevFilePosAndColumn();
+            }
             else
-            m_tokenString.assign(sEqual);
+            m_tokenString.assign(sAssign);
         }
         else if (m_fileBuffer[m_filePosition] == '#')
         {
-            if (nextFilePosAndColumn(), !m_isEndofFile and m_fileBuffer[m_filePosition] == sLparen.front())
-            m_tokenString.assign(sHashedLparen), nextFilePosAndColumn();
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sLsquare.front())
+                m_tokenString.assign(sHashedLsquare);
+                else
+                return prevFilePosAndColumn(), TokenType::_miscellany;
+            }
             else
-            return prevFilePosAndColumn(), TokenType::_miscellany;
+            return TokenType::_miscellany;
+        }
+        else if (m_fileBuffer[m_filePosition] == '$')
+        {
+            if (nextFilePosAndColumn(), !m_isEndofFile)
+            {
+                if (m_fileBuffer[m_filePosition] == sLparen.front())
+                m_tokenString.assign(sDollarSignLparen);
+                else
+                return prevFilePosAndColumn(), TokenType::_miscellany;
+            }
+            else
+            return TokenType::_miscellany;
         }
         else if (
         m_fileBuffer[m_filePosition] == sLcurly.front() or m_fileBuffer[m_filePosition] == sRcurly.front() or
         m_fileBuffer[m_filePosition] == sLparen.front() or m_fileBuffer[m_filePosition] == sRparen.front() or
         m_fileBuffer[m_filePosition] == sSemicolon.front() or m_fileBuffer[m_filePosition] == sComma.front() or
         m_fileBuffer[m_filePosition] == sLsquare.front() or m_fileBuffer[m_filePosition] == sRsquare.front() or
-        m_fileBuffer[m_filePosition] == sQuestionMark.front() or
-        m_fileBuffer[m_filePosition] == sMemberOf.front() or m_fileBuffer[m_filePosition] == sCommercialAt.front() or
-        m_fileBuffer[m_filePosition] == sAlternateLessThan_equalTo.front() or m_fileBuffer[m_filePosition] == sAlternateNotEqual.front() or
-        m_fileBuffer[m_filePosition] == sAlternateGreaterThan_equalTo.front() or m_fileBuffer[m_filePosition] == sAmperSand.front() or
-        m_fileBuffer[m_filePosition] == sPipe.front() or m_fileBuffer[m_filePosition] == sDollarSign.front()
+        m_fileBuffer[m_filePosition] == sQuestionMark.front() or m_fileBuffer[m_filePosition] == sMemberOf.front() or
+        m_fileBuffer[m_filePosition] == sCommercialAt.front() or m_fileBuffer[m_filePosition] == sAlternateLessThan_equalTo.front() or
+        m_fileBuffer[m_filePosition] == sAlternateNotEqual.front() or m_fileBuffer[m_filePosition] == sAlternateGreaterThan_equalTo.front() or
+        m_fileBuffer[m_filePosition] == sAmperSand.front() or m_fileBuffer[m_filePosition] == sPipe.front()
         )
-        m_tokenString.push_back(m_fileBuffer[m_filePosition]), nextFilePosAndColumn() /*move the file position past the symbol*/;
+        m_tokenString.push_back(m_fileBuffer[m_filePosition]);
         else
         return TokenType::_miscellany;
         
-        addToTokenDataList(std::optional<std::uint32_t>{}, m_line, false, false, {}, true);
+        nextFilePosAndColumn(), addToTokenDataList(std::optional<std::uint32_t>{}, m_line, false, false, {}, true);
 
         return TokenType::symbol;
     }
@@ -2509,7 +2601,7 @@ namespace Nc
     {
         m_log.log(true);
         
-        m_log.write("   \033[1mLine\033[0m: \033[48;2;10;6;26;36;1m", m_line, "\033[0m from \033[1mcolumn\033[0m: [\033[48;2;10;6;26;36;1m", m_relativeColumn, "\033[0m - \033[48;2;10;6;26;36;1m", m_absoluteColumn, "\033[0m]"), m_log.log();
+        m_log.write("   \033[1mLine\033[0m: \033[38;2;249;128;33;1m", m_line, "\033[0m from \033[1mcolumn\033[0m: [\033[38;2;249;128;33;1m", m_relativeColumn, "\033[0m - \033[38;2;249;128;33;1m", m_absoluteColumn, "\033[0m]"), m_log.log();
 
         U8string lineContents{};
         std::uint32_t count{};
@@ -2541,9 +2633,9 @@ namespace Nc
         m_log.log(true);
         
         consideredNewLine_flag?
-        m_log.write("   \033[1mLine\033[0m: \033[48;2;10;6;26;36;1m", line, "\033[0m \033[1mcolumn\033[0m: \033[48;2;10;6;26;36;1m", relativeColumn, "\033[0m")
+        m_log.write("   \033[1mLine\033[0m: \033[38;2;249;128;33;1m", line, "\033[0m \033[1mcolumn\033[0m: \033[38;2;249;128;33;1m", relativeColumn, "\033[0m")
         :
-        m_log.write("   \033[1mLine\033[0m: \033[48;2;10;6;26;36;1m", line, "\033[0m from \033[1mcolumn\033[0m: [\033[48;2;10;6;26;36;1m", relativeColumn, "\033[0m - \033[48;2;10;6;26;36;1m", absoluteColumn, "\033[0m]");
+        m_log.write("   \033[1mLine\033[0m: \033[38;2;249;128;33;1m", line, "\033[0m from \033[1mcolumn\033[0m: [\033[38;2;249;128;33;1m", relativeColumn, "\033[0m - \033[38;2;249;128;33;1m", absoluteColumn, "\033[0m]");
 
         m_log.log();
 
@@ -2581,41 +2673,52 @@ namespace Nc
     {
         m_log.log(true);
 
-        m_log.write("   From [\033[1mline\033[0m: \033[48;2;10;6;26;36;1m", start_line, "\033[0m \033[1mcolumn\033[0m: \033[48;2;10;6;26;36;1m", relativeColumn, "\033[0m] - [\033[1mline\033[0m: \033[48;2;10;6;26;36;1m", m_line, "\033[0m \033[1mcolumn\033[0m: \033[48;2;10;6;26;36;1m", m_absoluteColumn, "\033[0m]");
+        m_log.write("   From [\033[1mline\033[0m: \033[38;2;249;128;33;1m", start_line, "\033[0m \033[1mcolumn\033[0m: \033[38;2;249;128;33;1m", relativeColumn, "\033[0m] - [\033[1mline\033[0m: \033[38;2;249;128;33;1m", m_line, "\033[0m \033[1mcolumn\033[0m: \033[38;2;249;128;33;1m", m_absoluteColumn, "\033[0m]");
         m_log.log();
 
         U8string lineContents{};
+        bool log_once{};
         
         for (auto current_line = start_line; current_line <= m_line; ++current_line)
         {
-            std::uint32_t count{};
-            for (auto i = m_lineNumToFilePos[current_line], size = (std::uint32_t)m_fileBuffer.size(); i < size; ++i)
+            if (m_line - current_line <= 1 or current_line - start_line < 4)//if it is the last line or if 4logs have already been logged off
             {
-                if (m_fileBuffer[i] == '\n'_u8)
-                break;
+                std::uint32_t count{};
+                for (auto i = m_lineNumToFilePos[current_line], size = (std::uint32_t)m_fileBuffer.size(); i < size; ++i)
+                {
+                    if (m_fileBuffer[i] == '\n'_u8)
+                    break;
 
-                ++count;
+                    ++count;
+                }
+                lineContents.assign(m_fileBuffer, m_lineNumToFilePos[current_line], count);
+
+                m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
+                m_log.write("                │\033[1m");
+
+                if (current_line == start_line)//when it is the begining
+                {
+                    auto temp = lineContents.size() - (std::size_t)(relativeColumn - 1);
+                    m_log.write(U8string{lineContents.size(), ' '_u8}.replace(relativeColumn - 1, temp, temp, "⇧"_u8));
+                }
+                //no need to check for when it is end because i only call the function for unterminated multiLine entities like multi-comments and strings
+                else
+                {
+                    auto size = lineContents.size();
+                    m_log.write(U8string{size, ' '_u8}.replace(0uz, size, size, "⇧"_u8));
+                }
+
+                m_log.write("\033[0m"), m_log.log();
             }
-            lineContents.assign(m_fileBuffer, m_lineNumToFilePos[current_line], count);
-
-            m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
-            m_log.write("                │\033[1m");
-
-            if (current_line == start_line)//when it is the begining
-            {
-                auto temp = lineContents.size() - (std::size_t)(relativeColumn - 1);
-                m_log.write(U8string{lineContents.size(), ' '_u8}.replace(relativeColumn - 1, temp, temp, "⇧"_u8));
-            }
-            //no need to check for when it is end because i only call the function for unterminated multiLine entities like multi-comments and strings
             else
             {
-                auto size = lineContents.size();
-                m_log.write(U8string{size, ' '_u8}.replace(0uz, size, size, "⇧"_u8));
+                if (!log_once)
+                {
+                    log_once = true;
+                    m_log.write("               \033[32;5;1m...\033[0m"), m_log.log();
+                }
             }
-
-            m_log.write("\033[0m"), m_log.log();
         }
-
         m_isDeadZone = true;
     }
 

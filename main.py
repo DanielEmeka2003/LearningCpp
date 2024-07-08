@@ -40,5 +40,37 @@ while True:
     ieeeFP.print()
 """
 
-import turtle as resource
+def count_digits_iteratively(n, base):
+    """Counts the number of digits of an integer n in a given base iteratively."""
+    if n == 0:
+        return 1
+    count = 0
+    while n > 0:
+        n //= base
+        count += 1
+    return count
 
+import math
+
+def count_digits_in_base(n, base):
+    """Counts the number of digits of an integer n in a given base."""
+    if n == 0:
+        return 1
+    return math.floor(math.log(n, base)) + 1
+
+import time
+
+number = 890808
+base = 10
+
+# Logarithmic Method
+start = time.time()
+digits_count_log = count_digits_in_base(number, base)
+end = time.time()
+print(f"Logarithmic Method: {digits_count_log} digits, Time: {end - start} seconds")
+
+# Iterative Method
+start = time.time()
+digits_count_iter = count_digits_iteratively(number, base)
+end = time.time()
+print(f"Iterative Method: {digits_count_iter} digits, Time: {end - start} seconds")

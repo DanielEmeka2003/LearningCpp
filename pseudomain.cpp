@@ -23,6 +23,9 @@
 #include <limits>
 #include <format>
 #include <source_location>
+#include <chrono>
+
+#include "timer.h"
 
 using namespace boost::multiprecision;
 
@@ -1236,17 +1239,16 @@ void denormalize_realNum(std::string& realNum)
     trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
 }
 
-std::string denormalize_realNum(const std::string& realNum, ImmutableLref)
+std::string denormalize_realNum(std::string realNum, ImmutableLref)
 {
     std::regex reg{R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@([+-]?[[:digit:]]+)$)"};
     std::smatch smatch{};
-    auto realNum_copy = realNum;
 
     if (!std::regex_match(realNum, smatch, reg))
     panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format i.e [[:alnum:]]{1,}(\.[[:alnum:]]*)?[@]([+-]?[[:digit:]]+)");
     
     //removal of the exponent
-    realNum_copy.erase(realNum_copy.begin() + realNum_copy.find('@'), realNum_copy.end());
+    realNum.erase(realNum.begin() + realNum.find('@'), realNum.end());
 
     auto exponent = std::stoi(smatch[2]); //smatch[2] contains the exponent
 
@@ -1255,52 +1257,52 @@ std::string denormalize_realNum(const std::string& realNum, ImmutableLref)
     {
         if (exponent >= 0)
         {
-            realNum_copy.append((std::size_t)exponent, '0');
-            realNum_copy.append(".0");
+            realNum.append((std::size_t)exponent, '0');
+            realNum.append(".0");
         }
         else
         {
             exponent *= -1; //making the exponent positive
 
-            if (std::size_t(exponent) == realNum_copy.size())
+            if (std::size_t(exponent) == realNum.size())
             {
-                realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                realNum.insert(realNum.begin(), {'0', '.'});
             }
-            else if (std::size_t(exponent) < realNum_copy.size())
+            else if (std::size_t(exponent) < realNum.size())
             {   
-                realNum_copy.insert(realNum_copy.begin() + (realNum_copy.size() - std::size_t(exponent)), '.');
+                realNum.insert(realNum.begin() + (realNum.size() - std::size_t(exponent)), '.');
             }
-            else //if (exponent > realNum_copy.size())
+            else //if (exponent > realNum.size())
             {
-                auto number_of_realZeros_to_add = std::max(exponent, int(realNum_copy.size())) - std::min(exponent, int(realNum_copy.size()));
-                realNum_copy.insert(0, number_of_realZeros_to_add, '0');
-                realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                auto number_of_realZeros_to_add = std::max(exponent, int(realNum.size())) - std::min(exponent, int(realNum.size()));
+                realNum.insert(0, number_of_realZeros_to_add, '0');
+                realNum.insert(realNum.begin(), {'0', '.'});
             }
         }
     }
     else
     {
-        auto radix_index = realNum_copy.find('.');
+        auto radix_index = realNum.find('.');
         auto whole_number_size = radix_index;
 
-        realNum_copy.erase(realNum_copy.begin() + radix_index); //removing the radix separator
-        auto real_part_size = realNum_copy.size() - whole_number_size; //real_part_size depends on realNum_copy devoid of the radix seperator
+        realNum.erase(realNum.begin() + radix_index); //removing the radix separator
+        auto real_part_size = realNum.size() - whole_number_size; //real_part_size depends on realNum devoid of the radix seperator
 
         if (exponent >= 0)
         {
             if (std::size_t(exponent) > real_part_size)
             {
                 auto number_of_realZeros_to_add = (std::size_t)exponent - real_part_size;
-                realNum_copy.append(number_of_realZeros_to_add, '0');
-                realNum_copy.append(".0");
+                realNum.append(number_of_realZeros_to_add, '0');
+                realNum.append(".0");
             }
             else if (std::size_t(exponent) < real_part_size)
             {
                 auto newRadix_index = exponent + radix_index;
-                realNum_copy.insert(realNum_copy.begin() + newRadix_index, '.');
+                realNum.insert(realNum.begin() + newRadix_index, '.');
             }
             else //if (std::size_t(exponent) == real_part_size)
-            realNum_copy.append({'.', '0'});
+            realNum.append({'.', '0'});
         }
         else
         {
@@ -1308,23 +1310,23 @@ std::string denormalize_realNum(const std::string& realNum, ImmutableLref)
 
             if (std::size_t(exponent) == whole_number_size)//0.008@-2
             {
-                realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                realNum.insert(realNum.begin(), {'0', '.'});
             }
             else if (std::size_t(exponent) < whole_number_size)
             {
-                realNum_copy.insert(realNum_copy.begin() + (whole_number_size - std::size_t(exponent)), '.');
+                realNum.insert(realNum.begin() + (whole_number_size - std::size_t(exponent)), '.');
             }
             else //if (std::size_t(exponent) > whole_number_size)
             {
                 auto number_of_realZeros_to_add = std::max((std::size_t)exponent, whole_number_size) - std::min((std::size_t)exponent, whole_number_size);
-                realNum_copy.insert(0, number_of_realZeros_to_add, '0');
-                realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                realNum.insert(0, number_of_realZeros_to_add, '0');
+                realNum.insert(realNum.begin(), {'0', '.'});
             }
         }
     }
 
-    trim_real_leading_zeros(realNum_copy), trim_real_trailing_zeros(realNum_copy);
-    return realNum_copy;
+    trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
+    return realNum;
 }
 
 void normalize_realNum(std::string& realNum)
@@ -1373,11 +1375,13 @@ void normalize_realNum(std::string& realNum)
     }
     else if (std::regex_match(realNum, reg = R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"))//<third-and-final case> for any fallout that has an exponent: [12.34@1], [123.4@-23], [0023.34@34] or [0.4534@-10]
     {
-        /* dangerous: regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
+        /*
+        * [dangerous]: std::regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
         * std::string_view would be better to reference only the non-exponent
         */
         auto exponent_indicator_index = realNum.find('@');
 	    auto real_only = std::string{realNum.begin(), realNum.begin() + exponent_indicator_index};
+        auto exponent = 0;
 
         //0.23456@-33 | 0356@-12 | 0.1@-3 | 0000.1@-3 | 0.0@-2 | 0000.0@-3 | 0000@-23
         //replace with my implementation of regex_search: nc_reg::regex_search(immutable_lref realNum, reg = R"('0'+('.'<digit>+)?)")
@@ -1385,19 +1389,11 @@ void normalize_realNum(std::string& realNum)
         {
             if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
             {
-                if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.begin() + (exponent_indicator_index != std::string::npos? exponent_indicator_index : realNum.size())}.find_first_not_of('0'); non_zero_pos != std::string::npos)
+                if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.begin() + exponent_indicator_index}.find_first_not_of('0'); non_zero_pos != std::string::npos)
                 {
-                    int exponent{};
                     //extracting the exponent
-                    for (auto i = realNum.size() - 1; i != 0; --i)
-                    {
-                        if (realNum[i] == '@')
-                        {
-                            exponent =  std::stoi(std::string/*_view*/(realNum.begin() + (i + 1), realNum.end()));
-                            realNum.erase(realNum.begin() + (i + 1), realNum.end());
-                            break;
-                        }
-                    }
+                    exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+                    realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
                     realNum.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');
                     realNum.append(exponent >= 0? '+' + std::to_string(exponent - int(non_zero_pos  + 1)) : std::to_string(exponent - int(non_zero_pos  + 1)));
@@ -1411,17 +1407,9 @@ void normalize_realNum(std::string& realNum)
         }
         else if (std::regex_match(real_only, reg = R"(^[0-9]{2,}(\.[[:digit:]]*)?$)"))//a similar reiteration of the <second-case>, but one which captures exponents: [000001@-23], [02343@+45] or [233445.3434@+2]
         {
-            int exponent{};
             //extracting the exponent
-            for (auto i = realNum.size() - 1; i != 0; --i)
-            {
-                if (realNum[i] == '@')
-                {
-                    exponent =  std::stoi(std::string/*_view*/(realNum.begin() + (i + 1), realNum.end()));
-                    realNum.erase(realNum.begin() + (i + 1), realNum.end());
-                    break;
-                }
-            }
+            exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+            realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
             if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
             {
@@ -1431,8 +1419,9 @@ void normalize_realNum(std::string& realNum)
             }
             else
             {
+                auto realNum_size = realNum.size();//save the realNum.size() because std::string::insert modifies the string and to avoid function call overhead
                 realNum.insert(realNum.find_first_not_of('0') + 1, 1, '.');
-                realNum.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum.size() - 2)) : std::to_string(exponent + int(realNum.size() - 2)));
+                realNum.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum_size - 2)) : std::to_string(exponent + int(realNum_size - 2)));
             }
         }
     }
@@ -1442,139 +1431,127 @@ void normalize_realNum(std::string& realNum)
     trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
 }
 
-std::string normalize_realNum(const std::string& realNum, ImmutableLref)
+std::string normalize_realNum(std::string realNum, ImmutableLref)
 {
     std::regex reg{R"(^[1-9[[:alpha:]]]{1}(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"};
-    std::string realNum_copy = realNum;
 
     if (std::regex_match(realNum, reg)){}
-    else if (std::regex_match(realNum_copy, reg = R"(^(0{1,}|[[:alnum:]]{1})(\.[[:alnum:]]*)?$)"))//<first-case> for matching something like this: [00000.23], [0.1223] or [1.2345]
+    else if (std::regex_match(realNum, reg = R"(^(0{1,}|[[:alnum:]]{1})(\.[[:alnum:]]*)?$)"))//<first-case> for matching something like this: [00000.23], [0.1223] or [1.2345]
     {
-        if (auto radix_index = realNum_copy.find('.'); realNum_copy.starts_with('0') and radix_index != std::string::npos)
+        if (auto radix_index = realNum.find('.'); realNum.starts_with('0') and radix_index != std::string::npos)
         {
-            if (auto non_zero_pos = std::string_view{realNum_copy.begin() + radix_index + 1, realNum_copy.end()}.find_first_not_of('0'); non_zero_pos != std::string::npos)
+            if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.end()}.find_first_not_of('0'); non_zero_pos != std::string::npos)
             {
                 //example with 0.00234
-                realNum_copy.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');//insertion occurs here: 0.002[.]34 => 0.002.34
-                realNum_copy.append("@-" + std::to_string(non_zero_pos  + 1));//appending the exponent: 0.002.34@-3
-                realNum_copy.erase(radix_index, 1);//erasure of the [0.]: 0.002.34@-3 => 002.34@-3; [plus one because of the insertion of a new radix point]
+                realNum.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');//insertion occurs here: 0.002[.]34 => 0.002.34
+                realNum.append("@-" + std::to_string(non_zero_pos  + 1));//appending the exponent: 0.002.34@-3
+                realNum.erase(radix_index, 1);//erasure of the [0.]: 0.002.34@-3 => 002.34@-3; [plus one because of the insertion of a new radix point]
             }
-            else realNum_copy += "@+0";
+            else realNum += "@+0";
         }
-        else realNum_copy += "@+0";
+        else realNum += "@+0";
     }
-    else if (std::regex_match(realNum_copy, reg = R"(^[[:alnum:]]{2,}(\.[[:alnum:]]*)?$)"))//<second-case> for matching something like this: [12], [00012.2] or [123.34]
+    else if (std::regex_match(realNum, reg = R"(^[[:alnum:]]{2,}(\.[[:alnum:]]*)?$)"))//<second-case> for matching something like this: [12], [00012.2] or [123.34]
     {
-        if (auto radix_index = realNum_copy.find('.'); radix_index != std::string::npos)
+        if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
         {
             /*
             * the insertion followed by the erasure is so unnecessary, an alorigthm like [move] would be more efficient, example:
             * instead of inserting a new radix_seperator[.] and then erasing the old one, moving the radix_seperator from it's former index_position
-            * to a new desitination would be better and more efficient; realNum_copy.move(radix_index, (radix_index - 1) - (radix_index - 2));
+            * to a new desitination would be better and more efficient; realNum.move(radix_index, (radix_index - 1) - (radix_index - 2));
             * to calculate how much the radix point was moved, with index starting from 1 is = (radix_index - 1) - (radix_index - 2)
             * while from 0 is = radix_index - radix_index - 1
             */
 
             //example with 12.34 1234.5
 
-            realNum_copy.erase(radix_index, 1);//erase the radix seperator
-            realNum_copy.insert(1, 1, '.');//insertion occurs here: 1[.]2.34 => 1.2.34
-            realNum_copy.append("@+" + std::to_string(radix_index - 1));//appending the exponent: 1.2.34@+1
+            realNum.erase(radix_index, 1);//erase the radix seperator
+            realNum.insert(1, 1, '.');//insertion occurs here: 1[.]2.34 => 1.2.34
+            realNum.append("@+" + std::to_string(radix_index - 1));//appending the exponent: 1.2.34@+1
         }
         else
         {
-            realNum_copy.insert(1, 1, '.');
-            realNum_copy.append("@+" + std::to_string(realNum_copy.size() - 2));
+            realNum.insert(1, 1, '.');
+            realNum.append("@+" + std::to_string(realNum.size() - 2));
         }
     }
-    else if (std::regex_match(realNum_copy, reg = R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"))//<third-and-final case> for any fallout that has an exponent: [12.34@1], [123.4@-23], [0023.34@34] or [0.4534@-10]
+    else if (std::regex_match(realNum, reg = R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"))//<third-and-final case> for any fallout that has an exponent: [12.34@1], [123.4@-23], [0023.34@34] or [0.4534@-10]
     {
-        /* dangerous: regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
+        /*
+        * [dangerous]: std::regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
         * std::string_view would be better to reference only the non-exponent
         */
-        auto exponent_indicator_index = realNum_copy.find('@');
-	    auto real_only = std::string{realNum_copy.begin(), realNum_copy.begin() + exponent_indicator_index};
+        auto exponent_indicator_index = realNum.find('@');
+	    auto real_only = std::string{realNum.begin(), realNum.begin() + exponent_indicator_index};
+        auto exponent = 0;
 
         //0.23456@-33 | 0356@-12 | 0.1@-3 | 0000.1@-3 | 0.0@-2 | 0000.0@-3 | 0000@-23
-        //replace with my implementation of regex_search: nc_reg::regex_search(immutable_lref realNum_copy, reg = R"('0'+('.'<digit>+)?)")
+        //replace with my implementation of regex_search: nc_reg::regex_search(immutable_lref realNum, reg = R"('0'+('.'<digit>+)?)")
         if (std::regex_match(real_only, reg = R"(0+(\.[[:digit:]]*)?)"))//a similar reiteration of the <first-case> but captures exponents: [0000000000.1@-3], [000.000@-23] or [0.234@+4]
         {
-            if (auto radix_index = realNum_copy.find('.'); radix_index != std::string::npos)
+            if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
             {
-                if (auto non_zero_pos = std::string_view{realNum_copy.begin() + radix_index + 1, realNum_copy.begin() + (exponent_indicator_index != std::string::npos? exponent_indicator_index : realNum_copy.size())}.find_first_not_of('0'); non_zero_pos != std::string::npos)
+                if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.begin() + exponent_indicator_index}.find_first_not_of('0'); non_zero_pos != std::string::npos)
                 {
-                    int exponent{};
                     //extracting the exponent
-                    for (auto i = realNum_copy.size() - 1; i != 0; --i)
-                    {
-                        if (realNum_copy[i] == '@')
-                        {
-                            exponent =  std::stoi(std::string/*_view*/(realNum_copy.begin() + (i + 1), realNum_copy.end()));
-                            realNum_copy.erase(realNum_copy.begin() + (i + 1), realNum_copy.end());
-                            break;
-                        }
-                    }
+                    exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+                    realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
-                    realNum_copy.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');
-                    realNum_copy.append(exponent >= 0? '+' + std::to_string(exponent - int(non_zero_pos  + 1)) : std::to_string(exponent - int(non_zero_pos  + 1)));
-                    realNum_copy.erase(radix_index, 1);
+                    realNum.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');
+                    realNum.append(exponent >= 0? '+' + std::to_string(exponent - int(non_zero_pos  + 1)) : std::to_string(exponent - int(non_zero_pos  + 1)));
+                    realNum.erase(radix_index, 1);
                 }
                 else
-                realNum_copy = "0.0@+0";
+                realNum = "0.0@+0";
             }
             else
-            realNum_copy = "0.0@+0";
+            realNum = "0.0@+0";
         }
         else if (std::regex_match(real_only, reg = R"(^[0-9]{2,}(\.[[:digit:]]*)?$)"))//a similar reiteration of the <second-case>, but one which captures exponents: [000001@-23], [02343@+45] or [233445.3434@+2]
         {
-            int exponent{};
             //extracting the exponent
-            for (auto i = realNum_copy.size() - 1; i != 0; --i)
-            {
-                if (realNum_copy[i] == '@')
-                {
-                    exponent =  std::stoi(std::string/*_view*/(realNum_copy.begin() + (i + 1), realNum_copy.end()));
-                    realNum_copy.erase(realNum_copy.begin() + (i + 1), realNum_copy.end());
-                    break;
-                }
-            }
+            exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+            realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
-            if (auto radix_index = realNum_copy.find('.'); radix_index != std::string::npos)
+            if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
             {
-                realNum_copy.erase(radix_index, 1);
-                realNum_copy.insert(realNum_copy.find_first_not_of('0') + 1, 1, '.');
-                realNum_copy.append(exponent >= 0? '+' + std::to_string(exponent + int(radix_index - 1)) : std::to_string(exponent + int(radix_index - 1)));
+                realNum.erase(radix_index, 1);
+                realNum.insert(realNum.find_first_not_of('0') + 1, 1, '.');
+                realNum.append(exponent >= 0? '+' + std::to_string(exponent + int(radix_index - 1)) : std::to_string(exponent + int(radix_index - 1)));
             }
             else
             {
-                realNum_copy.insert(realNum_copy.find_first_not_of('0') + 1, 1, '.');
-                realNum_copy.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum_copy.size() - 2)) : std::to_string(exponent + int(realNum_copy.size() - 2)));
+                auto realNum_size = realNum.size();//save the realNum.size() because std::string::insert modifies the string and to avoid function call overhead
+                realNum.insert(realNum.find_first_not_of('0') + 1, 1, '.');
+                realNum.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum_size - 2)) : std::to_string(exponent + int(realNum_size - 2)));
             }
         }
     }
     else
     panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, ") is not in the expected format .i.e a real-like format");
     
-    trim_real_leading_zeros(realNum_copy), trim_real_trailing_zeros(realNum_copy);
-    return realNum_copy;
+    trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
+    return realNum;
 }
 
-std::string approximate_base10_real(const std::string& realNum, std::uint32_t desired_digits)
+void approximate_base10_real(std::string&/*do-something-about-this*/ realNum, std::uint32_t desired_digits)
 {
-    std::regex reg{R"(^([0-9]+)(\.[0-9]+)?$)"};
+    std::regex reg{R"(^([0-9]+)(\.[0-9]*)?$)"};//replace the 
     std::smatch smatch{};
 
     if (std::regex_match(realNum, smatch, reg))
     {
         /* slices would be soo fucking good for this; when i switch to my slice's rich language, re-implement this using mutable slices instead*/
         
+        if (smatch[2].str().size() <= 1) return;
+
         std::string real_part = smatch[2];/*contains the real_part plus the radix*/
 
         if (real_part.size() - 1/*minus the radix*/ > desired_digits)
         {
             std::string integer_part = smatch[1];
 
-            if (digitsMap[real_part.back()] >= 5)
+            if (digitsMap[real_part[desired_digits+1]] >= 5)//checks if the first unsafe digit is >= 5
             {
                 auto carry_digit_flag = true;
                 auto temp_insert_digit = 0;
@@ -1584,7 +1561,87 @@ std::string approximate_base10_real(const std::string& realNum, std::uint32_t de
                     if (carry_digit_flag)
                     {
                         temp_insert_digit = 1 + digitsMap[real_part[i]];
-                        carry_digit_flag = temp_insert_digit / 10 == 1, temp_insert_digit %= 10;
+                        carry_digit_flag = temp_insert_digit == 10, temp_insert_digit %= 10;
+
+                        real_part.replace((std::size_t)i, 1uz, 1uz, mapDigits[temp_insert_digit]);
+                    }
+                    else
+                    break;
+                }
+
+                if (carry_digit_flag)//for dealing with the integer_part of approximation
+                {
+                    for (int i = integer_part.size() - 1; /*no need for this check*/; i--)
+                    {
+                        if (i == 0)
+                        {
+                            if (carry_digit_flag)
+                            {
+                                temp_insert_digit = 1 + digitsMap[integer_part[i]];
+
+                                if (temp_insert_digit == 10)
+                                integer_part.replace((std::size_t)i, 1uz, "10");
+                                else
+                                integer_part.replace((std::size_t)i, 1uz, 1uz, mapDigits[temp_insert_digit]);
+                            }
+
+                            break;
+                        }
+                        else
+                        {
+                            if (carry_digit_flag)
+                            {
+                                temp_insert_digit = 1 + digitsMap[integer_part[i]];
+                                carry_digit_flag = temp_insert_digit / 10 == 1, temp_insert_digit %= 10;
+
+                                integer_part.replace((std::size_t)i, 1uz, 1uz, mapDigits[temp_insert_digit]);
+                            }
+                            else
+                            break;
+                        }
+                    }
+                    
+                }
+            }
+            //removing the undesired digits
+            real_part.erase((std::size_t)desired_digits + 1 /*, default value is set to end*/);
+
+            realNum = integer_part + real_part;
+        }
+        return;
+    }
+    else
+    panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format .i.e ([0-9]+)(\.[0-9]*))");
+}
+
+std::string approximate_base10_real(const std::string&/*do-something-about-this*/ realNum, std::uint32_t desired_digits, ImmutableLref)
+{
+    std::regex reg{R"(^([0-9]+)(\.[0-9]*)?$)"};//replace the 
+    std::smatch smatch{};
+
+    if (std::regex_match(realNum, smatch, reg))
+    {
+        /* slices would be soo fucking good for this; when i switch to my slice's rich language, re-implement this using mutable slices instead*/
+        
+        if (smatch[2].str().size() <= 1) return realNum;//performs a copy here even though const std::string& performs rvalue promotion
+
+        std::string real_part = smatch[2];/*contains the real_part plus the radix*/
+
+        if (real_part.size() - 1/*minus the radix*/ > desired_digits)
+        {
+            std::string integer_part = smatch[1];
+
+            if (digitsMap[real_part[desired_digits+1]] >= 5)//checks if the first unsafe digit is >= 5
+            {
+                auto carry_digit_flag = true;
+                auto temp_insert_digit = 0;
+                
+                for (int i = desired_digits /*to get the last safe digit index*/; i > 0/*because the radix is at index[0]*/; --i)
+                {
+                    if (carry_digit_flag)
+                    {
+                        temp_insert_digit = 1 + digitsMap[real_part[i]];
+                        carry_digit_flag = temp_insert_digit == 10, temp_insert_digit %= 10;
 
                         real_part.replace((std::size_t)i, 1uz, 1uz, mapDigits[temp_insert_digit]);
                     }
@@ -1634,7 +1691,7 @@ std::string approximate_base10_real(const std::string& realNum, std::uint32_t de
         return realNum;
     }
     else
-    panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format .i.e [0-9]{1}\.[0-9]*?@[+-]?[0-9]+)");
+    panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format .i.e ([0-9]+)(\.[0-9]*))");
 
     return "";
 }
@@ -1859,6 +1916,8 @@ std::string convertRealBase10ToBaseN(const std::string& realNum, std::uint8_t ba
     return normalize_realNum(std::get<0>(i_r_e) + std::get<1>(i_r_e), immutable_lref);
 }
 
+//Incorprorate [type slice] instead of [type astr:"&"] for generally all of the string-as-number functions.
+//And triming should have an overload that returns a slice of the intended value
 bool real_eq(const std::string& lhs, const std::string& rhs)
 {
     /*
@@ -1870,7 +1929,7 @@ bool real_eq(const std::string& lhs, const std::string& rhs)
     std::smatch smatch1{};
     std::smatch smatch2{};
 
-    if (std::regex_match(lhs, smatch1, reg) and std::regex_match(rhs, smatch2, reg)) 
+    if (std::regex_match(lhs, smatch1, reg) and std::regex_match(rhs, smatch2, reg))//This is wasteful
     {
         if (integer_eq(smatch1[1], "0") and integer_eq(smatch2[1], "0"))
         return true;
@@ -2098,11 +2157,6 @@ void min_denormal(int n_of_mantissa, int default_denormal_exp)
     io::cout.get() << boost::multiprecision::pow(boost50{2}, {-n_of_mantissa}) * boost::multiprecision::pow(boost50{2}, {default_denormal_exp}) << '\n';
 }
 
-namespace R
-{
-    #include <tuple>
-    
-};
 
 bool operator==(std::string_view lhs, U8string_view rhs)
 {
@@ -2148,10 +2202,688 @@ bool operator==(std::string_view lhs, const U8char& rhs)
 { return rhs == lhs; }
 
 using fn_ptr = void(*)();
-void g(){ std::cout << "Hello "; }
-void h(){ std::cout << "world\n"; }
 
-int main()
+auto digit_count(std::uint64_t digit, std::uint8_t base = 10)
+{
+    if (digit == 0) return 1u;
+    return std::uint32_t(std::log(digit) / std::log(base)) + 1u;
+}
+
+auto left_shift(std::uint64_t operand, std::uint8_t count, std::uint32_t base = 10)
+{
+    return operand * std::uint64_t(std::pow(double(base), double(count)));
+}
+
+auto right_shift(std::uint64_t operand, std::uint8_t count, std::uint32_t base = 10)
+{
+    return operand / std::uint64_t(std::pow(double(base), double(count)));
+}
+
+class d32fp//specialized exponential function for the arthimetic calculations
+{
+    std::uint8_t sb{}, ib{}; std::uint32_t rb{}; std::int8_t eb{};
+
+/*=====================================================================================================================================*/
+
+    //Note: me.rb is modified after during in this function and it returns a pair contianing ib_and_rb first then it's zero_count
+    auto merge_ib_and_rb()
+    {
+        //merges the integer_bits and real_bits in a way that handles special case(2):
+
+        d32fp& me = *this;
+
+        auto ib_and_rb = std::uint32_t(me.ib);
+        
+        //handling special case(2) here:
+        if (me.rb != 0 and me.rb % 10u == 0)
+        {
+            auto zero_count = 1u;
+            me.rb /= 10u;
+            
+            while (me.rb % 10u == 0)
+            me.rb /= 10u, ++zero_count;
+
+            ib_and_rb = left_shift(ib_and_rb, zero_count);
+        }
+        ib_and_rb = left_shift(ib_and_rb, digit_count(me.rb));
+        return ib_and_rb += me.rb;
+    }
+
+    auto merge_ib_and_rb_and_return_zero_count()
+    {
+        //merges the integer_bits and real_bits in a way that handles special case(2):
+
+        d32fp& me = *this;
+
+        auto ib_and_rb = std::uint32_t(me.ib);
+        auto zero_count = 0u;
+        
+        //handling special case(2) here:
+        if (me.rb != 0 and me.rb % 10u == 0)
+        {
+            me.rb /= 10u;
+            zero_count = 1u;
+
+            while (me.rb % 10u == 0)
+            me.rb /= 10u, ++zero_count;
+
+            ib_and_rb = left_shift(ib_and_rb, zero_count);
+        }
+        ib_and_rb = left_shift(ib_and_rb, digit_count(me.rb));
+
+        return std::pair{ib_and_rb += me.rb, zero_count};
+    }
+
+    auto demerge_ib_and_rb(std::uint64_t ib_and_rb)
+    {
+        //split the ib and rb as base(10) numbers
+        std::pair<std::uint8_t, std::uint32_t> ib_rb_pair{};
+
+        auto ib_and_rb_digit_count = digit_count(ib_and_rb);
+        std::uint64_t base10_raised = std::uint64_t(std::pow(10.0f, float(ib_and_rb_digit_count-2/*because of counting starts from 1 and i also want the second to the last digit*/)));
+        auto zeros_count = 0u;
+
+        //since it is after removal of trialing zeros, no value entering here would have trailing zeros
+        if (ib_and_rb_digit_count > 2)//The problem starts from 3digits values
+        {
+            base10_raised = std::uint64_t(std::pow(10.0f, float(ib_and_rb_digit_count-2/*because of counting starts from 1 and i also want the second to the last digit*/)));
+
+            while ((ib_and_rb / base10_raised)%10u == 0)
+            ++zeros_count, base10_raised /= 10u;
+        }
+        base10_raised = std::pow(float(10), float(--ib_and_rb_digit_count));
+
+        ib_rb_pair.second = std::uint32_t(ib_and_rb % base10_raised);
+        ib_rb_pair.first = std::uint8_t(ib_and_rb / base10_raised);
+
+        if (ib_rb_pair.second != 0 or zeros_count != 0)
+        {
+            base10_raised = std::pow(float(10), float(zeros_count));
+            ib_rb_pair.second *= base10_raised;
+        }
+        return ib_rb_pair;
+    }
+
+    static auto remove_trailing_zeros(std::uint64_t& x)
+    {
+        if (x == 0) return;
+
+        //handles special case(1):
+        while (x % 10ull == 0) x /= 10ull;
+    }
+
+public:
+    static constexpr std::uint32_t decfp32_overflow_default_pos_number = 0x7a1'2000u;
+    static constexpr std::uint32_t decfp32_overflow_default_neg_number = 0x87a1'2000u;
+
+    void print_internals()
+    {
+        io::cout.get() << "[sb: " << std::uint16_t(sb) << "][ib: " << std::uint16_t(ib) << "][rb: " << rb << "][eb: " << std::int16_t(eb) << ']';
+    }
+
+    static std::uint64_t approximate_ui64(std::uint64_t operand, std::uint32_t desired_digits, std::int8_t& exponent)
+    {
+        std::uint32_t operand_digit_count = digit_count(operand);//when inlining, remove this
+        if (operand_digit_count > desired_digits)//remove this when inlining
+        {
+            auto last_safe_digit = operand_digit_count - desired_digits;
+
+            if (right_shift(operand, last_safe_digit-1/*to get the first unsafe digit*/) % 10u >= 5u)//checks if the first unsafe digit is >= 5
+            {
+                auto carry_digit_flag = true;
+                auto insert_digit = 0;
+                std::uint8_t old_digit{};
+                /*
+                * In here, base(10) numbers expands on the same semantics as binary numbers (least-significant-bit to most-significant-bit where) it is
+                * counted from the right which is the least-significant-digit starting from 0 to the left which has the most-significant-digits
+                * 
+                * [i] holds the old_digit position to replace which is normally gotten by subtracting the desired_digits from the operand_digit_count
+                * but since it is already assured that the operand is already primed for this exact operation, we just set to 1
+                */
+                
+                for (auto i = last_safe_digit, n = operand_digit_count - 1u; ; ++i)
+                {
+                    if (carry_digit_flag)
+                    {
+                        //compute the old_digit at position i
+                        old_digit = right_shift(operand, i) % 10;
+                        {
+                            insert_digit = old_digit + 1;
+                            carry_digit_flag = insert_digit == 10;
+
+                            if (carry_digit_flag) insert_digit xor_eq insert_digit;//zero the insert digit if the inset_digit is 10
+
+                            // insert_digit %= 10/*incase if the insert digit is 10*/; old way of doing the above
+                        }
+                        //remove the old_digit at position i from the number
+                        operand -= left_shift(old_digit, i);
+                        //insert the new_digit in the position that the old_digit was, which is at position i
+                        operand += left_shift(insert_digit, i);
+
+                        if (i == n)
+                        {
+                            if (old_digit == 9)//to account for something like this approximated to 6digits for example: 9'999'999 = 1'000'000
+                            exponent += 1, operand += left_shift(10, operand_digit_count);
+
+                            break;
+                        }
+                    }
+                    else
+                    break;
+                }    
+            }
+            //remove all the unsafe/unwanted digits
+            operand = right_shift(operand, last_safe_digit/*the last_safe_digit is also synonmous to the amount of unsafe_digits*/);
+        }
+        return operand;
+    }
+
+    auto operator*(d32fp rhs)
+    {
+        d32fp lhs = *this;
+
+        std::int8_t added_lhs_rhs_eb = lhs.eb + rhs.eb;
+
+        std::pair<uint8_t, uint32_t> ib_and_rb_pair{};
+        {
+            auto lhs_rb_digit_count = digit_count(lhs.rb);
+            auto rhs_rb_digit_count = digit_count(rhs.rb);
+            
+            //digit_count must be collected before merging
+
+            auto lhs_ib_rb = lhs.merge_ib_and_rb(), rhs_ib_rb = rhs.merge_ib_and_rb();
+
+            auto multiplied_lhs_rhs_irb = std::uint64_t(lhs_ib_rb) * std::uint64_t(rhs_ib_rb);
+
+            auto multiplied_lhs_rhs_irb_digit_count = digit_count(multiplied_lhs_rhs_irb);
+            
+            if (multiplied_lhs_rhs_irb_digit_count - (lhs_rb_digit_count + rhs_rb_digit_count) != 1)
+            added_lhs_rhs_eb += 1;
+
+            remove_trailing_zeros(multiplied_lhs_rhs_irb);
+            multiplied_lhs_rhs_irb = approximate_ui64(multiplied_lhs_rhs_irb, 7, added_lhs_rhs_eb);
+            remove_trailing_zeros(multiplied_lhs_rhs_irb);
+            
+            //split the ib and rb as base(10) numbers
+            ib_and_rb_pair = demerge_ib_and_rb(multiplied_lhs_rhs_irb);
+        }
+        //relationship between signs([-] * [+]) with [-] as 1 and [+] as 0 is xor i.e (1 xor 0)
+        std::uint8_t xored_lhs_rhs_sb = lhs.sb xor rhs.sb;
+
+        // instead of creating a new d32fp object, why not just use either lhs or rhs, because they aren't references anyway
+        d32fp result{};
+        result.sb = xored_lhs_rhs_sb, result.ib = ib_and_rb_pair.first, result.rb = ib_and_rb_pair.second, result.eb = added_lhs_rhs_eb;
+        return result;
+    }
+
+    auto operator/(d32fp rhs)
+    {
+        d32fp lhs = *this;
+        if (lhs.ib == 0)
+        {
+            return d32fp{};
+        }
+
+        std::int8_t subtracted_lhs_rhs_eb = lhs.eb - rhs.eb;
+
+        std::pair<uint8_t, uint32_t> ib_and_rb_pair{};
+        {   
+            //digit_count must be collected before merging
+
+            auto lhs_ib_rb = lhs.merge_ib_and_rb(), rhs_ib_rb = rhs.merge_ib_and_rb();
+            std::uint64_t divided_lhs_rhs_irb{};
+
+            if (rhs_ib_rb == 1)
+            {
+                divided_lhs_rhs_irb = lhs_ib_rb;
+            }
+            else if (lhs_ib_rb < rhs_ib_rb)
+            {
+                /*
+                * To account for something like 5.2 ÷ 2.34, which is compared like this 52 < 234 when in integer form, but when in real number
+                * like this: 5.2 < 2.34
+                */
+                if (lhs.ib < rhs.ib)
+                --subtracted_lhs_rhs_eb;
+
+                //extract as much
+                while (lhs_ib_rb *= 10, lhs_ib_rb / rhs_ib_rb == 0){}
+                
+                //the quotient is already 8 base(10) digits, so it's 10^(8-1)
+                //1@+7 because it already has one digit
+                divided_lhs_rhs_irb = std::uint64_t(lhs_ib_rb) * 10'000'000ull / std::uint64_t(rhs_ib_rb);
+                
+                remove_trailing_zeros(divided_lhs_rhs_irb);
+
+                divided_lhs_rhs_irb = approximate_ui64(divided_lhs_rhs_irb, 7, subtracted_lhs_rhs_eb);
+
+                remove_trailing_zeros(divided_lhs_rhs_irb);
+            }
+            else if (lhs_ib_rb > rhs_ib_rb)
+            {
+               /*
+               * To account for something like 5.67 ÷ 9.9 which is compared like this 567 > 99 when in integer form, but when in real number
+               * like this: 5.67 < 9.9
+               */
+               if (lhs.ib < rhs.ib)//for something like this 5.67 ÷ 9.9
+               --subtracted_lhs_rhs_eb;
+
+                //since atleast one digit is always guaranteed, and we need 8digits, it becomes 10^(8-1)
+                divided_lhs_rhs_irb = std::uint64_t(lhs_ib_rb) * 10'000'000ull / rhs_ib_rb;
+
+                remove_trailing_zeros(divided_lhs_rhs_irb);
+
+                divided_lhs_rhs_irb = approximate_ui64(divided_lhs_rhs_irb, 7, subtracted_lhs_rhs_eb);
+
+                remove_trailing_zeros(divided_lhs_rhs_irb);
+            }
+            else //if (lhs_ib_rb == rhs_ib_rb)
+            {
+                divided_lhs_rhs_irb = 1;
+            }
+
+            //split the ib and rb as base(10) numbers
+            ib_and_rb_pair = demerge_ib_and_rb(divided_lhs_rhs_irb);
+        }
+        //relationship between signs([-] * [+]) with [-] as 1 and [+] as 0 is xor i.e (1 xor 0)
+        std::uint8_t xored_lhs_rhs_sb = lhs.sb xor rhs.sb;
+
+        // instead of creating a new d32fp object, why not just use either lhs or rhs, because they aren't references anyway
+        d32fp result{};
+        result.sb = xored_lhs_rhs_sb, result.ib = ib_and_rb_pair.first, result.rb = ib_and_rb_pair.second, result.eb = subtracted_lhs_rhs_eb;
+        return result;
+    }
+    
+    auto operator+(d32fp rhs)//requires 9 base(10) digits
+    {
+        d32fp lhs = *this;
+        /*zero case is not handled*/
+
+        /*
+        * lagerOperandDigitCountBeforeTheSmallerOperandStarts: as the name implies, is the larger number count of digits it has before the smaller
+        * number digits starts. Example:
+        * [1] lhs(5.26@+5) and rhs(2.63@-1)
+        * largerOperandDigitCountBeforeTheSmallerOperandStarts is |5--1| = 6
+        * 526000.0
+        * 000000.263
+        * The smaller operand starts just after digit 6
+        * 
+        * [2] lhs(5@+6) and rhs(5@+4)
+        * largerOperandDigitCountBeforeTheSmallerOperandStarts is |6-4| = 2
+        * 5000000.0
+        * 0050000.0
+        * The smaller operand starts just after digit 2
+        * 
+        * [3] lhs(2.245@-3) and rhs(1.0@-6)
+        * largerOperandDigitCountBeforeTheSmallerOperandStarts is |-3--6| = 3
+        * 0.002245
+        * 0.000001
+        * The smaller operand starts just after digit 3
+        * 
+        * So with the above, we can ascertain that if the digit where the smaller operand starts is > 8(which is the +1 of the calculative
+        * precision) i aim to compute, or if the largerOperandDigitCountBeforeTheSmallerOperandStarts is >= 8, that the smaller operand is
+        * just too small to be computed and therefore the larger operand should be return as it is. 
+        */
+        std::uint8_t lagerOperandDigitCountBeforeTheSmallerOperandStarts = std::abs(lhs.eb - rhs.eb);
+        bool is_lhs_exponent_greater = lhs.eb > rhs.eb;
+        auto larger_exponent = is_lhs_exponent_greater ? lhs.eb : rhs.eb;
+        std::pair<uint8_t, uint32_t> ib_and_rb_pair{};
+
+        if (lagerOperandDigitCountBeforeTheSmallerOperandStarts >= 8)
+        return is_lhs_exponent_greater? lhs : rhs;
+        else
+        {
+            auto lhs_ib_rb = lhs.merge_ib_and_rb(), rhs_ib_rb = rhs.merge_ib_and_rb();
+            auto rhs_digit_count = digit_count(rhs_ib_rb);
+            auto lhs_digit_count = digit_count(lhs_ib_rb);
+            
+            if (lhs.eb == rhs.eb)
+            {
+                //treat them as equals
+                if (rhs_digit_count < 8)
+                rhs_ib_rb *= std::uint32_t(std::pow(10.0f, float(8u - rhs_digit_count)));
+
+                if (lhs_digit_count < 8)
+                lhs_ib_rb *= std::uint32_t(std::pow(10.0f, float(8u - lhs_digit_count)));
+            }
+            else
+            {
+                std::uint32_t count_of_digits_the_smaller_operand_must_have = 8 - lagerOperandDigitCountBeforeTheSmallerOperandStarts;
+                if (is_lhs_exponent_greater)
+                {
+                    if (lhs_digit_count < 8)//increase it to it's calculative precision
+                    lhs_ib_rb *= std::uint32_t(std::pow(10.0f, float(8u - lhs_digit_count)));
+                    
+                    if (rhs_digit_count > count_of_digits_the_smaller_operand_must_have)
+                    rhs_ib_rb /= std::uint32_t(std::pow(10.0f, float(rhs_digit_count - count_of_digits_the_smaller_operand_must_have)));
+                    else if (rhs_digit_count < count_of_digits_the_smaller_operand_must_have)
+                    rhs_ib_rb *= std::uint32_t(std::pow(10.0f, float(count_of_digits_the_smaller_operand_must_have - rhs_digit_count)));
+                }
+                else
+                {
+                    if (rhs_digit_count < 8)//increase it to it's calculative precision
+                    rhs_ib_rb *= std::uint32_t(std::pow(10.0f, float(8u - rhs_digit_count)));
+                    
+                    if (lhs_digit_count > count_of_digits_the_smaller_operand_must_have)
+                    lhs_ib_rb /= std::uint32_t(std::pow(10.0f, float(lhs_digit_count - count_of_digits_the_smaller_operand_must_have)));
+                    else if (lhs_digit_count < count_of_digits_the_smaller_operand_must_have)
+                    lhs_ib_rb *= std::uint32_t(std::pow(10.0f, float(count_of_digits_the_smaller_operand_must_have - lhs_digit_count)));
+                }
+            }
+
+            if (bool(lhs.sb xor rhs.sb))
+            {
+                std::uint64_t subtracted_lhs_rhs_irb = std::max(lhs_ib_rb, rhs_ib_rb) - std::min(lhs_ib_rb, rhs_ib_rb);
+                
+                remove_trailing_zeros(subtracted_lhs_rhs_irb);
+                subtracted_lhs_rhs_irb = approximate_ui64(subtracted_lhs_rhs_irb, 7, larger_exponent);
+                remove_trailing_zeros(subtracted_lhs_rhs_irb);
+
+                //split the ib and rb as base(10) numbers
+                ib_and_rb_pair = demerge_ib_and_rb(subtracted_lhs_rhs_irb);
+            }
+            else
+            {
+                /*change to std::uint32_t later*/ std::uint64_t added_lhs_rhs_irb = lhs_ib_rb + rhs_ib_rb;
+                
+                //because normally, addition only results in at most 8 base(10) digits or less, anymore and it means an extra digit was added as a result of the operation
+                if (digit_count(added_lhs_rhs_irb) == 9) ++larger_exponent;
+
+                remove_trailing_zeros(added_lhs_rhs_irb);
+                added_lhs_rhs_irb = approximate_ui64(added_lhs_rhs_irb, 7, larger_exponent);
+                remove_trailing_zeros(added_lhs_rhs_irb);
+
+                //split the ib and rb as base(10) numbers
+                ib_and_rb_pair = demerge_ib_and_rb(added_lhs_rhs_irb);
+            }
+        }
+        //relationship between signs([-] +/- [+]) with [-] as 1 and [+] as 0 is or i.e (1 xor 0)
+        std::uint8_t ored_lhs_rhs_sb = lhs.sb bitor rhs.sb;
+
+        // instead of creating a new d32fp object, why not just use either lhs or rhs, because they aren't references anyway
+        d32fp result{};
+        result.sb = ored_lhs_rhs_sb, result.ib = ib_and_rb_pair.first, result.rb = ib_and_rb_pair.second, result.eb = larger_exponent;
+        return result;
+    }
+
+    auto operator-(d32fp rhs)
+    {
+        d32fp lhs = *this;
+        return rhs.sb xor_eq 1/*true*/, lhs + rhs;
+    }
+
+    auto operator-()
+    {
+        d32fp operand = *this;
+        return operand.sb xor_eq 1/*true*/, operand;
+    }
+
+    auto operator==(d32fp rhs)
+    {
+        d32fp lhs = *this;
+
+        if (lhs.ib == 0 and rhs.ib == 0)
+        return true;//to prevent something like 0.0@+3 not-equaling 0.0@-34
+
+        //check if the exponent is not equal
+        if (lhs.eb != rhs.eb) return false;
+
+        //check if the integer is not equal
+        if (lhs.ib != rhs.ib) return false;
+        
+        //check if the real-part is not equal
+        if (lhs.rb != rhs.ib) return false;
+
+        return true;
+    }
+
+    auto operator!=(d32fp rhs) { return !(*this == rhs); }
+
+    auto operator<(d32fp rhs)
+    {
+        d32fp lhs = *this;
+
+        if (lhs.ib == 0 and rhs.ib != 0) return true;
+        else if (lhs.ib != 0 and rhs.ib == 0) return false;
+        else if (lhs.ib == 0 and rhs.ib == 0) return false;
+
+        //exponent comparsion
+        if (lhs.eb < rhs.eb) return true;
+        else  if (lhs.eb > rhs.eb) return false;
+        
+        //integer-part comparison
+        if (lhs.ib < rhs.ib) return true;
+        else if (lhs.ib > rhs.ib) return false;
+
+        //real-part comparison
+        if (lhs.rb < rhs.rb) return true;
+        else if (lhs.rb > rhs.rb) return false;
+        /*reminder that real-parts of .0003 are stored as this .3000*/
+        
+        //an optimization can be used here, by just removing the last (else if) and return false, or should nc-compiler be capable of optimizing it away?
+
+        return false;//must be equal
+    }
+
+    auto operator>(d32fp rhs)
+    { return *this != rhs and !(*this < rhs); }
+    
+    auto operator<=(d32fp rhs)
+    { return *this == rhs or *this < rhs; }
+    
+    auto operator>=(d32fp rhs)
+    { return *this == rhs or *this > rhs; }
+
+    static auto tcast_cstr(const char* char_ptr_d32fp)
+    {
+        auto count_sequential_if = [&](std::string& ds, std::function<bool(char)> predicate)
+        {
+            std::uint32_t count{};
+            for (auto i = 0uz, n = ds.length() ; i < n; i++)
+            {
+                if (predicate(ds[i])) ++count;
+                else break;
+            }
+            return count;
+        };
+
+        bool isNegative{};
+        std::string str_d32fp{char_ptr_d32fp};
+
+        if (str_d32fp[0] == '+')
+        str_d32fp.erase(0, 1);
+        else if (str_d32fp[0] == '-')
+        str_d32fp.erase(0, 1), isNegative = true;
+
+        //something really costly
+        normalize_realNum(str_d32fp);
+
+        std::tuple<std::string, std::string, std::string> i_r_e{};
+        //spliting up to integer_real_exponent
+        {
+            std::size_t radix_index{};
+            auto exponent_index = str_d32fp.find('@');
+
+            //remove when writing it in llvm
+            {
+                std::string temp{};
+
+                temp = approximate_base10_real(std::string{str_d32fp.begin(), str_d32fp.begin() + exponent_index}, 6, immutable_lref);
+                normalize_realNum(temp.append(str_d32fp.begin() + exponent_index, str_d32fp.end()));
+                str_d32fp = std::move(temp);
+            }
+            radix_index = str_d32fp.find('.');
+            exponent_index = str_d32fp.find('@');
+
+            if (radix_index != std::string::npos)
+            {
+                std::get<0>(i_r_e).assign(str_d32fp.begin(), str_d32fp.begin() + radix_index);
+
+                if (exponent_index != std::string::npos)
+                {
+                    std::get<1>(i_r_e).assign(str_d32fp.begin() + radix_index + 1, str_d32fp.begin() + exponent_index);
+                    std::get<2>(i_r_e).assign(str_d32fp, exponent_index + 1);
+                }
+                else
+                std::get<1>(i_r_e).assign(str_d32fp.begin() + radix_index + 1, str_d32fp.end());
+            }
+            else
+            {
+                if (exponent_index != std::string::npos)
+                {
+                    std::get<0>(i_r_e).assign(str_d32fp.begin(), str_d32fp.begin() + exponent_index);
+                    std::get<2>(i_r_e).assign(str_d32fp, exponent_index + 1);
+                }
+                else
+                std::get<0>(i_r_e).assign(str_d32fp);
+            }
+        };
+
+        d32fp x{};
+        x.sb = std::uint8_t(isNegative);
+        x.ib = std::stoul(std::get<0>(i_r_e));
+
+        if (std::get<1>(i_r_e).empty())
+        x.rb = 0u;
+        else
+        {
+            //handling special case(2) for the real-part, because something like this .003 can't be stored as an integer
+            if (std::get<1>(i_r_e) != std::string{'0'} and std::get<1>(i_r_e).starts_with('0'))
+            {
+                auto zero_count = count_sequential_if(std::get<1>(i_r_e), [&](char x){return x == '0';});
+                std::get<1>(i_r_e).append(zero_count, '0');
+            }
+            x.rb = std::stoul(std::get<1>(i_r_e));
+        }
+
+        x.eb = std::int8_t(std::stoi(std::get<2>(i_r_e)));
+
+        return x;
+    }
+
+    d32fp& bitcast_ui32_to_d32fp(std::uint32_t ui32)
+    {
+        /*if it was using llvm or my language, i would simply have to cast to the integer of that specific size then shift the remaining to the lsb section*/
+        
+        d32fp& x = *this;
+        x.eb = 0x7f;
+        x.eb and_eq std::uint8_t(ui32);//extract the exponent bits, while ignoring other set bits
+        //adjust exponent because of two's complement
+        {
+            if (bool(x.eb bitand 0b1'000000))//because values from '-63' - '63' need just 6bits [-64] actually needs all 7bits
+            x.eb xor_eq std::int8_t(0b1'0000000);//turn it on
+        }
+        
+        ui32 >>= 7;//remove the amount of bits for the exponent
+        
+        x.rb = 0xf'ffff;
+        x.rb and_eq ui32;//extract the real bits, while ignoring other set bits
+
+        ui32 >>= 20;//remove the amount of bits for the real_part
+
+        x.ib = 0xF;
+        x.ib and_eq std::int8_t(ui32);//extract the integer bits, while ignoring other set bits
+
+        ui32 >>= 4;//remove the amount of bits for the integer_part
+
+        x.sb = std::uint8_t(ui32);
+
+        return x;
+    }
+
+    friend std::ostream& operator<<(std::ostream& out, d32fp x);
+};
+
+std::ostream& operator<<(std::ostream& out, d32fp x)
+{
+    auto output_flags = out.flags();
+    auto should_show_pos_sign = bool(output_flags & std::ios_base::showpos);
+    auto sign_to_display = (x.sb == 1? '-':(should_show_pos_sign? '+': '\0'));
+
+    if (x.ib > 9)
+    return out << "nan";
+    else if (x.rb > 999'999)
+    return out << sign_to_display << "inf";
+    else if (x.ib == 0)
+    return out << sign_to_display << '0' << '.' << '0';
+
+    auto isfixed = bool(out.flags() & std::ios_base::fixed);
+    
+    auto mantissa_and_zero_count = x.merge_ib_and_rb_and_return_zero_count();
+    if (auto precision = out.precision(); precision > 0 and precision < 6)
+    {
+        mantissa_and_zero_count.first = d32fp::approximate_ui64(mantissa_and_zero_count.first, precision+1/*to protect the integer part*/, x.eb);
+
+        x.rb = 0xf'ffff;
+        x.rb and_eq mantissa_and_zero_count.first;
+        
+        x.ib = std::uint8_t(mantissa_and_zero_count.first >> 20/*remove the amount of bit for the real part*/);
+    }
+    out << sign_to_display;
+
+    if (!isfixed)//is scientific
+    {
+        out << std::uint16_t(x.ib) << '.';
+        
+        for (auto i = 0u; i < mantissa_and_zero_count.second; i++)
+        out << 0;
+        
+        out << x.rb << "\033[38;2;190;110;40;1m@" << (std::int16_t(x.eb) < 0?'\0':'+') << std::int16_t(x.eb) << "\033[0m";
+    }
+    else
+    {
+        bool isExponentNegative = x.eb < 0;
+        std::uint32_t storage_space{};
+
+        if (isExponentNegative)
+        {
+            storage_space = std::uint32_t(-x.eb  - 1);
+            out << 0 << '.';
+            for (auto i = 0u; i < storage_space; i++)
+            out << 0;
+            out << mantissa_and_zero_count.first;
+        }
+        else
+        {
+            auto real_part_digit_count = digit_count(x.rb) + mantissa_and_zero_count.second;
+            
+            if (x.eb == 0)
+            {
+                out << std::uint16_t(x.ib);
+                out << '.';
+                for (auto i = 0u; i < mantissa_and_zero_count.second; i++) out << 0;
+                out << x.rb;
+            }
+            else if (std::uint32_t(x.eb) > real_part_digit_count)
+            {
+                out << mantissa_and_zero_count.first;
+
+                storage_space = x.eb - real_part_digit_count;
+                for (auto i = 0u; i < storage_space; i++)
+                out << 0;
+                
+                out << '.' << 0;
+            }
+            else if (std::uint32_t(x.eb) < real_part_digit_count)
+            {
+                out << std::uint16_t(x.ib);
+
+                storage_space = real_part_digit_count - x.eb;
+                auto real_part_that_is_before_the_radix_point = right_shift(x.rb, storage_space);
+                auto real_part_that_is_after_the_radix_point = x.rb % std::uint32_t(std::pow(float(10), float(storage_space)));
+
+                out << real_part_that_is_before_the_radix_point << '.' << real_part_that_is_after_the_radix_point;
+            }
+            else
+            {
+                out << mantissa_and_zero_count.first << '.' << 0;
+            }
+        }
+    }
+    return out;
+}
+
+int main()//test d32fp with that conversion of base(10) real_part to base(n)
 {
     try
     {
@@ -2159,6 +2891,97 @@ int main()
 
         // for (auto i : convertAsciiStrToU8Str("+§№™🌹℉asf®_©℗⁆"))
         
+        //tcast<raw_ptr<bin32>>(mem b)
+
+        // io::cout.writews_nl(split_real(decfp32_overflow_default_pos_number), split_real(decfp32_overflow_default_neg_number));
+        //[0x800'f181] = [14.83] [0x1455'2a82] = [256.7893]
+        // io::cout.setPrecision(8). write_nl(1.892523476f * 5.262253376f * 1.892523476f * 5.262253376f * 1.892523476f * 5.262253376f);
+        // 1.8952e-8 * 6.5267e-2 ``highlights the true difference between nc's-decimal-fp and IEEE's-binary-fp
+        /*
+        * 1. handle special cases like zero, nan and inf
+        * 2. remove implicit trailing zeros from the real-part after each calculation
+        * 3. test your multiplication of decimal-fp against binary-fp using the conversion of base(10) real to base(n)
+        * 4. My decimal implementation can't store a real-nuber like this: 1.000001 or 1.02
+        * 
+        * Special case(1) for the exponent:
+        * Using d32fp as an example. Exponents are stored as signed integers using the two's complement. Now the problem comes when extractions
+        * and insertions are performed to and from a signed integer of greater size than the intended size of the exponent.
+        * This is because signed integer using the two's complement are range dependent.
+        * 
+        * Special case(1) for the real-part:
+        * Something like this .30000 can never be stored as an integer 30000 in the real-part, because numbers after the radix, which are the
+        * real-part, consider them useless. But operations like multiplication and division gets them as a result, so they are truncated
+        * out of the real-part after an operation
+        * 
+        * Special case(2) for the real-part:
+        * Since real-part are stored using integers, storing something like this .00003 won't work so a compromise is made,
+        * instead a real part like this .00003 will have it's zero's carried to be back so it would become this: .30000, this works
+        * because real-part don't ever store numbers with implicit trailing zeros because they are useless to them,
+        * it's like integers but instead of not storing trailing zeros, they don't store leading zeros.
+        * 
+        * Find a faster way to compute 10^n
+        * 
+        * multiplication for d32 requires an integer that can hold 13 base(10) digits
+        * divison:
+        * for lhs < rhs:
+        * I use the number of leading zeros after the radix, the orginal lhs digit-count and the highest possible rhs which is 9'999'999.
+        * When an lhs with a digit-count of (1, 6] is divide by the highest possible rhs, it produces a fixed number of leading zeros after the
+        * radix. I can further ascertain that with an lhs digit-count of (1, 6], the number of leading zeros is constant regardless of the magnitude,
+        * example:
+        * (1,9] ÷ 9'999'999; produces 6 leading zeros after the radix
+        * (10,99] ÷ 9'999'999; produces 5 leading zeros after the radix
+        * (100,999] ÷ 9'999'999; produces 4 leading zeros after the radix
+        * (1000,9999] ÷ 9'999'999; produces 3 leading zeros after the radix
+        * (10000,99999] ÷ 9'999'999; produces 2 leading zeros after the radix
+        * (100000,999999] ÷ 9'999'999; produces 1 leading zeros after the radix
+        * 
+        * //a smaller program should be written to compute the above
+        * With the above invariant, I can deduce the maximum of base(10) digits amount i need in such a division operation
+        * (1,9] ÷ 9'999'999; 1 + 6 + 8 = 15
+        * (10,99] ÷ 9'999'999; 2 + 5 + 8 = 15
+        * (100,999] ÷ 9'999'999; 3 + 4 + 8 = 15
+        * (1000,9999] ÷ 9'999'999; 4 + 3 + 8 = 15
+        * (10000,99999] ÷ 9'999'999; 2 + 5 + 8 = 15
+        * (100000,999999] ÷ 9'999'999; 5 + 1 + 8 = 15
+        * 
+        * for lhs > rhs, max(9'999'999 ÷ 9'999'998) = 1.0000004
+        * 
+        * 3'333'333 * 6? almost there value
+        * 9'999'999 * 6? almost there value
+        * 9'999'999 * 9'999'999? correct value
+        * 
+        * test approximate_ui64(999'999, 5);
+        */
+
+        // io::cout.setFmtf(std::ios_base::fixed);
+        io::cout.setPrecision(7);//try rounding this 9'999'999
+        //Now it's time for definig operations on special values
+        auto lhs = d32fp::tcast_cstr("2.0002@-3"), rhs = d32fp::tcast_cstr("1.02@-6");
+        io::cout.writews_nl(lhs, "<", rhs, '=', lhs < rhs);
+        //52 ÷ 234
+
+        /*misc::Timer timer{};
+        timer.start();
+        for (size_t i = 0; i < 100; i++)//try it with 10'000 again
+        {
+            io::cout.write_nl(result);
+            result = result * rhs;
+        }
+        timer.pause();
+        io::cout.writews_nl("d32fp =", result, "time:", timer.getTicks());
+
+        boost::multiprecision::cpp_dec_float_50 y{ 3.333333e6 * 6.0 };
+        timer.restart(), timer.start();
+        for (size_t i = 0; i < 100; i++)
+        {
+            io::cout.write_nl(y);
+            y = y * 6.0f;
+        }
+        timer.pause();
+        io::cout.writews_nl("boostfp =", y, "time:", timer.getTicks());*/
+
+        //only add numbers of the same sign, if they are of different sign, subtract
+
         // io::cout.setPrecision(40);
         // max_normal(10, 15), max_normal(23, 127), max_normal(52, 1'023), max_normal(112, 16'383);
         // std::cout << '\n';

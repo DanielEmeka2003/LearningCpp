@@ -485,17 +485,16 @@ namespace nc_misc
         trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
     }
 
-    std::string denormalize_realNum(const std::string& realNum, ImmutableLref)
+    std::string denormalize_realNum(std::string realNum, ImmutableLref)
     {
         std::regex reg{R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@([+-]?[[:digit:]]+)$)"};
         std::smatch smatch{};
-        auto realNum_copy = realNum;
 
         if (!std::regex_match(realNum, smatch, reg))
         panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format i.e [[:alnum:]]{1,}(\.[[:alnum:]]*)?[@]([+-]?[[:digit:]]+)");
         
         //removal of the exponent
-        realNum_copy.erase(realNum_copy.begin() + realNum_copy.find('@'), realNum_copy.end());
+        realNum.erase(realNum.begin() + realNum.find('@'), realNum.end());
 
         auto exponent = std::stoi(smatch[2]); //smatch[2] contains the exponent
 
@@ -504,52 +503,52 @@ namespace nc_misc
         {
             if (exponent >= 0)
             {
-                realNum_copy.append((std::size_t)exponent, '0');
-                realNum_copy.append(".0");
+                realNum.append((std::size_t)exponent, '0');
+                realNum.append(".0");
             }
             else
             {
                 exponent *= -1; //making the exponent positive
 
-                if (std::size_t(exponent) == realNum_copy.size())
+                if (std::size_t(exponent) == realNum.size())
                 {
-                    realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                    realNum.insert(realNum.begin(), {'0', '.'});
                 }
-                else if (std::size_t(exponent) < realNum_copy.size())
+                else if (std::size_t(exponent) < realNum.size())
                 {   
-                    realNum_copy.insert(realNum_copy.begin() + (realNum_copy.size() - std::size_t(exponent)), '.');
+                    realNum.insert(realNum.begin() + (realNum.size() - std::size_t(exponent)), '.');
                 }
-                else //if (exponent > realNum_copy.size())
+                else //if (exponent > realNum.size())
                 {
-                    auto number_of_realZeros_to_add = std::max(exponent, int(realNum_copy.size())) - std::min(exponent, int(realNum_copy.size()));
-                    realNum_copy.insert(0, number_of_realZeros_to_add, '0');
-                    realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                    auto number_of_realZeros_to_add = std::max(exponent, int(realNum.size())) - std::min(exponent, int(realNum.size()));
+                    realNum.insert(0, number_of_realZeros_to_add, '0');
+                    realNum.insert(realNum.begin(), {'0', '.'});
                 }
             }
         }
         else
         {
-            auto radix_index = realNum_copy.find('.');
+            auto radix_index = realNum.find('.');
             auto whole_number_size = radix_index;
 
-            realNum_copy.erase(realNum_copy.begin() + radix_index); //removing the radix separator
-            auto real_part_size = realNum_copy.size() - whole_number_size; //real_part_size depends on realNum_copy devoid of the radix seperator
+            realNum.erase(realNum.begin() + radix_index); //removing the radix separator
+            auto real_part_size = realNum.size() - whole_number_size; //real_part_size depends on realNum devoid of the radix seperator
 
             if (exponent >= 0)
             {
                 if (std::size_t(exponent) > real_part_size)
                 {
                     auto number_of_realZeros_to_add = (std::size_t)exponent - real_part_size;
-                    realNum_copy.append(number_of_realZeros_to_add, '0');
-                    realNum_copy.append(".0");
+                    realNum.append(number_of_realZeros_to_add, '0');
+                    realNum.append(".0");
                 }
                 else if (std::size_t(exponent) < real_part_size)
                 {
                     auto newRadix_index = exponent + radix_index;
-                    realNum_copy.insert(realNum_copy.begin() + newRadix_index, '.');
+                    realNum.insert(realNum.begin() + newRadix_index, '.');
                 }
                 else //if (std::size_t(exponent) == real_part_size)
-                realNum_copy.append({'.', '0'});
+                realNum.append({'.', '0'});
             }
             else
             {
@@ -557,23 +556,23 @@ namespace nc_misc
 
                 if (std::size_t(exponent) == whole_number_size)//0.008@-2
                 {
-                    realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                    realNum.insert(realNum.begin(), {'0', '.'});
                 }
                 else if (std::size_t(exponent) < whole_number_size)
                 {
-                    realNum_copy.insert(realNum_copy.begin() + (whole_number_size - std::size_t(exponent)), '.');
+                    realNum.insert(realNum.begin() + (whole_number_size - std::size_t(exponent)), '.');
                 }
                 else //if (std::size_t(exponent) > whole_number_size)
                 {
                     auto number_of_realZeros_to_add = std::max((std::size_t)exponent, whole_number_size) - std::min((std::size_t)exponent, whole_number_size);
-                    realNum_copy.insert(0, number_of_realZeros_to_add, '0');
-                    realNum_copy.insert(realNum_copy.begin(), {'0', '.'});
+                    realNum.insert(0, number_of_realZeros_to_add, '0');
+                    realNum.insert(realNum.begin(), {'0', '.'});
                 }
             }
         }
 
-        trim_real_leading_zeros(realNum_copy), trim_real_trailing_zeros(realNum_copy);
-        return realNum_copy;
+        trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
+        return realNum;
     }
 
     void normalize_realNum(std::string& realNum)
@@ -622,11 +621,13 @@ namespace nc_misc
         }
         else if (std::regex_match(realNum, reg = R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"))//<third-and-final case> for any fallout that has an exponent: [12.34@1], [123.4@-23], [0023.34@34] or [0.4534@-10]
         {
-            /* dangerous: regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
+            /*
+            * [dangerous]: std::regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
             * std::string_view would be better to reference only the non-exponent
             */
             auto exponent_indicator_index = realNum.find('@');
             auto real_only = std::string{realNum.begin(), realNum.begin() + exponent_indicator_index};
+            auto exponent = 0;
 
             //0.23456@-33 | 0356@-12 | 0.1@-3 | 0000.1@-3 | 0.0@-2 | 0000.0@-3 | 0000@-23
             //replace with my implementation of regex_search: nc_reg::regex_search(immutable_lref realNum, reg = R"('0'+('.'<digit>+)?)")
@@ -634,19 +635,11 @@ namespace nc_misc
             {
                 if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
                 {
-                    if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.begin() + (exponent_indicator_index != std::string::npos? exponent_indicator_index : realNum.size())}.find_first_not_of('0'); non_zero_pos != std::string::npos)
+                    if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.begin() + exponent_indicator_index}.find_first_not_of('0'); non_zero_pos != std::string::npos)
                     {
-                        int exponent{};
                         //extracting the exponent
-                        for (auto i = realNum.size() - 1; i != 0; --i)
-                        {
-                            if (realNum[i] == '@')
-                            {
-                                exponent =  std::stoi(std::string/*_view*/(realNum.begin() + (i + 1), realNum.end()));
-                                realNum.erase(realNum.begin() + (i + 1), realNum.end());
-                                break;
-                            }
-                        }
+                        exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+                        realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
                         realNum.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');
                         realNum.append(exponent >= 0? '+' + std::to_string(exponent - int(non_zero_pos  + 1)) : std::to_string(exponent - int(non_zero_pos  + 1)));
@@ -660,17 +653,9 @@ namespace nc_misc
             }
             else if (std::regex_match(real_only, reg = R"(^[0-9]{2,}(\.[[:digit:]]*)?$)"))//a similar reiteration of the <second-case>, but one which captures exponents: [000001@-23], [02343@+45] or [233445.3434@+2]
             {
-                int exponent{};
                 //extracting the exponent
-                for (auto i = realNum.size() - 1; i != 0; --i)
-                {
-                    if (realNum[i] == '@')
-                    {
-                        exponent =  std::stoi(std::string/*_view*/(realNum.begin() + (i + 1), realNum.end()));
-                        realNum.erase(realNum.begin() + (i + 1), realNum.end());
-                        break;
-                    }
-                }
+                exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+                realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
                 if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
                 {
@@ -680,8 +665,9 @@ namespace nc_misc
                 }
                 else
                 {
+                    auto realNum_size = realNum.size();//save the realNum.size() because std::string::insert modifies the string and to avoid function call overhead
                     realNum.insert(realNum.find_first_not_of('0') + 1, 1, '.');
-                    realNum.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum.size() - 2)) : std::to_string(exponent + int(realNum.size() - 2)));
+                    realNum.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum_size - 2)) : std::to_string(exponent + int(realNum_size - 2)));
                 }
             }
         }
@@ -691,131 +677,199 @@ namespace nc_misc
         trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
     }
 
-    std::string normalize_realNum(const std::string& realNum, ImmutableLref)
+    std::string normalize_realNum(std::string realNum, ImmutableLref)
     {
         std::regex reg{R"(^[1-9[[:alpha:]]]{1}(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"};
-        std::string realNum_copy = realNum;
 
         if (std::regex_match(realNum, reg)){}
-        else if (std::regex_match(realNum_copy, reg = R"(^(0{1,}|[[:alnum:]]{1})(\.[[:alnum:]]*)?$)"))//<first-case> for matching something like this: [00000.23], [0.1223] or [1.2345]
+        else if (std::regex_match(realNum, reg = R"(^(0{1,}|[[:alnum:]]{1})(\.[[:alnum:]]*)?$)"))//<first-case> for matching something like this: [00000.23], [0.1223] or [1.2345]
         {
-            if (auto radix_index = realNum_copy.find('.'); realNum_copy.starts_with('0') and radix_index != std::string::npos)
+            if (auto radix_index = realNum.find('.'); realNum.starts_with('0') and radix_index != std::string::npos)
             {
-                if (auto non_zero_pos = std::string_view{realNum_copy.begin() + radix_index + 1, realNum_copy.end()}.find_first_not_of('0'); non_zero_pos != std::string::npos)
+                if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.end()}.find_first_not_of('0'); non_zero_pos != std::string::npos)
                 {
                     //example with 0.00234
-                    realNum_copy.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');//insertion occurs here: 0.002[.]34 => 0.002.34
-                    realNum_copy.append("@-" + std::to_string(non_zero_pos  + 1));//appending the exponent: 0.002.34@-3
-                    realNum_copy.erase(radix_index, 1);//erasure of the [0.]: 0.002.34@-3 => 002.34@-3; [plus one because of the insertion of a new radix point]
+                    realNum.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');//insertion occurs here: 0.002[.]34 => 0.002.34
+                    realNum.append("@-" + std::to_string(non_zero_pos  + 1));//appending the exponent: 0.002.34@-3
+                    realNum.erase(radix_index, 1);//erasure of the [0.]: 0.002.34@-3 => 002.34@-3; [plus one because of the insertion of a new radix point]
                 }
-                else realNum_copy += "@+0";
+                else realNum += "@+0";
             }
-            else realNum_copy += "@+0";
+            else realNum += "@+0";
         }
-        else if (std::regex_match(realNum_copy, reg = R"(^[[:alnum:]]{2,}(\.[[:alnum:]]*)?$)"))//<second-case> for matching something like this: [12], [00012.2] or [123.34]
+        else if (std::regex_match(realNum, reg = R"(^[[:alnum:]]{2,}(\.[[:alnum:]]*)?$)"))//<second-case> for matching something like this: [12], [00012.2] or [123.34]
         {
-            if (auto radix_index = realNum_copy.find('.'); radix_index != std::string::npos)
+            if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
             {
                 /*
                 * the insertion followed by the erasure is so unnecessary, an alorigthm like [move] would be more efficient, example:
                 * instead of inserting a new radix_seperator[.] and then erasing the old one, moving the radix_seperator from it's former index_position
-                * to a new desitination would be better and more efficient; realNum_copy.move(radix_index, (radix_index - 1) - (radix_index - 2));
+                * to a new desitination would be better and more efficient; realNum.move(radix_index, (radix_index - 1) - (radix_index - 2));
                 * to calculate how much the radix point was moved, with index starting from 1 is = (radix_index - 1) - (radix_index - 2)
                 * while from 0 is = radix_index - radix_index - 1
                 */
 
                 //example with 12.34 1234.5
 
-                realNum_copy.erase(radix_index, 1);//erase the radix seperator
-                realNum_copy.insert(1, 1, '.');//insertion occurs here: 1[.]2.34 => 1.2.34
-                realNum_copy.append("@+" + std::to_string(radix_index - 1));//appending the exponent: 1.2.34@+1
+                realNum.erase(radix_index, 1);//erase the radix seperator
+                realNum.insert(1, 1, '.');//insertion occurs here: 1[.]2.34 => 1.2.34
+                realNum.append("@+" + std::to_string(radix_index - 1));//appending the exponent: 1.2.34@+1
             }
             else
             {
-                realNum_copy.insert(1, 1, '.');
-                realNum_copy.append("@+" + std::to_string(realNum_copy.size() - 2));
+                realNum.insert(1, 1, '.');
+                realNum.append("@+" + std::to_string(realNum.size() - 2));
             }
         }
-        else if (std::regex_match(realNum_copy, reg = R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"))//<third-and-final case> for any fallout that has an exponent: [12.34@1], [123.4@-23], [0023.34@34] or [0.4534@-10]
+        else if (std::regex_match(realNum, reg = R"(^[[:alnum:]]+(\.[[:alnum:]]*)?@[+-]?[[:digit:]]+$)"))//<third-and-final case> for any fallout that has an exponent: [12.34@1], [123.4@-23], [0023.34@34] or [0.4534@-10]
         {
-            /* dangerous: regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
+            /*
+            * [dangerous]: std::regex_search does not work like i thought it would, it doesn't search for the characters in a row but instead individually.
             * std::string_view would be better to reference only the non-exponent
             */
-            auto exponent_indicator_index = realNum_copy.find('@');
-            auto real_only = std::string{realNum_copy.begin(), realNum_copy.begin() + exponent_indicator_index};
+            auto exponent_indicator_index = realNum.find('@');
+            auto real_only = std::string{realNum.begin(), realNum.begin() + exponent_indicator_index};
+            auto exponent = 0;
 
             //0.23456@-33 | 0356@-12 | 0.1@-3 | 0000.1@-3 | 0.0@-2 | 0000.0@-3 | 0000@-23
-            //replace with my implementation of regex_search: nc_reg::regex_search(immutable_lref realNum_copy, reg = R"('0'+('.'<digit>+)?)")
+            //replace with my implementation of regex_search: nc_reg::regex_search(immutable_lref realNum, reg = R"('0'+('.'<digit>+)?)")
             if (std::regex_match(real_only, reg = R"(0+(\.[[:digit:]]*)?)"))//a similar reiteration of the <first-case> but captures exponents: [0000000000.1@-3], [000.000@-23] or [0.234@+4]
             {
-                if (auto radix_index = realNum_copy.find('.'); radix_index != std::string::npos)
+                if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
                 {
-                    if (auto non_zero_pos = std::string_view{realNum_copy.begin() + radix_index + 1, realNum_copy.begin() + (exponent_indicator_index != std::string::npos? exponent_indicator_index : realNum_copy.size())}.find_first_not_of('0'); non_zero_pos != std::string::npos)
+                    if (auto non_zero_pos = std::string_view{realNum.begin() + radix_index + 1, realNum.begin() + exponent_indicator_index}.find_first_not_of('0'); non_zero_pos != std::string::npos)
                     {
-                        int exponent{};
                         //extracting the exponent
-                        for (auto i = realNum_copy.size() - 1; i != 0; --i)
-                        {
-                            if (realNum_copy[i] == '@')
-                            {
-                                exponent =  std::stoi(std::string/*_view*/(realNum_copy.begin() + (i + 1), realNum_copy.end()));
-                                realNum_copy.erase(realNum_copy.begin() + (i + 1), realNum_copy.end());
-                                break;
-                            }
-                        }
+                        exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+                        realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
-                        realNum_copy.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');
-                        realNum_copy.append(exponent >= 0? '+' + std::to_string(exponent - int(non_zero_pos  + 1)) : std::to_string(exponent - int(non_zero_pos  + 1)));
-                        realNum_copy.erase(radix_index, 1);
+                        realNum.insert((non_zero_pos + radix_index + 1) + 1, 1, '.');
+                        realNum.append(exponent >= 0? '+' + std::to_string(exponent - int(non_zero_pos  + 1)) : std::to_string(exponent - int(non_zero_pos  + 1)));
+                        realNum.erase(radix_index, 1);
                     }
                     else
-                    realNum_copy = "0.0@+0";
+                    realNum = "0.0@+0";
                 }
                 else
-                realNum_copy = "0.0@+0";
+                realNum = "0.0@+0";
             }
             else if (std::regex_match(real_only, reg = R"(^[0-9]{2,}(\.[[:digit:]]*)?$)"))//a similar reiteration of the <second-case>, but one which captures exponents: [000001@-23], [02343@+45] or [233445.3434@+2]
             {
-                int exponent{};
                 //extracting the exponent
-                for (auto i = realNum_copy.size() - 1; i != 0; --i)
-                {
-                    if (realNum_copy[i] == '@')
-                    {
-                        exponent =  std::stoi(std::string/*_view*/(realNum_copy.begin() + (i + 1), realNum_copy.end()));
-                        realNum_copy.erase(realNum_copy.begin() + (i + 1), realNum_copy.end());
-                        break;
-                    }
-                }
+                exponent =  std::stoi(std::string/*_view*/(realNum.begin() + exponent_indicator_index + 1, realNum.end()));
+                realNum.erase(realNum.begin() + exponent_indicator_index + 1, realNum.end());
 
-                if (auto radix_index = realNum_copy.find('.'); radix_index != std::string::npos)
+                if (auto radix_index = realNum.find('.'); radix_index != std::string::npos)
                 {
-                    realNum_copy.erase(radix_index, 1);
-                    realNum_copy.insert(realNum_copy.find_first_not_of('0') + 1, 1, '.');
-                    realNum_copy.append(exponent >= 0? '+' + std::to_string(exponent + int(radix_index - 1)) : std::to_string(exponent + int(radix_index - 1)));
+                    realNum.erase(radix_index, 1);
+                    realNum.insert(realNum.find_first_not_of('0') + 1, 1, '.');
+                    realNum.append(exponent >= 0? '+' + std::to_string(exponent + int(radix_index - 1)) : std::to_string(exponent + int(radix_index - 1)));
                 }
                 else
                 {
-                    realNum_copy.insert(realNum_copy.find_first_not_of('0') + 1, 1, '.');
-                    realNum_copy.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum_copy.size() - 2)) : std::to_string(exponent + int(realNum_copy.size() - 2)));
+                    auto realNum_size = realNum.size();//save the realNum.size() because std::string::insert modifies the string and to avoid function call overhead
+                    realNum.insert(realNum.find_first_not_of('0') + 1, 1, '.');
+                    realNum.append(exponent >= 0? '+' +  std::to_string(exponent + int(realNum_size - 2)) : std::to_string(exponent + int(realNum_size - 2)));
                 }
             }
         }
         else
         panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, ") is not in the expected format .i.e a real-like format");
         
-        trim_real_leading_zeros(realNum_copy), trim_real_trailing_zeros(realNum_copy);
-        return realNum_copy;
+        trim_real_leading_zeros(realNum), trim_real_trailing_zeros(realNum);
+        return realNum;
     }
 
-    std::string approximate_base10_real(const std::string& realNum, std::uint32_t desired_digits)
+    void approximate_base10_real(std::string& realNum, std::uint32_t desired_digits)
     {
-        std::regex reg{R"(^([0-9]+)(\.[0-9]+)?$)"};
+        std::regex reg{R"(^([0-9]+)(\.[0-9]*)?$)"};//replace the 
         std::smatch smatch{};
 
         if (std::regex_match(realNum, smatch, reg))
         {
             /* slices would be soo fucking good for this; when i switch to my slice's rich language, re-implement this using mutable slices instead*/
+            
+            if (smatch[2].str().size() <= 1) return;
+
+            std::string real_part = smatch[2];/*contains the real_part plus the radix*/
+
+            if (real_part.size() - 1/*minus the radix*/ > desired_digits)
+            {
+                std::string integer_part = smatch[1];
+
+                if (digitsMap[real_part[desired_digits+1]] >= 5)//checks if the first unsafe digit is >= 5
+                {
+                    auto carry_digit_flag = true;
+                    auto temp_insert_digit = 0;
+                    
+                    for (int i = desired_digits /*to get the last safe digit index*/; i > 0/*because the radix is at index[0]*/; --i)
+                    {
+                        if (carry_digit_flag)
+                        {
+                            temp_insert_digit = 1 + digitsMap[real_part[i]];
+                            carry_digit_flag = temp_insert_digit == 10, temp_insert_digit %= 10;
+
+                            real_part.replace((std::size_t)i, 1uz, 1uz, mapDigits[temp_insert_digit]);
+                        }
+                        else
+                        break;
+                    }
+
+                    if (carry_digit_flag)//for dealing with the integer_part of approximation
+                    {
+                        for (int i = integer_part.size() - 1; /*no need for this check*/; i--)
+                        {
+                            if (i == 0)
+                            {
+                                if (carry_digit_flag)
+                                {
+                                    temp_insert_digit = 1 + digitsMap[integer_part[i]];
+
+                                    if (temp_insert_digit == 10)
+                                    integer_part.replace((std::size_t)i, 1uz, "10");
+                                    else
+                                    integer_part.replace((std::size_t)i, 1uz, 1uz, mapDigits[temp_insert_digit]);
+                                }
+
+                                break;
+                            }
+                            else
+                            {
+                                if (carry_digit_flag)
+                                {
+                                    temp_insert_digit = 1 + digitsMap[integer_part[i]];
+                                    carry_digit_flag = temp_insert_digit / 10 == 1, temp_insert_digit %= 10;
+
+                                    integer_part.replace((std::size_t)i, 1uz, 1uz, mapDigits[temp_insert_digit]);
+                                }
+                                else
+                                break;
+                            }
+                        }
+                        
+                    }
+                }
+                //removing the undesired digits
+                real_part.erase((std::size_t)desired_digits + 1 /*, default value is set to end*/);
+
+                realNum = integer_part + real_part;
+            }
+            return;
+        }
+        else
+        panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format .i.e ([0-9]+)(\.[0-9]*))");
+    }
+
+    std::string approximate_base10_real(const std::string& realNum, std::uint32_t desired_digits, ImmutableLref)
+    {
+        std::regex reg{R"(^([0-9]+)(\.[0-9]*)?$)"};
+        std::smatch smatch{};
+
+        if (std::regex_match(realNum, smatch, reg))
+        {
+            /* slices would be soo fucking good for this; when i switch to my slice's rich language, re-implement this using mutable slices instead*/
+            
+            if (smatch[2].str().size() <= 1) return realNum;
             
             std::string real_part = smatch[2];/*contains the real_part plus the radix*/
 
@@ -883,7 +937,7 @@ namespace nc_misc
             return realNum;
         }
         else
-        panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format .i.e [0-9]{1}\.[0-9]*?@[+-]?[0-9]+)");
+        panic("in function", std::source_location::current().function_name(), "\b, arg realNum(", realNum, R"() is not in the expected format .i.e ([0-9]+)(\.[0-9]*))");
 
         return "";
     }
@@ -1446,7 +1500,7 @@ namespace misc
 
         auto perform_newLine_fix = [&](std::size_t newLine_index)
         {
-            m_out.write("\033[44;37;1m↳");
+            m_out.write("\033[44m ");
 
             if (auto last_special_terminal_text_index = std::string_view{text.begin(), text.begin() + newLine_index}.find_last_of('\033'_u8); last_special_terminal_text_index != std::string_view::npos)
             {
@@ -1454,7 +1508,7 @@ namespace misc
                 auto special_terminal_text_delimeter_index = temp.find('m'_u8);
 
                 if (special_terminal_text_delimeter_index != std::string_view::npos)
-                m_out.write(std::string_view{temp.begin(), temp.begin() + special_terminal_text_delimeter_index + 1});
+                m_out.write("\033[0m", std::string_view{temp.begin(), temp.begin() + special_terminal_text_delimeter_index + 1});
                 else
                 panic("in function", std::source_location::current().function_name(), "special_terminal_text_delimeter(m) index was not found");
             }
@@ -1561,7 +1615,7 @@ namespace misc
 
         auto perform_newLine_fix = [&](std::size_t newLine_index)
         {
-            m_out.write("\033[47;31;1m.");
+            m_out.write("\033[44m ");
 
             if (auto last_special_terminal_text_index = U8string_view{text.begin(), text.begin() + newLine_index}.find_last_of('\033'_u8); last_special_terminal_text_index != U8string_view::npos)
             {
@@ -1569,7 +1623,7 @@ namespace misc
                 auto special_terminal_text_delimeter_index = temp.find('m'_u8);
 
                 if (special_terminal_text_delimeter_index != U8string_view::npos)
-                m_out.write(U8string_view{temp.begin(), temp.begin() + special_terminal_text_delimeter_index + 1});
+                m_out.write("\033[0m", U8string_view{temp.begin(), temp.begin() + special_terminal_text_delimeter_index + 1});
                 else
                 panic("in function", std::source_location::current().function_name(), "special_terminal_text_delimeter(m) index was not found");
             }

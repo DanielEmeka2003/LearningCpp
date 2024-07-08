@@ -137,10 +137,10 @@ namespace Nc
                 
                 auto determine_slipt_pos = [&](std::size_t pos){
                     /*pos - 1 is for adjusting for possible outliers
-                    * Outliers are specialTerminalText delimeters that have a position just one greater than the end of a particular slipt_pos
+                    * Outliers are specialTerminalText delimeters that have a position just one greater than the end of a particular slipt-end
                     * example with the maxTextSizeLimit being (130):
-                    * - 131 is an outlier for the first slipt, it calculated slipt is the second
-                    * - 261 is an outlier for the second slipt, it's calculated slipt is the third
+                    * - 131 is an outlier for the first slipt - it's calculated slipt lies in the second slipt
+                    * - 261 is an outlier for the second slipt - it's calculated slipt lies in the third slipt
                     * e.t.c
                     * 
                     * Outliers are only dangerous when they are the last position e.g with a textSize of 260 after removal of the specialTerminalText
@@ -165,8 +165,18 @@ namespace Nc
                     else
                     return 1uz;
                 };
+
+                auto determine_slipt_size = [&](std::size_t original_string_size)
+                {
+                    auto temp = original_string_size / m_textSizeLimit;
+
+                    if (original_string_size % m_textSizeLimit != 0)
+                    temp += 1;
+                    
+                    return temp;
+                };
                 
-                for (size_t i = 1, n = determine_slipt_pos(log_as_str.size()); i <= n; i++)
+                for (size_t i = 1, n = determine_slipt_size(log_as_str.size()); i <= n; i++)
                 {
                     if (i != 1)
                     {
@@ -499,7 +509,7 @@ namespace Nc
         void outputLogEntries(std::string LogHeading, Streams::OutputStream<char>& output)
         {
             //Footer insertion
-            write("\002(10)\033[5;1mCompilation terminated (⌐■_■) ψ(._. )>\033[0m"), log();
+            write("\002(13)\033[31;5;1mCompilation terminated\033[0m (⌐■_■) ψ(._. )>"), log();
 
             //Heading insertion
             {

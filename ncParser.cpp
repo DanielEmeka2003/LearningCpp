@@ -43,10 +43,10 @@ namespace Nc
             }
             else if (!language_items())
             {
-                expect(Lexer::TokenType::_miscellany, {}, FailureCase{{}, "Expected a \033[48;2;10;6;26;32;1m<language_item>\033[0m", "in \033[48;2;10;6;26;33;1mglobal_space_scope\033[0m"});
+                expect(Lexer::TokenType::_miscellany, {}, FailureCase{{}, "Expected a \033[32;1m<language_item>\033[0m", "in \033[33;1mglobal_space_scope\033[0m"});
                 spaceLog();
-                m_log.write("   Below is \033[48;2;10;6;26;36;1m<language_item>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   \033[48;2;10;6;26;32;1m<function_decl>|<object_decl>[';']|<named_st_decl>|<named_pt_decl>|<enum_decl>|<alias>[';']|<namespace_decl>\033[0m"), additionalLog();
+                m_log.write("   Below is \033[36;1m<language_item>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   \033[32;1m<function_decl>|<object_decl>[';']|<named_st_decl>|<named_pt_decl>|<enum_decl>|<alias>[';']|<namespace_decl>\033[0m"), additionalLog();
             }
             // m_ast.mkNcFileNode();
         }
@@ -61,7 +61,7 @@ namespace Nc
             expect(Lexer::TokenType::symbol, {Lexer::sSemicolon});
             return true;
         }
-        else if (function_decl() or named_st_decl() or named_pt_decl() or enum_decl() or namespace_decl())
+        else if (function_decl(false) or named_st_decl() or named_pt_decl() or enum_decl() or name_space_decl() or type_space_decl())
         {
             return true;
         }
@@ -69,10 +69,17 @@ namespace Nc
         return false;
     }
     
-    bool Parser::namespace_decl(const FailureCase& fc)
+    bool Parser::name_space_decl(const FailureCase& fc)
     {
-        if (expect(Lexer::TokenType::reserved, {Lexer::rNamespace}, fc))
+        if (expect(Lexer::TokenType::reserved, {Lexer::rName_space}, fc))
         {
+            if (!special_ident_list(FailureCase{true, "Expected a \033[32;1m<special_ident_list>\033[0m", "in \033[36;1m<name_space_decl>\033[0m's BNF syntax"}))
+            {
+                afterTokenLog(), spaceLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<name_space_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'name_space' \033[31;1m<special_ident_list>\033[0m ('{' {<language_item>} '}')|[';']"), additionalLog();
+            }
+
             if (expect(Lexer::TokenType::symbol, {Lexer::sLcurly}))
             {
                 auto savedLcurlyTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
@@ -81,8 +88,10 @@ namespace Nc
                 {
                     if (m_isEndofTokenList)
                     {
-                        expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "to end namespace declaration"});
-                        afterTokenLog(), missingBraceLog(savedLcurlyTokenDataIndex);
+                        expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[36;1m<name_space_decl>\033[0m's BNF syntax"});
+                        afterTokenLog(), missingBraceLog(savedLcurlyTokenDataIndex), spaceLog();
+                        m_log.write("   The missing entity is highlighted below in \033[36;1m<name_space_decl>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   'name_space' <special_ident_list> ('{' {<language_item>} \033[31;1m'}'\033[0m)|[';']"), additionalLog();
                         break;
                     }
                     else if (!language_items())
@@ -93,19 +102,68 @@ namespace Nc
                         }
                         else
                         {
-                            expect(Lexer::TokenType::_miscellany, {}, FailureCase{{}, "Expected a \033[48;2;10;6;26;32;1m<language_item>\033[0m", "in \033[48;2;10;6;26;33;1m<namespace_decl>\033[0m's BNF syntax"});
+                            expect(Lexer::TokenType::_miscellany, {}, FailureCase{{}, "Expected a \033[32;1m<language_item>\033[0m", "in \033[36;1m<name_space_decl>\033[0m's BNF syntax"});
                             spaceLog();
-                            m_log.write("   Below is \033[48;2;10;6;26;36;1m<language_item>\033[0m's BNF syntax:"), additionalLog();
-                            m_log.write("   \033[48;2;10;6;26;32;1m<function_decl>|<object_decl>[';']|<named_st_decl>|<named_pt_decl>|<enum_decl>|<alias>[';']|<namespace_decl>\033[0m"), additionalLog();
+                            m_log.write("   Below is \033[36;1m<language_item>\033[0m's BNF syntax:"), additionalLog();
+                            m_log.write("   \033[32;1m<function_decl>|<object_decl>[';']|<named_st_decl>|<named_pt_decl>|<enum_decl>|<alias>[';']|<name_space_decl>|<type_space_decl>\033[0m"), additionalLog();
                         }   
                     }   
                 }
             }
-            else if (expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}))
-            {}
             else
-            m_log.write("expected either [ ; ] or [ { ] in namespace declaration"), start_log();
+            {
+                expect(Lexer::TokenType::symbol, {Lexer::sSemicolon});
+            }
+            return true;
+        }
+        return false;
+    }
 
+    bool Parser::type_space_decl(const FailureCase& fc)
+    {
+        if (expect(Lexer::TokenType::reserved, {Lexer::rType_space}, fc))
+        {
+            if (!special_ident_list(FailureCase{true, "Expected a \033[32;1m<special_ident_list>\033[0m", "in \033[36;1m<type_space_decl>\033[0m's BNF syntax"}))
+            {
+                afterTokenLog(), spaceLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<type_space_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'type_space' \033[31;1m<special_ident_list>\033[0m ('{' {<language_item>} '}')|[';']"), additionalLog();
+            }
+
+            if (expect(Lexer::TokenType::symbol, {Lexer::sLcurly}))
+            {
+                auto savedLcurlyTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
+
+                while (true)
+                {
+                    if (m_isEndofTokenList)
+                    {
+                        expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[36;1m<type_space_decl>\033[0m's BNF syntax"});
+                        afterTokenLog(), missingBraceLog(savedLcurlyTokenDataIndex), spaceLog();
+                        m_log.write("   The missing entity is highlighted below in \033[36;1m<type_space_decl>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   'type_space' <special_ident_list> ('{' {<language_item>} \033[31;1m'}'\033[0m)|[';']"), additionalLog();
+                        break;
+                    }
+                    else if (!language_items())
+                    {
+                        if (expect(Lexer::TokenType::symbol, {Lexer::sRcurly}))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            expect(Lexer::TokenType::_miscellany, {}, FailureCase{{}, "Expected a \033[32;1m<language_item>\033[0m", "in \033[36;1m<type_space_decl>\033[0m's BNF syntax"});
+                            spaceLog();
+                            m_log.write("   Below is \033[36;1m<language_item>\033[0m's BNF syntax:"), additionalLog();
+                            m_log.write("   \033[32;1m<function_decl>|<object_decl>[';']|<named_st_decl>|<named_pt_decl>|<enum_decl>|<alias>[';']|<name_space_decl>|<type_space_decl>\033[0m"), additionalLog();
+                        }   
+                    }   
+                }
+            }
+            else
+            {
+                expect(Lexer::TokenType::symbol, {Lexer::sSemicolon});
+            }
             return true;
         }
         return false;
@@ -115,11 +173,11 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::reserved, {Lexer::rNamed_st}, fc))
         {
-            if (!special_ident(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m", "in \033[48;2;10;6;26;36;1m<named_st_decl>\033[0m's BNF syntax"}))
+            if (!special_ident_list(FailureCase{true, "Expected a \033[32;1m<special_ident_list>\033[0m", "in \033[36;1m<named_st_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<named_st_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'named_st' \033[48;2;10;6;26;31;1m<special_ident>\033[0m ('{' [<optPrefix_type> {',' <optPrefix_type>}] '}')|[';']"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<named_st_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'named_st' \033[31;1m<special_ident_list>\033[0m ('{' [<optPrefix_type> {',' <optPrefix_type>}] '}')|[';']"), additionalLog();
             }
             
             if (expect(Lexer::TokenType::symbol, {Lexer::sLcurly}))
@@ -130,20 +188,20 @@ namespace Nc
                 {
                     while (expect(Lexer::TokenType::symbol, {Lexer::sComma}))
                     {
-                        if (!optPrefix_type(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<optPrefix_type>\033[0m", "in \033[48;2;10;6;26;36;1m<named_st_decl>\033[0m's BNF syntax"}))
+                        if (!optPrefix_type(FailureCase{true, "Expected an \033[32;1m<optPrefix_type>\033[0m", "in \033[36;1m<named_st_decl>\033[0m's BNF syntax"}))
                         {
                             afterTokenLog(), spaceLog();
-                            m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<named_st_decl>\033[0m's BNF syntax:"), additionalLog();
-                            m_log.write("   'named_st' <special_ident> ('{' [<optPrefix_type> {',' \033[48;2;10;6;26;31;1m<optPrefix_type>\033[0m}] '}')|[';']"), additionalLog();
+                            m_log.write("   The missing entity is highlighted below in \033[36;1m<named_st_decl>\033[0m's BNF syntax:"), additionalLog();
+                            m_log.write("   'named_st' <special_ident_list> ('{' [<optPrefix_type> {',' \033[31;1m<optPrefix_type>\033[0m}] '}')|[';']"), additionalLog();
                         }
                     }
                 }
 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<named_st_decl>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[36;1m<named_st_decl>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), missingBraceLog(savedLcurlyTokenDataIndex), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<named_st_decl>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'named_st' <special_ident> ('{' [<optPrefix_type> {',' <optPrefix_type>}] \033[48;2;10;6;26;31;1m'}'\033[0m)|[';']"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<named_st_decl>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'named_st' <special_ident_list> ('{' [<optPrefix_type> {',' <optPrefix_type>}] \033[31;1m'}'\033[0m)|[';']"), additionalLog();
                 }
             }
             else
@@ -159,11 +217,11 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::reserved, {Lexer::rNamed_pt}, fc))
         {
-            if (!special_ident(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m", "in \033[48;2;10;6;26;36;1m<named_pt_decl>\033[0m's BNF syntax"}))
+            if (!special_ident_list(FailureCase{true, "Expected a \033[32;1m<special_ident_list>\033[0m", "in \033[36;1m<named_pt_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<named_pt_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'named_pt' \033[48;2;10;6;26;31;1m<special_ident>\033[0m ('{' [<object_decl> {';' <object_decl>}] '}')|[';']"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<named_pt_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'named_pt' \033[31;1m<special_ident_list>\033[0m ('{' [<object_decl> {';' <object_decl>}] '}')|[';']"), additionalLog();
             }
             
             if (expect(Lexer::TokenType::symbol, {Lexer::sLcurly}))
@@ -174,20 +232,20 @@ namespace Nc
                 {
                     while (expect(Lexer::TokenType::symbol, {Lexer::sComma}))
                     {
-                        if (!object_decl(false, false, FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<object_decl>\033[0m", "in \033[48;2;10;6;26;36;1m<named_pt_decl>\033[0m's BNF syntax"}))
+                        if (!object_decl(false, false, FailureCase{true, "Expected an \033[32;1m<object_decl>\033[0m", "in \033[36;1m<named_pt_decl>\033[0m's BNF syntax"}))
                         {
                             afterTokenLog(), spaceLog();
-                            m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<named_pt_decl>\033[0m's BNF syntax:"), additionalLog();
-                            m_log.write("   'named_pt' <special_ident> ('{' [<object_decl> {';' \033[48;2;10;6;26;31;1m<object_decl>\033[0m}] '}')|[';']"), additionalLog();
+                            m_log.write("   The missing entity is highlighted below in \033[36;1m<named_pt_decl>\033[0m's BNF syntax:"), additionalLog();
+                            m_log.write("   'named_pt' <special_ident_list> ('{' [<object_decl> {';' \033[31;1m<object_decl>\033[0m}] '}')|[';']"), additionalLog();
                         }
                     }
                 }
 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<named_pt_decl>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[36;1m<named_pt_decl>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), missingBraceLog(savedLcurlyTokenDataIndex), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<named_pt_decl>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'named_pt' <special_ident> ('{' [<object_decl> {';' <object_decl>}] \033[48;2;10;6;26;31;1m'}'\033[0m)|[';']"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<named_pt_decl>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'named_pt' <special_ident_list> ('{' [<object_decl> {';' <object_decl>}] \033[31;1m'}'\033[0m)|[';']"), additionalLog();
                 }
             }
             else
@@ -203,13 +261,21 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::reserved, {Lexer::rEnum}, fc))
         {
-            if (!special_ident(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m", "in \033[48;2;10;6;26;36;1m<enum_decl>\033[0m's BNF syntax"}))
+            if (!special_ident_list(FailureCase{true, "Expected a \033[32;1m<special_ident_list>\033[0m", "in \033[36;1m<enum_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<enum_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'enum' \033[48;2;10;6;26;31;1m<special_ident>\033[0m ('{' <identifier>[<initializer] {',' <identifier>[<initializer]} '}')|[';']"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<enum_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'enum' \033[31;1m<special_ident_list>\033[0m [':' <optPrefix_type>] ('{' <identifier>[<initializer] {',' <identifier>[<initializer]} '}')|[';']"), additionalLog();
             }
             
+            if (expect(Lexer::TokenType::symbol, {Lexer::sColon}))
+            {
+                if (!optPrefix_type(FailureCase{true, "Expected a \033[32;1m<optPrefix_type>\033[0m", "in \033[36;1m<enum_decl>\033[0m's BNF syntax"}))
+                {
+                    
+                }
+            }
+
             if (expect(Lexer::TokenType::symbol, {Lexer::sLcurly}))
             {
                 auto savedLcurlyTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
@@ -221,11 +287,11 @@ namespace Nc
                     
                     while (expect(Lexer::TokenType::symbol, {Lexer::sComma}))
                     {
-                        if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<enum_decl>\033[0m's BNF syntax"}))
+                        if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<enum_decl>\033[0m's BNF syntax"}))
                         {
                             afterTokenLog(), spaceLog();
-                            m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<enum_decl>\033[0m's BNF syntax:"), additionalLog();
-                            m_log.write("   'enum' <special_ident> ('{' <identifier>[<initializer] {',' \033[48;2;10;6;26;31;1m<identifier>\033[0m[<initializer]} '}')|[';']"), additionalLog();
+                            m_log.write("   The missing entity is highlighted below in \033[36;1m<enum_decl>\033[0m's BNF syntax:"), additionalLog();
+                            m_log.write("   'enum' <special_ident_list> [':' <optPrefix_type>] ('{' <identifier>[<initializer] {',' \033[31;1m<identifier>\033[0m[<initializer]} '}')|[';']"), additionalLog();
                         }
                         else
                         {
@@ -234,11 +300,11 @@ namespace Nc
                     }
                 }
 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<enum_decl>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[36;1m<enum_decl>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), missingBraceLog(savedLcurlyTokenDataIndex), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<enum_decl>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'enum' <special_ident> ('{' <identifier>[<initializer] {',' <identifier>[<initializer]} \033[48;2;10;6;26;31;1m'}'\033[0m)|[';']"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<enum_decl>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'enum' <special_ident_list> [':' <optPrefix_type>] ('{' <identifier>[<initializer] {',' <identifier>[<initializer]} \033[31;1m'}'\033[0m)|[';']"), additionalLog();
                 }
             }
             else
@@ -254,38 +320,38 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::reserved, {Lexer::rAlias}, fc))
         {
-            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<alias_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'alias' \033[48;2;10;6;26;31;1m<identifier>\033[0m '=' ['namespace']<special_ident>|<prefix_type>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'alias' \033[31;1m<identifier>\033[0m '=' ['namespace']<special_ident>|<prefix_type>"), additionalLog();
             }
             
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sEqual}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sEqual}, FailureCase{true, {}, "in \033[36;1m<alias_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'alias' <identifier> \033[48;2;10;6;26;31;1m'='\033[0m ['namespace']<special_ident>|<prefix_type>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'alias' <identifier> \033[31;1m'='\033[0m ['namespace']<special_ident>|<prefix_type>"), additionalLog();
             }
 
-            if (expect(Lexer::TokenType::reserved, {Lexer::rNamespace}))
+            if (expect(Lexer::TokenType::reserved, {Lexer::rName_space}))
             {
-                if (!special_ident(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m", "in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax"}))
+                if (!special_ident(FailureCase{true, "Expected a \033[32;1m<special_ident>\033[0m", "in \033[36;1m<alias_decl>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'alias' <identifier> '=' ['namespace']\033[48;2;10;6;26;31;1m<special_ident>\033[0m|<prefix_type>"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'alias' <identifier> '=' ['namespace']\033[31;1m<special_ident>\033[0m|<prefix_type>"), additionalLog();
                 }
             }
             else if (special_ident())
             {}
-            else if (prefix_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m, a \033[48;2;10;6;26;32;1m<prefix_type>\033[0m or a \033[48;2;10;6;26;33;1mnamespace\033[0m prefixed \033[48;2;10;6;26;32;1m<special_ident>\033[0m", "in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax"}))
+            else if (prefix_exp(FailureCase{true, "Expected a \033[32;1m<special_ident>\033[0m, a \033[32;1m<prefix_type>\033[0m or a \033[33;1mnamespace\033[0m prefixed \033[32;1m<special_ident>\033[0m", "in \033[36;1m<alias_decl>\033[0m's BNF syntax"}))
             {}
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'alias' <identifier> '=' \033[48;2;10;6;26;31;1m['namespace']<special_ident>|<prefix_type>\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<alias_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'alias' <identifier> '=' \033[31;1m['namespace']<special_ident>|<prefix_type>\033[0m"), additionalLog();
             }
             
             return true;
@@ -293,41 +359,44 @@ namespace Nc
         return false;
     }
 
-    bool Parser::function_decl(const FailureCase& fc)
+    bool Parser::function_decl(bool is_parsed_as_blockItem, const FailureCase& fc)
     {
         if (expect(Lexer::TokenType::reserved, {Lexer::rFn}, fc))
         {
-            if (m_currentTokenData.get().token == Lexer::sLparen)//must be a function_exp right??
-            return previousTokenIndex(), false;
-
-            if (!special_ident(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m", "in \033[48;2;10;6;26;36;1m<function_decl>\033[0m's BNF syntax"}))
+            if (is_parsed_as_blockItem)
+            {
+                if (m_lexer.getTokenDataList()[m_currentTokenDataIndex].token == Lexer::sLparen)//must be a function_exp right??
+                return previousTokenIndex(), false;
+            }
+            
+            if (!special_ident(FailureCase{true, "Expected a \033[32;1m<special_ident>\033[0m", "in \033[36;1m<function_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' \033[48;2;10;6;26;31;1m<special_ident>\033[0m '('[<func_param_list>]')' [<optPrefix_type>] <block>|[';']"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' \033[31;1m<special_ident>\033[0m '('[<func_param_list>]')' [<optPrefix_type>] <block>|[';']"), additionalLog();
             }
             
             std::optional<std::size_t> optional_savedLparenTokenDataIndex{};
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<function_decl>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<function_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' <special_ident> \033[48;2;10;6;26;31;1m'('\033[0m[<func_param_list>]')' [<optPrefix_type>] <block>|[';']"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' <special_ident> \033[31;1m'('\033[0m[<func_param_list>]')' [<optPrefix_type>] <block>|[';']"), additionalLog();
             }
             else
             optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
             func_param_list();
             
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<function_decl>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<function_decl>\033[0m's BNF syntax"}))
             {
                 afterTokenLog();
                 if (optional_savedLparenTokenDataIndex.has_value()) missingBraceLog(optional_savedLparenTokenDataIndex.value());
 
                 spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' <special_ident> '('[<func_param_list>]\033[48;2;10;6;26;31;1m')'\033[0m [<optPrefix_type>] <block>|[';']"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' <special_ident> '('[<func_param_list>]\033[31;1m')'\033[0m [<optPrefix_type>] <block>|[';']"), additionalLog();
             }
 
             // Type giveType{};
@@ -343,7 +412,7 @@ namespace Nc
                 if (!wasTypeFound)
                 {
                     //parse again just to log an error
-                    optPrefix_type(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<optPrefix_type>\033[0m", "because \033[48;2;10;6;26;33;1mfunction-disclosures\033[0m require them since they have no body"});
+                    optPrefix_type(FailureCase{true, "Expected an \033[32;1m<optPrefix_type>\033[0m", "because \033[33;1mfunction-disclosures\033[0m require them since they have no body"});
                 }
                 expect(Lexer::TokenType::symbol, {Lexer::sSemicolon});
             }
@@ -361,11 +430,11 @@ namespace Nc
         {
             std::optional<std::size_t> optional_savedLparenTokenDataIndex{};
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<function_signature>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' \033[48;2;10;6;26;31;1m'('\033[0m[<optPrefix_type> {',' <optPrefix_type>}]')' <optPrefix_type>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' \033[31;1m'('\033[0m[<optPrefix_type> {',' <optPrefix_type>}]')' <optPrefix_type>"), additionalLog();
             }
             else
             optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
@@ -378,32 +447,32 @@ namespace Nc
 
                 while (expect(Lexer::TokenType::symbol, {Lexer::sComma}))
                 {
-                    if (!optPrefix_type(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<optPrefix_type>\033[0m", "in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax"}))
+                    if (!optPrefix_type(FailureCase{true, "Expected an \033[32;1m<optPrefix_type>\033[0m", "in \033[36;1m<function_signature>\033[0m's BNF syntax"}))
                     {
                         afterTokenLog(), spaceLog();
-                        m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
-                        m_log.write("   'fn' '('[<optPrefix_type> {',' \033[48;2;10;6;26;31;1m<optPrefix_type>\033[0m}]')' <optPrefix_type>"), additionalLog();
+                        m_log.write("   The missing entity is highlighted below in \033[36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   'fn' '('[<optPrefix_type> {',' \033[31;1m<optPrefix_type>\033[0m}]')' <optPrefix_type>"), additionalLog();
                     }
                 
                     // typeParameterList.push_back(std::move(m_ast._getType()));
                 }
             }
             
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<function_signature>\033[0m's BNF syntax"}))
             {
                 afterTokenLog();
                 if (optional_savedLparenTokenDataIndex.has_value()) missingBraceLog(optional_savedLparenTokenDataIndex.value());
 
                 spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' '('[<optPrefix_type> {',' <optPrefix_type>}]\033[48;2;10;6;26;31;1m')'\033[0m <optPrefix_type>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' '('[<optPrefix_type> {',' <optPrefix_type>}]\033[31;1m')'\033[0m <optPrefix_type>"), additionalLog();
             }
             
-            if (!optPrefix_type(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<optPrefix_type>\033[0m", "in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax"}))
+            if (!optPrefix_type(FailureCase{true, "Expected an \033[32;1m<optPrefix_type>\033[0m", "in \033[36;1m<function_signature>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' '('[<optPrefix_type> {',' <optPrefix_type>}]')' \033[48;2;10;6;26;31;1m<optPrefix_type>\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_signature>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' '('[<optPrefix_type> {',' <optPrefix_type>}]')' \033[31;1m<optPrefix_type>\033[0m"), additionalLog();
             }
 
             // Type giveType{ std::move(m_ast._getType()) };
@@ -421,29 +490,29 @@ namespace Nc
         {
             std::optional<std::size_t> optional_savedLparenTokenDataIndex{};
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<typeof>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<typeof>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<typeof>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'typeof' \033[48;2;10;6;26;31;1m'('\033[0m<expression>')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<typeof>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'typeof' \033[31;1m'('\033[0m<expression>')'"), additionalLog();
             }
             else
             optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
-            if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m", "in \033[48;2;10;6;26;36;1m<typeof>\033[0m's BNF syntax"}))
+            if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m", "in \033[36;1m<typeof>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<typeof>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'typeof' '('\033[48;2;10;6;26;31;1m<expression>\033[0m')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<typeof>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'typeof' '('\033[31;1m<expression>\033[0m')'"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<typeof>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<typeof>\033[0m's BNF syntax"}))
             {
                 afterTokenLog();
                 if (optional_savedLparenTokenDataIndex.has_value()) missingBraceLog(optional_savedLparenTokenDataIndex.value());
                 spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<typeof>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'typeof' '('<expression>\033[48;2;10;6;26;31;1m')'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<typeof>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'typeof' '('<expression>\033[31;1m')'\033[0m"), additionalLog();
             }
 
             return true;
@@ -461,15 +530,15 @@ namespace Nc
             {
                 
             }
-            else if (function_signature(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m or a \033[48;2;10;6;26;32;1m<function_signature>\033[0m", "in \033[48;2;10;6;26;36;1m<optPrefix_type>\033[0m's BNF syntax"}))
+            else if (function_signature(FailureCase{true, "Expected a \033[32;1m<special_ident>\033[0m or a \033[32;1m<function_signature>\033[0m", "in \033[36;1m<optPrefix_type>\033[0m's BNF syntax"}))
             {
                 
             }
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<optPrefix_type>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   ( (['type'] \033[48;2;10;6;26;31;1m<special_ident>|<function_signature>\033[0m)|'guess' [':' <string_literal>] )|<typeof>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<optPrefix_type>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   ( (['type'] \033[31;1m<special_ident>|<function_signature>\033[0m)|'guess' [':' <string_literal>] )|<typeof>"), additionalLog();
             }
        }
        else if ((result = special_ident()))
@@ -489,11 +558,11 @@ namespace Nc
        {
             if (expect(Lexer::TokenType::symbol, {Lexer::sColon}))
             {
-                if (!expect(Lexer::TokenType::literal, {Lexer::lStr}, FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<string_literal>\033[0m", "in \033[48;2;10;6;26;36;1m<optPrefix_type>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::literal, {Lexer::lStr}, FailureCase{true, "Expected a \033[32;1m<string_literal>\033[0m", "in \033[36;1m<optPrefix_type>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<optPrefix_type>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   ( (['type'] <special_ident>|<function_signature>)|'guess' [':' \033[48;2;10;6;26;31;1m<string_literal>\033[0m] )|<typeof>"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<optPrefix_type>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ( (['type'] <special_ident>|<function_signature>)|'guess' [':' \033[31;1m<string_literal>\033[0m] )|<typeof>"), additionalLog();
                 }
             }
             return true;
@@ -514,25 +583,25 @@ namespace Nc
                 {
                     
                 }
-                else if (function_signature(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<special_ident>\033[0m or a \033[48;2;10;6;26;32;1m<function_signature>\033[0m", "in \033[48;2;10;6;26;36;1m<prefix_type>\033[0m's BNF syntax"}))
+                else if (function_signature(FailureCase{true, "Expected a \033[32;1m<special_ident>\033[0m or a \033[32;1m<function_signature>\033[0m", "in \033[36;1m<prefix_type>\033[0m's BNF syntax"}))
                 {
                     
                 }
                 else
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<prefix_type>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   ( ('type' \033[48;2;10;6;26;31;1m<special_ident>|<function_signature>\033[0m)|'guess' [':' <string_literal>] )|<typeof>"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<prefix_type>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ( ('type' \033[31;1m<special_ident>|<function_signature>\033[0m)|'guess' [':' <string_literal>] )|<typeof>"), additionalLog();
                 }
             }
             
             if (expect(Lexer::TokenType::symbol, {Lexer::sColon}))
             {
-                if (!expect(Lexer::TokenType::literal, {Lexer::lStr}, FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<string_literal>\033[0m", "in \033[48;2;10;6;26;36;1m<prefix_type>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::literal, {Lexer::lStr}, FailureCase{true, "Expected a \033[32;1m<string_literal>\033[0m", "in \033[36;1m<prefix_type>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<prefix_type>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   ( ('type' <special_ident>|<function_signature>)|'guess' [':' \033[48;2;10;6;26;31;1m<string_literal>\033[0m] )|<typeof>"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<prefix_type>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ( ('type' <special_ident>|<function_signature>)|'guess' [':' \033[31;1m<string_literal>\033[0m] )|<typeof>"), additionalLog();
                 }
             }
             return true;
@@ -545,23 +614,60 @@ namespace Nc
 
     bool Parser::func_param_list(const FailureCase& fc)
     {
-        if (object_decl(false, false, fc))
+        bool result{};
+        if (object_decl(false, false))
         {
-            if (expect(Lexer::TokenType::identifier, {}))
-            {
-                if (initializer())
-                {}   
-            }
-            
+            result = true;
+        }
+        else if (me_func_param())
+        {
+            result = true;
+        }
+        
+        if (result)
+        {
             while (expect(Lexer::TokenType::symbol, {Lexer::sComma}))
             {
-                if (!object_decl(false, false, FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<optPrefix_type>\033[0m", "in \033[48;2;10;6;26;36;1m<func_param_list>\033[0m's BNF syntax"}))
+                if (object_decl(false, false))
+                {}
+                else if (me_func_param(FailureCase{true, "Expected an \033[32;1m<object_decl>\033[0m or a \033[32;1m<me_func_param>\033[0m", "in \033[36;1m<func_param_list>\033[0m's BNF syntax"}))
+                {}
+                else
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<func_param_list>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <object_decl> {',' \033[48;2;10;6;26;31;1m<object_decl>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<func_param_list>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <object_decl>|<me_func_param> {',' \033[31;1m<object_decl>|<me_func_param>\033[0m}"), additionalLog();
                 }
             }
+            return true;
+        }
+        return false;
+    }
+
+    bool Parser::me_func_param(const FailureCase& fc)
+    {
+        bool result{};
+        if (expect(Lexer::TokenType::reserved, {Lexer::rImut}))
+        {
+            result = true;
+        }
+        if (expect(Lexer::TokenType::symbol, {Lexer::sAmperSand}))
+        {
+            result = true;
+        }
+        
+        if (result)
+        {
+            if (!expect(Lexer::TokenType::reserved, {Lexer::rMe}, FailureCase{true, {}, "in \033[36;1m<me_func_param>\033[0m's BNF syntax"}))
+            {
+                afterTokenLog(), spaceLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<me_func_param>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   ['imut']['&']\033[31;1m'me'\033[0m"), additionalLog();
+            }
+            return true;
+        }
+        else if (expect(Lexer::TokenType::reserved, {Lexer::rMe}, fc))
+        {
             return true;
         }
         return false;
@@ -571,11 +677,11 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}))
         {
-            if (!assignment_exp(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<initializer>\033[0m's BNF syntax"}))
+            if (!assignment_exp(FailureCase{true, "Expected an \033[32;1m<assignment_exp>\033[0m", "in \033[36;1m<initializer>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<initializer>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '::='\033[48;2;10;6;26;31;1m<assignment_exp>\033[0m|'('[<expArg_list>]')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<initializer>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '::='\033[31;1m<assignment_exp>\033[0m|'('[<expArg_list>]')'"), additionalLog();
             }
             
             return true;
@@ -587,17 +693,36 @@ namespace Nc
             if (expArg_list())
             {}
             
-            if (expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<initializer>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<initializer>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), missingBraceLog(savedLparenTokenDataIndex), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<initializer>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '::='<assignment_exp>|'('[<expArg_list>]\033[48;2;10;6;26;31;1m')'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<initializer>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '::='<assignment_exp>|'('[<expArg_list>]\033[31;1m')'\033[0m"), additionalLog();
             }
             return true;
         }
         
         return false;
     }
+
+    bool Parser::special_ident_list(const FailureCase& fc)
+    {
+        if (special_ident())
+        {
+            while (expect(Lexer::TokenType::symbol, {Lexer::sComma}))
+            {
+                if (!special_ident(FailureCase{true, {}, "in \033[36;1m<special_ident_list>\033[0m's BNF syntax"}))
+                {
+                    afterTokenLog(), spaceLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<special_ident_list>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <special_ident> {',' \033[31;1m<special_ident>\033[0m}"), additionalLog();
+                } 
+            }
+            return true;
+        }
+        return false;
+    }
+
 
     
     bool Parser::block(const FailureCase& fc)
@@ -612,10 +737,10 @@ namespace Nc
             {
                 if (m_isEndofTokenList)
                 {
-                    expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<block>\033[0m's BNF syntax"});
+                    expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[36;1m<block>\033[0m's BNF syntax"});
                     afterTokenLog(), missingBraceLog(savedLcurlyTokenDataIndex), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<block>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   '{' {<block_item>} \033[48;2;10;6;26;31;1m'}'\033[0m"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<block>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   '{' {<block_item>} \033[31;1m'}'\033[0m"), additionalLog();
                     break;
                 }
                 else if (!block_item())
@@ -636,10 +761,10 @@ namespace Nc
                     }
                     else
                     {
-                        expect(Lexer::TokenType::_miscellany, {}, FailureCase{{}, "Expected a \033[48;2;10;6;26;32;1m<block_item>\033[0m", "in \033[48;2;10;6;26;36;1m<block>\033[0m's BNF syntax"});
+                        expect(Lexer::TokenType::_miscellany, {}, FailureCase{{}, "Expected a \033[32;1m<block_item>\033[0m", "in \033[36;1m<block>\033[0m's BNF syntax"});
                         spaceLog();
-                        m_log.write("   Below is \033[48;2;10;6;26;36;1m<block_item>\033[0m's BNF syntax:"), additionalLog();
-                        m_log.write("   \033[48;2;10;6;26;32;1m<object_decl>[';']|<statement>|<named_pt_decl>|<named_st_decl>|<enum_decl>|<alias>[';']\033[0m"), additionalLog();
+                        m_log.write("   Below is \033[36;1m<block_item>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   \033[32;1m(<object_decl>|<alias>|'label'<identifier> [';'])|<statement>|<named_pt_decl>|<named_st_decl>|<enum_decl>|<function_decl>\033[0m"), additionalLog();
                     }
                 }
             }   
@@ -650,13 +775,18 @@ namespace Nc
 
     bool Parser::block_item(const FailureCase& fc)
     {
-        if (object_decl(true) or alias_decl())//<statement> should be parsed after <object_decl> and <function_decl>
+        if (object_decl(true) or alias_decl() or expect(Lexer::TokenType::reserved, {Lexer::rLabel}))//<statement> should be parsed after <object_decl> and <function_decl>
         {
+            if (m_currentTokenData.get().token == Lexer::rLabel)
+            {
+                
+            }
+            
             expect(Lexer::TokenType::symbol, {Lexer::sSemicolon});
 
             return true;
         }
-        else if (named_pt_decl() or named_st_decl() or enum_decl() or function_decl() or statement(fc))//function
+        else if (named_pt_decl() or named_st_decl() or enum_decl() or function_decl(true) or statement(fc))//function
         {
             // m_ast.makeStatementNode();
 
@@ -688,29 +818,29 @@ namespace Nc
             {
                 
             }
-            else if (expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<identifier>\033[0m or \033[48;2;10;6;26;32;1m(\033[0m to start an \033[48;2;10;6;26;36;1m<identifier-list>\033[0m", "in \033[48;2;10;6;26;36;1m<object_decl>\033[0m's BNF syntax"}))
+            else if (expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, "Expected an \033[32;1m<identifier>\033[0m or \033[32;1m(\033[0m to start an \033[36;1m<identifier-list>\033[0m", "in \033[36;1m<object_decl>\033[0m's BNF syntax"}))
             {
                 auto savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
-                if (!identifier_list(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<identifier_list>\033[0m", "in \033[48;2;10;6;26;36;1m<object_decl>\033[0m's BNF syntax"}))
+                if (!identifier_list(FailureCase{true, "Expected an \033[32;1m<identifier_list>\033[0m", "in \033[36;1m<object_decl>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<object_decl>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   ", which_type, " <identifier>|'('\033[48;2;10;6;26;31;1m<identifier_list>\033[0m')' [<intializier>]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<object_decl>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ", which_type, " <identifier>|'('\033[31;1m<identifier_list>\033[0m')' [<intializier>]"), additionalLog();
                 }
 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "to end the \033[48;2;10;6;26;36;1m<identifier_list>\033[0m in \033[48;2;10;6;26;36;1m<object_decl>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "to end the \033[36;1m<identifier_list>\033[0m in \033[36;1m<object_decl>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), missingBraceLog(savedLparenTokenDataIndex), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<object_decl>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   ", which_type, " <identifier>|'('<identifier_list>\033[48;2;10;6;26;31;1m')'\033[0m [<intializier>]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<object_decl>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ", which_type, " <identifier>|'('<identifier_list>\033[31;1m')'\033[0m [<intializier>]"), additionalLog();
                 }
             }
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<object_decl>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   ", which_type, " \033[48;2;10;6;26;31;1m<identifier>|'('<identifier_list>')'\033[0m [<intializier>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<object_decl>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   ", which_type, " \033[31;1m<identifier>|'('<identifier_list>')'\033[0m [<intializier>]"), additionalLog();
             }
             
             if (initializer())
@@ -749,45 +879,45 @@ namespace Nc
         {
             if (object_decl(false))
             {
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[36;1m<if_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'if'[<object_decl> \033[48;2;10;6;26;31;1m';'\033[0m] <expression> ':' <statement> ['else' <statement>]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'if'[<object_decl> \033[31;1m';'\033[0m] <expression> ':' <statement> ['else' <statement>]"), additionalLog();
                 }
             }
 
-            if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m", "in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax"}))
+            if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m", "in \033[36;1m<if_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'if'[<object_decl> ';'] \033[48;2;10;6;26;31;1m<expression>\033[0m ':' <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'if'[<object_decl> ';'] \033[31;1m<expression>\033[0m ':' <statement> ['else' <statement>]"), additionalLog();
             }
 
             // m_ast.makeExpNode();
             // Expression conditionalExp{ std::move(m_ast.getExpNode()) };
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[36;1m<if_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'if'[<object_decl> ';'] <expression> \033[48;2;10;6;26;31;1m':'\033[0m <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'if'[<object_decl> ';'] <expression> \033[31;1m':'\033[0m <statement> ['else' <statement>]"), additionalLog();
             }
 
-            if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax"}))
+            if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<if_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'if'[<object_decl> ';'] <expression> ':' \033[48;2;10;6;26;31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'if'[<object_decl> ';'] <expression> ':' \033[31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::reserved, {Lexer::rElse}))
             {
-                if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax"}))
+                if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<if_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'if'[<object_decl> ';'] <expression> ':' <statement> ['else' \033[48;2;10;6;26;31;1m<statement>\033[0m]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<if_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'if'[<object_decl> ';'] <expression> ':' <statement> ['else' \033[31;1m<statement>\033[0m]"), additionalLog();
                 }
             }
             
@@ -809,48 +939,48 @@ namespace Nc
 
             if (result)
             {
-                if (expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax"}))
+                if (expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[36;1m<for_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'for' [<object_decl>|<expression> \033[48;2;10;6;26;31;1m';'\033[0m][<expression>';'][<expression>] ':' <statement> ['else' <statement>]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'for' [<object_decl>|<expression> \033[31;1m';'\033[0m][<expression>';'][<expression>] ':' <statement> ['else' <statement>]"), additionalLog();
                 }
             }
             
             if (expression())
             {
-                if (expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax"}))
+                if (expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[36;1m<for_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>\033[48;2;10;6;26;31;1m';'\033[0m][<expression>] ':' <statement> ['else' <statement>]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>\033[31;1m';'\033[0m][<expression>] ':' <statement> ['else' <statement>]"), additionalLog();
                 }
             }
 
             if (expression())
             {}
             
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[36;1m<for_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>';'][<expression>] \033[48;2;10;6;26;31;1m':'\033[0m <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>';'][<expression>] \033[31;1m':'\033[0m <statement> ['else' <statement>]"), additionalLog();
             }
 
-            if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax"}))
+            if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<for_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>';'][<expression>] ':' \033[48;2;10;6;26;31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>';'][<expression>] ':' \033[31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::reserved, {Lexer::rElse}))
             {
-                if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax"}))
+                if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<for_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>';'][<expression>] ':' <statement> ['else' \033[48;2;10;6;26;31;1m<statement>\033[0m]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<for_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'for' [<object_decl>|<expression> ';'][<expression>';'][<expression>] ':' <statement> ['else' \033[31;1m<statement>\033[0m]"), additionalLog();
                 }
             }            
             
@@ -863,57 +993,57 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::reserved, {Lexer::rIter}, fc))
         {
-            if (!identifier_list(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<identifier_list>\033[0m", "in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax"}))
+            if (!identifier_list(FailureCase{true, "Expected an \033[32;1m<identifier_list>\033[0m", "in \033[36;1m<iter_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'iter' \033[48;2;10;6;26;31;1m<identifier_list>\033[0m ':' '('[<iter_arg_list>]')' <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'iter' \033[31;1m<identifier_list>\033[0m ':' '('[<iter_arg_list>]')' <statement> ['else' <statement>]"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[36;1m<iter_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'iter' <identifier_list> \033[48;2;10;6;26;31;1m':'\033[0m '('[<iter_arg_list>]')' <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'iter' <identifier_list> \033[31;1m':'\033[0m '('[<iter_arg_list>]')' <statement> ['else' <statement>]"), additionalLog();
             }
             
             std::optional<std::size_t> optional_savedLparenTokenDataIndex{};
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<iter_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'iter' <identifier_list> ':' \033[48;2;10;6;26;31;1m'('\033[0m[<iter_arg_list>]')' <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'iter' <identifier_list> ':' \033[31;1m'('\033[0m[<iter_arg_list>]')' <statement> ['else' <statement>]"), additionalLog();
             }
             else
             optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
             if (iterArg_list()){}
             
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<iter_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog();
                 if (optional_savedLparenTokenDataIndex.has_value()) missingBraceLog(optional_savedLparenTokenDataIndex.value());
 
                 spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'iter' <identifier_list> ':' '('[<iter_arg_list>]\033[48;2;10;6;26;31;1m')'\033[0m <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'iter' <identifier_list> ':' '('[<iter_arg_list>]\033[31;1m')'\033[0m <statement> ['else' <statement>]"), additionalLog();
             }
 
-            if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax"}))
+            if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<iter_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'iter' <identifier_list> ':' '('[<iter_arg_list>]')' \033[48;2;10;6;26;31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'iter' <identifier_list> ':' '('[<iter_arg_list>]')' \033[31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::reserved, {Lexer::rElse}))
             {
-                if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax"}))
+                if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<iter_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'iter' <identifier_list> ':' '('[<iter_arg_list>]')' <statement> ['else' \033[48;2;10;6;26;31;1m<statement>\033[0m]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<iter_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'iter' <identifier_list> ':' '('[<iter_arg_list>]')' <statement> ['else' \033[31;1m<statement>\033[0m]"), additionalLog();
                 }
             }
 
@@ -928,42 +1058,42 @@ namespace Nc
         {
             if (object_decl(false))
             {
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[36;1m<while_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'while'[<object_decl> \033[48;2;10;6;26;31;1m';'\033[0m] <expression> ':' <statement> ['else' <statement>]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'while'[<object_decl> \033[31;1m';'\033[0m] <expression> ':' <statement> ['else' <statement>]"), additionalLog();
                 }
             }
 
-            if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m", "in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax"}))
+            if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m", "in \033[36;1m<while_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'while'[<object_decl> ';'] \033[48;2;10;6;26;31;1m<expression>\033[0m ':' <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'while'[<object_decl> ';'] \033[31;1m<expression>\033[0m ':' <statement> ['else' <statement>]"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[36;1m<while_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'while'[<object_decl> ';'] <expression> \033[48;2;10;6;26;31;1m':'\033[0m <statement> ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'while'[<object_decl> ';'] <expression> \033[31;1m':'\033[0m <statement> ['else' <statement>]"), additionalLog();
             }
 
-            if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax"}))
+            if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<while_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'while'[<object_decl> ';'] <expression> ':' \033[48;2;10;6;26;31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'while'[<object_decl> ';'] <expression> ':' \033[31;1m<statement>\033[0m ['else' <statement>]"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::reserved, {Lexer::rElse}))
             {
-                if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax"}))
+                if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<while_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'while'[<object_decl> ';'] <expression> ':' <statement> ['else' \033[48;2;10;6;26;31;1m<statement>\033[0m]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<while_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'while'[<object_decl> ';'] <expression> ':' <statement> ['else' \033[31;1m<statement>\033[0m]"), additionalLog();
                 }
             }
             
@@ -978,46 +1108,46 @@ namespace Nc
         {
             if (expect(Lexer::TokenType::symbol, {Lexer::sColon}))
             {
-                if (!object_decl(false, true, FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<object_decl>\033[0m", "in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax"}))
+                if (!object_decl(false, true, FailureCase{true, "Expected an \033[32;1m<object_decl>\033[0m", "in \033[36;1m<do_while_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'do'[':' \033[48;2;10;6;26;31;1m<object_decl>\033[0m] <statement> 'while' <expression> ';'"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'do'[':' \033[31;1m<object_decl>\033[0m] <statement> 'while' <expression> ';'"), additionalLog();
                 }
             }
             
-            if (!statement(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<statement>\033[0m", "in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax"}))
+            if (!statement(FailureCase{true, "Expected a \033[32;1m<statement>\033[0m", "in \033[36;1m<do_while_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'do'[':' <object_decl>] \033[48;2;10;6;26;31;1m<statement>\033[0m 'while' <expression> ';'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'do'[':' <object_decl>] \033[31;1m<statement>\033[0m 'while' <expression> ';'"), additionalLog();
             }
             
             // m_ast.makeStatementNode();
             // Statement doStatement{ std::move(m_ast.getStatementNode()) };
 
-            if (!expect(Lexer::TokenType::reserved, {Lexer::rWhile}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::reserved, {Lexer::rWhile}, FailureCase{true, {}, "in \033[36;1m<do_while_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'do'[':' <object_decl>] <statement> \033[48;2;10;6;26;31;1m'while'\033[0m <expression> ';'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'do'[':' <object_decl>] <statement> \033[31;1m'while'\033[0m <expression> ';'"), additionalLog();
             }
 
-            if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m", "in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax"}))
+            if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m", "in \033[36;1m<do_while_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'do'[':' <object_decl>] <statement> 'while' \033[48;2;10;6;26;31;1m<expression>\033[0m ';'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'do'[':' <object_decl>] <statement> 'while' \033[31;1m<expression>\033[0m ';'"), additionalLog();
             }
 
             // m_ast.makeExpNode();
             // Expression whileConditionExp{ std::move(m_ast.getExpNode()) };
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[36;1m<do_while_statement>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'do'[':' <object_decl>] <statement> 'while' <expression> \033[48;2;10;6;26;31;1m';'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<do_while_statement>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'do'[':' <object_decl>] <statement> 'while' <expression> \033[31;1m';'\033[0m"), additionalLog();
             }
 
             // m_ast.mkDoWhileLoopNode(doStatement, whileConditionExp);
@@ -1029,7 +1159,7 @@ namespace Nc
 
     bool Parser::jump_statement(const FailureCase& fc)
     {
-        if (expect(Lexer::TokenType::reserved, {Lexer::rGive}))
+        if (expect(Lexer::TokenType::reserved, {Lexer::rGive, Lexer::rDefer}))
         {
             if (expression())
             {
@@ -1045,7 +1175,7 @@ namespace Nc
             }
             return true;
         }
-        else if (expect(Lexer::TokenType::reserved, {Lexer::rBreak, Lexer::rContinue}, fc))
+        else if (expect(Lexer::TokenType::reserved, {Lexer::rBreak, Lexer::rContinue, Lexer::rGoto}, fc))
         {
             // LocationFinder locFinder{makeLocFinder(m_currentTokenData.get().line, m_currentTokenData.get().relativeColumn, m_currentTokenData.get().absoluteColumn)};
 
@@ -1054,23 +1184,22 @@ namespace Nc
             // else
             // m_ast.mkContinueJSNode(locFinder);
 
-
             if (expect(Lexer::TokenType::symbol, {Lexer::sLparen}))
             {
                 auto savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;;
 
-                if (!expect(Lexer::TokenType::literal, {Lexer::lInt}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<jump_statement>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<jump_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<jump_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'give'[<expression>]|('break'|'continue' ['('\033[48;2;10;6;26;31;1m<integer_number_literal>\033[0m')'])"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<jump_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ('give'|'defer' [<expression>])|('break'|'continue'|'goto' ['('\033[31;1m<identifier>\033[0m')'])"), additionalLog();
                 }
 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<jump_statement>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<jump_statement>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), missingBraceLog(savedLparenTokenDataIndex), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<jump_statement>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'give'[<expression>]|('break'|'continue' ['('<integer_number_literal>\033[48;2;10;6;26;31;1m')'\033[0m])"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<jump_statement>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ('give'|'defer' [<expression>])|('break'|'continue'|'goto' ['('<identifier>\033[31;1m')'\033[0m])"), additionalLog();
                 }
             }
             return true;
@@ -1084,76 +1213,84 @@ namespace Nc
         {
             if (object_decl(false))
             {
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sSemicolon}, FailureCase{true, {}, "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'match'[<object_decl> \033[48;2;10;6;26;31;1m';'\033[0m] <expression> [':' <identifier>] '{' {('case' <tal_encapsulation>|<expArg_list>)|'default ':' [<statement>]}  '}'"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'match'[<object_decl> \033[31;1m';'\033[0m] <expression> [':' <identifier>] '{' {'case' <tal_encapsulation>|'('[<expArg_list>]')' ':' [<statement>]} '}'"), additionalLog();
                 }
             }
 
-            if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m", "in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax"}))
+            if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m", "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'match'[<object_decl> ';'] \033[48;2;10;6;26;31;1m<expression>\033[0m [':' <identifier>] '{' {('case' <tal_encapsulation>|<expArg_list>)|'default ':' [<statement>]}  '}'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'match'[<object_decl> ';'] \033[31;1m<expression>\033[0m [':' <identifier>] '{' {'case' <tal_encapsulation>|'('[<expArg_list>]')' ':' [<statement>]} '}'"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::symbol, {Lexer::sColon}))
             {
-                if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'match'[<object_decl> ';'] <expression> [':' \033[48;2;10;6;26;31;1m<identifier>\033[0m] '{' {('case' <tal_encapsulation>|<expArg_list>)|'default ':' [<statement>]}  '}'"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'match'[<object_decl> ';'] <expression> [':' \033[31;1m<identifier>\033[0m] '{' {'case' <tal_encapsulation>|'('[<expArg_list>]')' ':' [<statement>]} '}'"), additionalLog();
                 }
             }
 
             std::optional<std::size_t> optional_savedLcurlyTokenDataIndex{};
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLcurly}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLcurly}, FailureCase{true, {}, "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] \033[48;2;10;6;26;31;1m'{'\033[0m {('case' <tal_encapsulation>|<expArg_list>)|'default ':' [<statement>]}  '}'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] \033[31;1m'{'\033[0m {<tal_encapsulation>|'('[<expArg_list>]')' ':' [<statement>]} '}'"), additionalLog();
             }
             else
             optional_savedLcurlyTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
             
-            while (expect(Lexer::TokenType::reserved, {Lexer::rCase, Lexer::rDefault}))
+            std::uint32_t savedLparenTokenDataIndex{};
+            while (expect(Lexer::TokenType::reserved, {Lexer::rCase}))
             {
-                if (m_currentTokenData.get().token == Lexer::rCase)
+                if (expect(Lexer::TokenType::symbol, {Lexer::sLparen}))
                 {
-                    if (tal_encapsulation())
+                    savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
+                    if (expArg_list())
                     {
                         
                     }
-                    else if (expArg_list(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<tal_encapsulation>\033[0m or an \033[48;2;10;6;26;32;1m<expArg_list>\033[0m", "in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax"}))
+                    if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
                     {
-                        
-                    }
-                    else
-                    {
-                        afterTokenLog(), spaceLog();
-                        m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
-                        m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] '{' {('case' \033[48;2;10;6;26;31;1m<tal_encapsulation>|<expArg_list>\033[0m)|'default ':' [<statement>]}  '}'"), additionalLog();
+                        afterTokenLog(), missingBraceLog(savedLparenTokenDataIndex), spaceLog();
+                        m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] '{' {'case' <tal_encapsulation>|'('[<expArg_list>]\033[31;1m')'\033[0m ':' [<statement>]} '}'"), additionalLog();
                     }
                 }
+                else if (tal_encapsulation(FailureCase{true, "Expected a \033[32;1m<tal_encapsulation>\033[0m or \033[32;1m(\033[0m", "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
+                {
+                    
+                }
+                else
+                {
+                    afterTokenLog(), missingBraceLog(savedLparenTokenDataIndex), spaceLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] '{' {'case' \033[31;1m<tal_encapsulation>|'('[<expArg_list>]')'\033[0m ':' [<statement>]} '}'"), additionalLog();
+                }
 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sColon}, FailureCase{true, {}, "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] '{' {('case' <tal_encapsulation>|<argument_list>)|'default \033[48;2;10;6;26;31;1m':'\033[0m [<statement>]}  '}'"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] '{' {'case' <tal_encapsulation>|'('[<expArg_list>]')' \033[31;1m':'\033[0m [<statement>]} '}'"), additionalLog();
                 }
                 
                 statement();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRcurly}, FailureCase{true, {}, "in \033[36;1m<match_block>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), missingBraceLog(optional_savedLcurlyTokenDataIndex.value_or(0)), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] '{' {('case' <tal_encapsulation>|<argument_list>)|'default ':' [<statement>]}  \033[48;2;10;6;26;31;1m'}'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<match_block>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'match'[<object_decl> ';'] <expression> [':' <identifier>] '{' {'case' <tal_encapsulation>|'('[<expArg_list>]')' ':' [<statement>]} \033[31;1m'}'\033[0m"), additionalLog();
             }
             return true;
         }
@@ -1167,11 +1304,11 @@ namespace Nc
         {
             while (expect(Lexer::TokenType::symbol, {Lexer::sComma}))
             {
-                if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<identifier_list>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<identifier_list>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<identifier_list>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <identifier> {',' \033[48;2;10;6;26;31;1m<identifier>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<identifier_list>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <identifier> {',' \033[31;1m<identifier>\033[0m}"), additionalLog();
                 } 
             }
             return true;
@@ -1215,15 +1352,15 @@ namespace Nc
                 {
                     
                 }
-                else if (assignment_exp(FailureCase{true, "Expected \033[48;2;10;6;26;32;1mdefault\033[0m, an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m, \033[48;2;10;6;26;32;1miter_no_end\033[0m, a \033[48;2;10;6;26;32;1m<relational_op>\033[0m, an \033[48;2;10;6;26;32;1m<assignment_op>\033[0m or a \033[48;2;10;6;26;32;1m<param_iterArg_assoc>\033[0m", "in \033[48;2;10;6;26;36;1m<iterArg_list>\033[0m's BNF syntax"}))
+                else if (assignment_exp(FailureCase{true, "Expected \033[32;1mdefault\033[0m, an \033[32;1m<assignment_exp>\033[0m, \033[32;1miter_no_end\033[0m, a \033[32;1m<relational_op>\033[0m, an \033[32;1m<assignment_op>\033[0m or a \033[32;1m<param_iterArg_assoc>\033[0m", "in \033[36;1m<iterArg_list>\033[0m's BNF syntax"}))
                 {
 
                 }
                 else
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<iterArg_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>|<param_iterArg_assoc> {',' \033[48;2;10;6;26;31;1m'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>|<param_iterArg_assoc>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<iterArg_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>|<param_iterArg_assoc> {',' \033[31;1m'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>|<param_iterArg_assoc>\033[0m}"), additionalLog();
                 }
             }
             return true;
@@ -1235,31 +1372,31 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::symbol, {Lexer::sMemberOf}, fc))
         {
-            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_iterArg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<param_iterArg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_iterArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'\033[48;2;10;6;26;31;1m<identifier>\033[0m '::=' 'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_iterArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'\033[31;1m<identifier>\033[0m '::=' 'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_iterArg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[36;1m<param_iterArg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_iterArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> \033[48;2;10;6;26;31;1m'::='\033[0m 'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_iterArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> \033[31;1m'::='\033[0m 'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::reserved, {Lexer::rDefault, Lexer::rIter_no_end}))
             {}
             else if (expect(Lexer::TokenType::symbol, {Lexer::sLessthan, Lexer::sGreaterthan, Lexer::sLessThan_equalTo, Lexer::sGreaterThan_equalTo, Lexer::sAlternateLessThan_equalTo, Lexer::sAlternateGreaterThan_equalTo}) or expect(Lexer::TokenType::symbol, {Lexer::sAssign, Lexer::sInitAssign, Lexer::sPlusAssign, Lexer::sMinusAssign, Lexer::sMultiplyAssign, Lexer::sDivideAssign, Lexer::sRemainderAssign, Lexer::sExponentionAssign, Lexer::sReverseMinusAssign, Lexer::sReverseDivideAssign, Lexer::sReverseRemainderAssign, Lexer::sReverseAlternateDivideAssign, Lexer::sShiftLeftAssign, Lexer::sShiftRightAssign, Lexer::sRotateLeftAssign, Lexer::sRotateRightAssign}) or expect(Lexer::TokenType::reserved, {Lexer::rAnd_eq, Lexer::rOr_eq, Lexer::rXor_eq, Lexer::rNand_eq, Lexer::rNor_eq, Lexer::rNxor_eq}))
             {}
-            else if (assignment_exp(FailureCase{true, "Expected \033[48;2;10;6;26;32;1mdefault\033[0m, an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m, \033[48;2;10;6;26;32;1miter_no_end\033[0m, a \033[48;2;10;6;26;32;1m<relational_op>\033[0m or an \033[48;2;10;6;26;32;1m<assignment_op>\033[0m", "in \033[48;2;10;6;26;36;1m<param_iterArg_assoc>\033[0m's BNF syntax"}))
+            else if (assignment_exp(FailureCase{true, "Expected \033[32;1mdefault\033[0m, an \033[32;1m<assignment_exp>\033[0m, \033[32;1miter_no_end\033[0m, a \033[32;1m<relational_op>\033[0m or an \033[32;1m<assignment_op>\033[0m", "in \033[36;1m<param_iterArg_assoc>\033[0m's BNF syntax"}))
             {}
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_iterArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> '::=' \033[48;2;10;6;26;31;1m'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_iterArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> '::=' \033[31;1m'default'|<assignment_exp>|'iter_no_end'|<relational_op>|<assignment_op>\033[0m"), additionalLog();
             }
             
             return true;
@@ -1279,11 +1416,11 @@ namespace Nc
 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!assignment_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<pipe_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<comma_exp>\033[0m's BNF syntax"}))
+                if (!assignment_exp(FailureCase{true, "Expected a \033[32;1m<pipe_exp>\033[0m", "in \033[36;1m<comma_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<comma_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <pipe_exp> {',' \033[48;2;10;6;26;31;1m<pipe_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<comma_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <assignment_exp> {',' \033[31;1m<assignment_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1309,11 +1446,11 @@ namespace Nc
 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!assignment_exp(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<assignment_exp>\033[0m's BNF syntax"}))
+                if (!assignment_exp(FailureCase{true, "Expected an \033[32;1m<assignment_exp>\033[0m", "in \033[36;1m<assignment_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<assignment_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <pipe_exp> [':='|'::='|'+='|'-='|'*='|'/='|'%='|'^='|'=-'|'=/'|'=%'|'=÷'|'<<='|'>>='|'<<<='|'>>>='|'and_eq'|'or_eq'|'xor_eq'|'nand_eq'|'nor_eq'|'nxor_eq' \033[48;2;10;6;26;31;1m<assignment_exp>\033[0m]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<assignment_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <pipe_exp> [':='|'::='|'+='|'-='|'*='|'/='|'%='|'^='|'=-'|'=/'|'=%'|'=÷'|'<<='|'>>='|'<<<='|'>>>='|'and_eq'|'or_eq'|'xor_eq'|'nand_eq'|'nor_eq'|'nxor_eq' \033[31;1m<assignment_exp>\033[0m]"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1339,11 +1476,11 @@ namespace Nc
 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!conditional_exp(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<conditional_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<pipe_exp>\033[0m's BNF syntax"}))
+                if (!conditional_exp(FailureCase{true, "Expected an \033[32;1m<conditional_exp>\033[0m", "in \033[36;1m<pipe_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<pipe_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <conditional_exp> {'|' \033[48;2;10;6;26;31;1m<conditional_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<pipe_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <conditional_exp> {'|' \033[31;1m<conditional_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1371,11 +1508,11 @@ namespace Nc
 
                 std::optional<std::size_t> optional_savedLparenTokenDataIndex{};
 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<conditional_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <logical_exp> ['?' \033[48;2;10;6;26;31;1m'('\033[0m  <expression>|<jump_statement> [':' <expression>|<jump_statement>] ')']"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <logical_exp> ['?' \033[31;1m'('\033[0m  <expression>|<jump_statement> [':' <expression>|<jump_statement>] ')']"), additionalLog();
                 }
                 else
                 optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
@@ -1384,11 +1521,11 @@ namespace Nc
                 {
                     
                 }
-                else if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m or a \033[48;2;10;6;26;32;1m<jump_statement>\033[0m", "to be used as the expression that gets executed if the condition is true in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax"}))
+                else if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m or a \033[32;1m<jump_statement>\033[0m", "to be used as the expression that gets executed if the condition is true in \033[36;1m<conditional_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <logical_exp> ['?' '('  \033[48;2;10;6;26;31;1m<expression>|<jump_statement>\033[0m [':' <expression>|<jump_statement>] ')']"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <logical_exp> ['?' '('  \033[31;1m<expression>|<jump_statement>\033[0m [':' <expression>|<jump_statement>] ')']"), additionalLog();
                 }
 
                 // Expression leftExp{};
@@ -1400,22 +1537,22 @@ namespace Nc
                     {
                         
                     }
-                    else if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m or a \033[48;2;10;6;26;32;1m<jump_statement>\033[0m", "to be used as the expression that gets executed if the condition is false in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax"}))
+                    else if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m or a \033[32;1m<jump_statement>\033[0m", "to be used as the expression that gets executed if the condition is false in \033[36;1m<conditional_exp>\033[0m's BNF syntax"}))
                     {
                         afterTokenLog(), spaceLog();
-                        m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
-                        m_log.write("   <logical_exp> ['?' '('  <expression>|<jump_statement> [':' \033[48;2;10;6;26;31;1m<expression>|<jump_statement>\033[0m] ')']"), additionalLog();
+                        m_log.write("   The missing entity is highlighted below in \033[36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   <logical_exp> ['?' '('  <expression>|<jump_statement> [':' \033[31;1m<expression>|<jump_statement>\033[0m] ')']"), additionalLog();
                     }
                 }
                 
-                if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax"}))
+                if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<conditional_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog();
                     if (optional_savedLparenTokenDataIndex.has_value()) missingBraceLog(optional_savedLparenTokenDataIndex.value());
                     
                     spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <logical_exp> ['?' '('  <expression>|<jump_statement> [':' <expression>|<jump_statement>] \033[48;2;10;6;26;31;1m')'\033[0m]"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<conditional_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <logical_exp> ['?' '('  <expression>|<jump_statement> [':' <expression>|<jump_statement>] \033[31;1m')'\033[0m]"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1441,11 +1578,11 @@ namespace Nc
 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!equality_exp(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<equality_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<logical_exp>\033[0m's BNF syntax"}))
+                if (!equality_exp(FailureCase{true, "Expected an \033[32;1m<equality_exp>\033[0m", "in \033[36;1m<logical_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<logical_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <equality_exp> {'='|'!='|'≠' \033[48;2;10;6;26;31;1m<equality_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<logical_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <equality_exp> {'='|'!='|'≠' \033[31;1m<equality_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1471,11 +1608,11 @@ namespace Nc
 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!relational_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<relational_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<equality_exp>\033[0m's BNF syntax"}))
+                if (!relational_exp(FailureCase{true, "Expected a \033[32;1m<relational_exp>\033[0m", "in \033[36;1m<equality_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<equality_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <relational_exp> {'='|'!='|'≠' \033[48;2;10;6;26;31;1m<relational_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<equality_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <relational_exp> {'='|'!='|'≠' \033[31;1m<relational_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1501,11 +1638,11 @@ namespace Nc
 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!shift_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<shift_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<relational_exp>\033[0m's BNF syntax"}))
+                if (!shift_exp(FailureCase{true, "Expected a \033[32;1m<shift_exp>\033[0m", "in \033[36;1m<relational_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<relational_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <shift_exp> {'<'|'>'|'<='|'>='|'≤'|'≥' \033[48;2;10;6;26;31;1m<shift_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<relational_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <shift_exp> {'<'|'>'|'<='|'>='|'≤'|'≥' \033[31;1m<shift_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1531,11 +1668,11 @@ namespace Nc
 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!additive_exp(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<additive_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<shift_exp>\033[0m's BNF syntax"}))
+                if (!additive_exp(FailureCase{true, "Expected an \033[32;1m<additive_exp>\033[0m", "in \033[36;1m<shift_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<shift_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <additive_exp> {'<<'|'>>'|'<<<'|'>>>' \033[48;2;10;6;26;31;1m<additive_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<shift_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <additive_exp> {'<<'|'>>'|'<<<'|'>>>' \033[31;1m<additive_exp>\033[0m}"), additionalLog();
                 }
                 
                 // Expression rightExp{};
@@ -1561,11 +1698,11 @@ namespace Nc
                 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!multiplicative_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<multiplicative_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<aditive_exp>\033[0m's BNF syntax"}))
+                if (!multiplicative_exp(FailureCase{true, "Expected a \033[32;1m<multiplicative_exp>\033[0m", "in \033[36;1m<aditive_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<additive_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <multiplicative_exp> {'+'|'-' \033[48;2;10;6;26;31;1m<multiplicative_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<additive_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <multiplicative_exp> {'+'|'-' \033[31;1m<multiplicative_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1591,11 +1728,11 @@ namespace Nc
                 
                 // U8string b_op{m_currentTokenData.get().token};
                 
-                if (!exponention_exp(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<exponention_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<multiplicative_exp>\033[0m's BNF syntax"}))
+                if (!exponention_exp(FailureCase{true, "Expected an \033[32;1m<exponention_exp>\033[0m", "in \033[36;1m<multiplicative_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<multiplicative_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <exponention_exp> {'*'|'/'|'%'|'/%'|'÷' \033[48;2;10;6;26;31;1m<exponention_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<multiplicative_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <exponention_exp> {'*'|'/'|'%'|'/%'|'÷' \033[31;1m<exponention_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1621,11 +1758,11 @@ namespace Nc
                 
                 // U8string b_op{m_currentTokenData.get().token};
                 
-                if (!member_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<member_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<exponention_exp>\033[0m's BNF syntax"}))
+                if (!member_exp(FailureCase{true, "Expected a \033[32;1m<member_exp>\033[0m", "in \033[36;1m<exponention_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<exponention_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <member_exp> {'^' \033[48;2;10;6;26;31;1m<member_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<exponention_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <member_exp> {'^' \033[31;1m<member_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1651,11 +1788,11 @@ namespace Nc
                 
                 // U8string b_op{m_currentTokenData.get().token};
 
-                if (!prefix_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<prefix_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<member_exp>\033[0m's BNF syntax"}))
+                if (!prefix_exp(FailureCase{true, "Expected a \033[32;1m<prefix_exp>\033[0m", "in \033[36;1m<member_exp>\033[0m's BNF syntax"}))
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<member_exp>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <prefix_exp> {'.'|'->' \033[48;2;10;6;26;31;1m<prefix_exp>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<member_exp>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <prefix_exp> {'.'|'->' \033[31;1m<prefix_exp>\033[0m}"), additionalLog();
                 }
 
                 // Expression rightExp{};
@@ -1672,15 +1809,15 @@ namespace Nc
 
     bool Parser::prefix_exp(const FailureCase& fc)
     {
-        if (expect(Lexer::TokenType::symbol, {Lexer::sMinus, Lexer::sNot, Lexer::sNot, Lexer::sIncrement, Lexer::sDecrement, Lexer::sCommercialAt, Lexer::sAmperSand, Lexer::sDollarSign}) or expect(Lexer::TokenType::reserved, {Lexer::rNot, Lexer::rNot, Lexer::rOdd, Lexer::rMv, Lexer::rCp, Lexer::rImut_lref, Lexer::rMut_lref}))
+        if (expect(Lexer::TokenType::symbol, {Lexer::sMinus, Lexer::sNot, Lexer::sIncrement, Lexer::sDecrement, Lexer::sAmperSand, Lexer::sMultiply}) or expect(Lexer::TokenType::reserved, {Lexer::rNot, Lexer::rOdd, Lexer::rCp, Lexer::rImut, Lexer::rMem}))
         {
             // U8string u_op{m_currentTokenData.get().token};
 
-            if (!prefix_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<prefix_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<prefix_exp>\033[0m's BNF syntax"}))
+            if (!prefix_exp(FailureCase{true, "Expected a \033[32;1m<prefix_exp>\033[0m", "in \033[36;1m<prefix_exp>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<prefix_exp>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   ('-'|'!'|'+'|'odd'|'++'|'--'|'$'|'&'|'mv'|'cp'|'mut_lref'|'imut_lref' \033[48;2;10;6;26;31;1m<prefix_exp>\033[0m)|<postfix_exp>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<prefix_exp>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   ('-'|'!'|'+'|'odd'|'++'|'--'|'*'|'&'|'cp'|'imut'|'mem' \033[31;1m<prefix_exp>\033[0m)|<postfix_exp>"), additionalLog();
             }
 
             // Expression rightExp{};
@@ -1729,11 +1866,11 @@ namespace Nc
                     // LocationFinder locFinder{ makeLocFinder(loc.first.first, loc.second.first, tokenData.absoluteColumn) };
                     // m_ast.mkUpostfixOpNode(leftExp, m_ast._getExpressionList(), locFinder);
 
-                    if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<postfix_exp>\033[0m's BNF syntax"}))
+                    if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<postfix_exp>\033[0m's BNF syntax"}))
                     {
                         afterTokenLog(), missingBraceLog(savedLparenTokenDataIndex), spaceLog();
-                        m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<postfix_exp>\033[0m's BNF syntax:"), additionalLog();
-                        m_log.write("   <primary_exp> {'++'|'--'|'('[<expArg_list>]\033[48;2;10;6;26;31;1m')'\033[0m'['[<expArg_list>]']'}"), additionalLog();
+                        m_log.write("   The missing entity is highlighted below in \033[36;1m<postfix_exp>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   <primary_exp> {'++'|'--'|'('[<expArg_list>]\033[31;1m')'\033[0m'['[<expArg_list>]']'}"), additionalLog();
                     }
                 }
                 else if (expect(Lexer::TokenType::symbol, {Lexer::sLsquare}))
@@ -1750,11 +1887,11 @@ namespace Nc
                     // LocationFinder locFinder{ makeLocFinder(loc.first.first, loc.second.first, tokenData.absoluteColumn) };
                     // m_ast.mkUpostfixOpNode(leftExp, m_ast._getExpressionList(), locFinder);
 
-                    if (!expect(Lexer::TokenType::symbol, {Lexer::sRsquare}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<postfix_exp>\033[0m's BNF syntax"}))
+                    if (!expect(Lexer::TokenType::symbol, {Lexer::sRsquare}, FailureCase{true, {}, "in \033[36;1m<postfix_exp>\033[0m's BNF syntax"}))
                     {
                         afterTokenLog(), missingBraceLog(savedLsquareTokenDataIndex), spaceLog();
-                        m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<postfix_exp>\033[0m's BNF syntax:"), additionalLog();
-                        m_log.write("   <primary_exp> {'++'|'--'|'('[<expArg_list>]')''['[<expArg_list>]\033[48;2;10;6;26;31;1m']'\033[0m}"), additionalLog();
+                        m_log.write("   The missing entity is highlighted below in \033[36;1m<postfix_exp>\033[0m's BNF syntax:"), additionalLog();
+                        m_log.write("   <primary_exp> {'++'|'--'|'('[<expArg_list>]')''['[<expArg_list>]\033[31;1m']'\033[0m}"), additionalLog();
                     }
                 }
                 else
@@ -1771,7 +1908,7 @@ namespace Nc
         {
             auto savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
-            if (!expression(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expression>\033[0m", "inside the parenthesis operator"}))
+            if (!expression(FailureCase{true, "Expected an \033[32;1m<expression>\033[0m", "inside the parenthesis operator"}))
             afterTokenLog();
             
             if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "when using the parenthesis operator"}))
@@ -1779,7 +1916,7 @@ namespace Nc
 
             return true;
         }
-        else if (r_l() or block() or special_ident() or object_exp() or function_exp())
+        else if (r_l() or block() or special_ident() or object_exp() or function_exp() or reserved_exp_ident())
         {
             return true;
         }
@@ -1802,11 +1939,11 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::symbol, {Lexer::sScopeResolution}))
         {
-            if (expect(Lexer::TokenType::reserved, {Lexer::rInput, Lexer::rOutput, Lexer::rTcast, Lexer::rBcast, Lexer::rPanic, Lexer::rNone, Lexer::rNullptr}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<reserved_exp_ident>\033[0m's BNF syntax"}))
+            if (expect(Lexer::TokenType::reserved, {Lexer::rTcast, Lexer::rBcast, Lexer::rNone, Lexer::rMe}, FailureCase{true, {}, "in \033[36;1m<reserved_exp_ident>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<special_ident>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   ['::'] \033[48;2;10;6;26;31;1m'input'|'output'|'tcast'|'bcast'|'panic'|'none'|'nullptr'\033[0m [<tal_encapsulation>]"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<reserved_exp_ident>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   ['::'] \033[31;1m'tcast'|'bcast'|'none'|'me'\033[0m [<tal_encapsulation>]"), additionalLog();
             }
             else
             {
@@ -1814,7 +1951,7 @@ namespace Nc
             }
             return true;
         }
-        else if (expect(Lexer::TokenType::reserved, {Lexer::rInput, Lexer::rOutput, Lexer::rTcast, Lexer::rBcast, Lexer::rPanic, Lexer::rNone, Lexer::rNullptr}, fc))
+        else if (expect(Lexer::TokenType::reserved, {Lexer::rTcast, Lexer::rBcast, Lexer::rNone, Lexer::rMe}, fc))
         {
             tal_encapsulation();
 
@@ -1825,17 +1962,17 @@ namespace Nc
 
     bool Parser::arg(const FailureCase& fc)
     {
-        if (expect(Lexer::TokenType::symbol, {Lexer::sHashedLparen}, fc))
+        if (expect(Lexer::TokenType::symbol, {Lexer::sDollarSignLparen}, fc))
         {
             auto savedHashedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
             expArg_list();
 
-            if (expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<arg>\033[0m's BNF syntax"}))
+            if (expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<arg>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), missingBraceLog(savedHashedLparenTokenDataIndex), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<arg>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '#('[<expArg_list>]\033[48;2;10;6;26;36;1m')'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<arg>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '$('[<expArg_list>]\033[36;1m')'\033[0m"), additionalLog();
             }
             return true;
         }
@@ -1844,7 +1981,7 @@ namespace Nc
 
     bool Parser::fromType(const FailureCase& fc)
     {
-        if (expect(Lexer::TokenType::reserved, {Lexer::rFromType}) or expect(Lexer::TokenType::symbol, {Lexer::sCommercialAt}, fc))
+        if (expect(Lexer::TokenType::symbol, {Lexer::sCommercialAt}, fc))
         {
             if (expect(Lexer::TokenType::identifier, {}))
             {
@@ -1852,13 +1989,13 @@ namespace Nc
             }
             else if (_typeof())
             {}
-            else if (function_signature(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<typeof>\033[0m, an \033[48;2;10;6;26;32;1m<identifier>\033[0m or a \033[48;2;10;6;26;32;1m<function_signature>\033[0m", "in \033[48;2;10;6;26;36;1m<fromType>\033[0m's BNF syntax"}))
+            else if (function_signature(FailureCase{true, "Expected a \033[32;1m<typeof>\033[0m, an \033[32;1m<identifier>\033[0m or a \033[32;1m<function_signature>\033[0m", "in \033[36;1m<fromType>\033[0m's BNF syntax"}))
             {}
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<fromType>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fromType'|'@' \033[48;2;10;6;26;31;1m<typeof>|<identifier>[<tal_encapsulation>]|<function_signature>\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<fromType>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fromType'|'@' \033[31;1m<typeof>|<identifier>[<tal_encapsulation>]|<function_signature>\033[0m"), additionalLog();
             }
             return true;
         }
@@ -1874,14 +2011,14 @@ namespace Nc
             {
                 tal_encapsulation();
             }
-            else if (fromType(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<identifier>\033[0m or a \033[48;2;10;6;26;32;1m<fromType>\033[0m", "in \033[48;2;10;6;26;36;1m<special_ident>\033[0m's BNF syntax"}))
+            else if (fromType(FailureCase{true, "Expected an \033[32;1m<identifier>\033[0m or a \033[32;1m<fromType>\033[0m", "in \033[36;1m<special_ident>\033[0m's BNF syntax"}))
             {
             }
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<special_ident>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   ['::'] \033[48;2;10;6;26;31;1m<identifier>[<tal_encapsulation>]|<fromType>\033[0m {'::' <identifier>[<tal_encapsulation>]|<fromType>}"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<special_ident>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   ['::'] \033[31;1m<identifier>[<tal_encapsulation>]|<fromType>\033[0m {'::' <identifier>[<tal_encapsulation>]|<fromType>}"), additionalLog();
             }
 
             result = true;
@@ -1904,14 +2041,14 @@ namespace Nc
                 {
                     tal_encapsulation();
                 }
-                else if (fromType(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<identifier>\033[0m or a \033[48;2;10;6;26;32;1m<fromType>\033[0m", "in \033[48;2;10;6;26;36;1m<special_ident>\033[0m's BNF syntax"}))
+                else if (fromType(FailureCase{true, "Expected an \033[32;1m<identifier>\033[0m or a \033[32;1m<fromType>\033[0m", "in \033[36;1m<special_ident>\033[0m's BNF syntax"}))
                 {
                 }
                 else
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<special_ident>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   ['::'] <identifier>[<tal_encapsulation>]|<fromType> {'::' \033[48;2;10;6;26;31;1m<identifier>[<tal_encapsulation>]|<fromType>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<special_ident>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   ['::'] <identifier>[<tal_encapsulation>]|<fromType> {'::' \033[31;1m<identifier>[<tal_encapsulation>]|<fromType>\033[0m}"), additionalLog();
                 }
             }
             return true;
@@ -1924,11 +2061,11 @@ namespace Nc
         if (m_hasType or prefix_type(fc))
         {
             m_hasType = false;
-            if (!initializer(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<initializer>\033[0m", "in \033[48;2;10;6;26;36;1m<object_exp>\033[0m's BNF syntax"}))
+            if (!initializer(FailureCase{true, "Expected an \033[32;1m<initializer>\033[0m", "in \033[36;1m<object_exp>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<object_exp>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   <prefix_type>\033[48;2;10;6;26;31;1m<initializer>\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<object_exp>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   <prefix_type>\033[31;1m<initializer>\033[0m"), additionalLog();
             }
             
             return true;
@@ -1942,36 +2079,36 @@ namespace Nc
         {
             std::optional<std::size_t> optional_savedLparenTokenDataIndex{};
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<function_exp>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<function_exp>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_exp>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' \033[48;2;10;6;26;31;1m'('\033[0m[<func_param_list>]')' [<optPrefix_type>] <block>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_exp>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' \033[31;1m'('\033[0m[<func_param_list>]')' [<optPrefix_type>] <block>"), additionalLog();
             }
             else
             optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
             func_param_list();
             
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<function_exp>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<function_exp>\033[0m's BNF syntax"}))
             {
                 afterTokenLog();
                 if (optional_savedLparenTokenDataIndex.has_value()) missingBraceLog(optional_savedLparenTokenDataIndex.value());
 
                 spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_exp>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' '('[<func_param_list>]\033[48;2;10;6;26;31;1m')'\033[0m [<optPrefix_type>] <block>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_exp>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' '('[<func_param_list>]\033[31;1m')'\033[0m [<optPrefix_type>] <block>"), additionalLog();
             }
 
             // Type giveType{};
             
             if (optPrefix_type()){}
 
-            if (!block(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<block>\033[0m", "in \033[48;2;10;6;26;36;1m<function_exp>\033[0m's BNF syntax"}))
+            if (!block(FailureCase{true, "Expected a \033[32;1m<block>\033[0m", "in \033[36;1m<function_exp>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<function_exp>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'fn' '('[<func_param_list>]')' [<optPrefix_type>] \033[48;2;10;6;26;31;1m<block>\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<function_exp>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'fn' '('[<func_param_list>]')' [<optPrefix_type>] \033[31;1m<block>\033[0m"), additionalLog();
             }
             // m_ast.mkFunctionDefNode(giveType, funcIdent, m_ast._getParameterList(), m_ast.getBlockNode());
             // m_ast.makeFuncDeclarationNode();
@@ -2010,14 +2147,14 @@ namespace Nc
                 else if (param_expArg_assoc())
                 {
                 }
-                else if (assignment_exp(FailureCase{true, "Expected \033[48;2;10;6;26;32;1mdefault\033[0m, an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m, \033[48;2;10;6;26;32;1m_v\033[0m, \033[48;2;10;6;26;32;1mv_\033[0m or a \033[48;2;10;6;26;32;1m<param_expArg_assoc>\033[0m", "in \033[48;2;10;6;26;36;1m<expArg_list>\033[0m's BNF syntax"}))
+                else if (assignment_exp(FailureCase{true, "Expected \033[32;1mdefault\033[0m, an \033[32;1m<assignment_exp>\033[0m, \033[32;1m_v\033[0m, \033[32;1mv_\033[0m or a \033[32;1m<param_expArg_assoc>\033[0m", "in \033[36;1m<expArg_list>\033[0m's BNF syntax"}))
                 {
                 }
                 else
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<expArg_list>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'default'|<assignment_exp>|'_v'|'v_'|<param_expArg_assoc> {',' \033[48;2;10;6;26;31;1m'default'|<assignment_exp>|'_v'|'v_'|<param_expArg_assoc>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<expArg_list>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'default'|<assignment_exp>|'_v'|'v_'|<param_expArg_assoc> {',' \033[31;1m'default'|<assignment_exp>|'_v'|'v_'|<param_expArg_assoc>\033[0m}"), additionalLog();
                 }
 
                 // m_ast.makeExpNode(), expList.push_back(std::move(m_ast.getExpNode()));
@@ -2034,29 +2171,29 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::symbol, {Lexer::sMemberOf}, fc))
         {
-            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_expArg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<param_expArg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_expArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'\033[48;2;10;6;26;31;1m<identifier>\033[0m '::=' 'default'|<assignment_exp>|'_v'|'v_'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_expArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'\033[31;1m<identifier>\033[0m '::=' 'default'|<assignment_exp>|'_v'|'v_'"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_expArg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[36;1m<param_expArg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_expArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> \033[48;2;10;6;26;31;1m'::='\033[0m 'default'|<assignment_exp>|'_v'|'v_'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_expArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> \033[31;1m'::='\033[0m 'default'|<assignment_exp>|'_v'|'v_'"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::reserved, {Lexer::rDefault, Lexer::rVarg_start, Lexer::rVarg_end}))
             {}
-            else if (assignment_exp(FailureCase{true, "Expected \033[48;2;10;6;26;32;1mdefault\033[0m, an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m, \033[48;2;10;6;26;32;1m_v\033[0m or \033[48;2;10;6;26;32;1mv_\033[0m", "in \033[48;2;10;6;26;36;1m<param_expArg_assoc>\033[0m's BNF syntax"}))
+            else if (assignment_exp(FailureCase{true, "Expected \033[32;1mdefault\033[0m, an \033[32;1m<assignment_exp>\033[0m, \033[32;1m_v\033[0m or \033[32;1mv_\033[0m", "in \033[36;1m<param_expArg_assoc>\033[0m's BNF syntax"}))
             {}
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_expArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> '::=' \033[48;2;10;6;26;31;1m'default'|<assignment_exp>|'_v'|'v_'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_expArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> '::=' \033[31;1m'default'|<assignment_exp>|'_v'|'v_'\033[0m"), additionalLog();
             }
             
             return true;
@@ -2071,11 +2208,11 @@ namespace Nc
             auto savedLangleTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
             typeArg_list();
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sGreaterthan}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<tal_encapsulation>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sGreaterthan}, FailureCase{true, {}, "in \033[36;1m<tal_encapsulation>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), missingBraceLog(savedLangleTokenDataIndex), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<tal_encapsulation>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '<'[<typeArg_list>]\033[48;2;10;6;26;31;1m'>'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<tal_encapsulation>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '<'[<typeArg_list>]\033[31;1m'>'\033[0m"), additionalLog();
             }
             return true;
         }
@@ -2113,14 +2250,14 @@ namespace Nc
                 {
                     
                 }
-                else if (optPrefix_type(FailureCase{true, "Expected \033[48;2;10;6;26;32;1mdefault\033[0m, a \033[48;2;10;6;26;32;1m<optPrefix_type>\033[0m, \033[48;2;10;6;26;32;1m_v\033[0m, \033[48;2;10;6;26;32;1mv_\033[0m or a \033[48;2;10;6;26;32;1m<param_typeArg_assoc>\033[0m", "in \033[48;2;10;6;26;36;1m<typeArg_list>\033[0m's BNF syntax"}))
+                else if (optPrefix_type(FailureCase{true, "Expected \033[32;1mdefault\033[0m, a \033[32;1m<optPrefix_type>\033[0m, \033[32;1m_v\033[0m, \033[32;1mv_\033[0m or a \033[32;1m<param_typeArg_assoc>\033[0m", "in \033[36;1m<typeArg_list>\033[0m's BNF syntax"}))
                 {
                 }
                 else
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<typeArg_list>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   'default'|<optPrefix_type>|'_v'|'v_'|<param_typeArg_assoc> {',' \033[48;2;10;6;26;31;1m'default'|<optPrefix_type>|'_v'|'v_'|<param_typeArg_assoc>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<typeArg_list>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   'default'|<optPrefix_type>|'_v'|'v_'|<param_typeArg_assoc> {',' \033[31;1m'default'|<optPrefix_type>|'_v'|'v_'|<param_typeArg_assoc>\033[0m}"), additionalLog();
                 }
                 
 
@@ -2138,29 +2275,29 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::symbol, {Lexer::sMemberOf}, fc))
         {
-            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_typeArg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<param_typeArg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_typeArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'\033[48;2;10;6;26;31;1m<identifier>\033[0m '::=' 'default'|<optPrefix_type>|'_v'|'v_'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_typeArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'\033[31;1m<identifier>\033[0m '::=' 'default'|<optPrefix_type>|'_v'|'v_'"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_typeArg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[36;1m<param_typeArg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_typeArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> \033[48;2;10;6;26;31;1m'::='\033[0m 'default'|<optPrefix_type>|'_v'|'v_'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_typeArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> \033[31;1m'::='\033[0m 'default'|<optPrefix_type>|'_v'|'v_'"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::reserved, {Lexer::rDefault, Lexer::rVarg_start, Lexer::rVarg_end}))
             {}
-            else if (optPrefix_type(FailureCase{true, "Expected \033[48;2;10;6;26;32;1mdefault\033[0m, an \033[48;2;10;6;26;32;1m<optPrefix_type>\033[0m, \033[48;2;10;6;26;32;1m_v\033[0m or \033[48;2;10;6;26;32;1mv_\033[0m", "in \033[48;2;10;6;26;36;1m<param_typeArg_assoc>\033[0m's BNF syntax"}))
+            else if (optPrefix_type(FailureCase{true, "Expected \033[32;1mdefault\033[0m, an \033[32;1m<optPrefix_type>\033[0m, \033[32;1m_v\033[0m or \033[32;1mv_\033[0m", "in \033[36;1m<param_typeArg_assoc>\033[0m's BNF syntax"}))
             {}
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_typeArg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> '::=' \033[48;2;10;6;26;31;1m'default'|<optPrefix_type>|'_v'|'v_'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_typeArg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> '::=' \033[31;1m'default'|<optPrefix_type>|'_v'|'v_'\033[0m"), additionalLog();
             }
             
             return true;
@@ -2174,55 +2311,55 @@ namespace Nc
         {
             std::optional<std::size_t> optional_savedLparenTokenDataIndex{};
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<r_l>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'r_l' \033[48;2;10;6;26;31;1m'('\033[0m<r_l_arg_list>')' '('<expArg_list>')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'r_l' \033[31;1m'('\033[0m<r_l_arg_list>')' '('<expArg_list>')'"), additionalLog();
             }
             else
             optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
 
-            if (!r_l_arg_list(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<r_l_arg_list>\033[0m", "in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax"}))
+            if (!r_l_arg_list(FailureCase{true, "Expected an \033[32;1m<r_l_arg_list>\033[0m", "in \033[36;1m<r_l>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'r_l' '('\033[48;2;10;6;26;31;1m<r_l_arg_list>\033[0m')' '('<expArg_list>')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'r_l' '('\033[31;1m<r_l_arg_list>\033[0m')' '('<expArg_list>')'"), additionalLog();
             }
 
             // m_ast.makeExpNode();
             // auto exp = std::move(m_ast.getExpNode());
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<r_l>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), missingBraceLog(optional_savedLparenTokenDataIndex.value_or(0)), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'r_l' '('<r_l_arg_list>\033[48;2;10;6;26;31;1m')'\033[0m '('<expArg_list>')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'r_l' '('<r_l_arg_list>\033[31;1m')'\033[0m '('<expArg_list>')'"), additionalLog();
 
                 optional_savedLparenTokenDataIndex.reset();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sLparen}, FailureCase{true, {}, "in \033[36;1m<r_l>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'r_l' '('<r_l_arg_list>')' \033[48;2;10;6;26;31;1m'('\033[0m<expArg_list>')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'r_l' '('<r_l_arg_list>')' \033[31;1m'('\033[0m<expArg_list>')'"), additionalLog();
             }
             else
             optional_savedLparenTokenDataIndex = m_isEndofTokenList? m_currentTokenDataIndex : m_currentTokenDataIndex - 1;
             
-            if (!expArg_list(FailureCase{true, "Expected an \033[48;2;10;6;26;32;1m<expArg_list>\033[0m", "in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax"}))
+            if (!expArg_list(FailureCase{true, "Expected an \033[32;1m<expArg_list>\033[0m", "in \033[36;1m<r_l>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'r_l' '('<r_l_arg_list>')' '('\033[48;2;10;6;26;31;1m<expArg_list>\033[0m')'"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'r_l' '('<r_l_arg_list>')' '('\033[31;1m<expArg_list>\033[0m')'"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sRparen}, FailureCase{true, {}, "in \033[36;1m<r_l>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), missingBraceLog(optional_savedLparenTokenDataIndex.value_or(0)), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   'r_l' '('<r_l_arg_list>')' '('<expArg_list>\033[48;2;10;6;26;31;1m')'\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<r_l>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   'r_l' '('<r_l_arg_list>')' '('<expArg_list>\033[31;1m')'\033[0m"), additionalLog();
             }
 
             // m_ast.mkR_And_L_Exp_Node(relationalOp, logicalOp, exp, m_ast._getExpressionList());
@@ -2261,13 +2398,13 @@ namespace Nc
                 }
                 else if (param_r_l_arg_assoc())
                 {}
-                else if (assignment_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<relational_op>\033[0m, a \033[48;2;10;6;26;32;1m<logical_op>\033[0m, an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m or a \033[48;2;10;6;26;32;1m<param_r_l_arg_assoc>\033[0m", "in \033[48;2;10;6;26;36;1m<r_l_arg_list>\033[0m's BNF syntax"}))
+                else if (assignment_exp(FailureCase{true, "Expected a \033[32;1m<relational_op>\033[0m, a \033[32;1m<logical_op>\033[0m, an \033[32;1m<assignment_exp>\033[0m or a \033[32;1m<param_r_l_arg_assoc>\033[0m", "in \033[36;1m<r_l_arg_list>\033[0m's BNF syntax"}))
                 {}
                 else
                 {
                     afterTokenLog(), spaceLog();
-                    m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<r_l_arg_list>\033[0m's BNF syntax:"), additionalLog();
-                    m_log.write("   <relational_op>|<logical_op>|<assignment_exp>|<param_r_l_arg_assoc> {',' \033[48;2;10;6;26;31;1m<relational_op>|<logical_op>|<assignment_exp>|<param_r_l_arg_assoc>\033[0m}"), additionalLog();
+                    m_log.write("   The missing entity is highlighted below in \033[36;1m<r_l_arg_list>\033[0m's BNF syntax:"), additionalLog();
+                    m_log.write("   <relational_op>|<logical_op>|<assignment_exp>|<param_r_l_arg_assoc> {',' \033[31;1m<relational_op>|<logical_op>|<assignment_exp>|<param_r_l_arg_assoc>\033[0m}"), additionalLog();
                 }
             }
             return true;
@@ -2279,18 +2416,18 @@ namespace Nc
     {
         if (expect(Lexer::TokenType::symbol, {Lexer::sMemberOf}, fc))
         {
-            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::identifier, {}, FailureCase{true, {}, "in \033[36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'\033[48;2;10;6;26;31;1m<identifier>\033[0m '::=' <relational_op>|<logical_op>|<assignment_exp>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'\033[31;1m<identifier>\033[0m '::=' <relational_op>|<logical_op>|<assignment_exp>"), additionalLog();
             }
 
-            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[48;2;10;6;26;36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax"}))
+            if (!expect(Lexer::TokenType::symbol, {Lexer::sInitAssign}, FailureCase{true, {}, "in \033[36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax"}))
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> \033[48;2;10;6;26;31;1m'::='\033[0m <relational_op>|<logical_op>|<assignment_exp>"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> \033[31;1m'::='\033[0m <relational_op>|<logical_op>|<assignment_exp>"), additionalLog();
             }
 
             if (expect(Lexer::TokenType::symbol, {Lexer::sEqual, Lexer::sNotEqual, Lexer::sAlternateNotEqual, Lexer::sLessthan, Lexer::sGreaterthan, Lexer::sLessThan_equalTo, Lexer::sGreaterThan_equalTo, Lexer::sAlternateLessThan_equalTo, Lexer::sAlternateGreaterThan_equalTo}))
@@ -2301,13 +2438,13 @@ namespace Nc
             {
                 
             }
-            else if (assignment_exp(FailureCase{true, "Expected a \033[48;2;10;6;26;32;1m<relational_op>\033[0m, a \033[48;2;10;6;26;32;1m<logical_op>\033[0m or an \033[48;2;10;6;26;32;1m<assignment_exp>\033[0m", "in \033[48;2;10;6;26;36;1m<r_l_arg_list>\033[0m's BNF syntax"}))
+            else if (assignment_exp(FailureCase{true, "Expected a \033[32;1m<relational_op>\033[0m, a \033[32;1m<logical_op>\033[0m or an \033[32;1m<assignment_exp>\033[0m", "in \033[36;1m<r_l_arg_list>\033[0m's BNF syntax"}))
             {}
             else
             {
                 afterTokenLog(), spaceLog();
-                m_log.write("   The missing entity is highlighted below in \033[48;2;10;6;26;36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax:"), additionalLog();
-                m_log.write("   '.'<identifier> '::=' \033[48;2;10;6;26;31;1m<relational_op>|<logical_op>|<assignment_exp>\033[0m"), additionalLog();
+                m_log.write("   The missing entity is highlighted below in \033[36;1m<param_r_l_arg_assoc>\033[0m's BNF syntax:"), additionalLog();
+                m_log.write("   '.'<identifier> '::=' \033[31;1m<relational_op>|<logical_op>|<assignment_exp>\033[0m"), additionalLog();
             }
             return true;
         }
@@ -2347,49 +2484,6 @@ namespace Nc
     }
 
 
-    bool Parser::errorRecoveryStep_altruism(std::list<Entity> next_expected_token)
-    {
-        auto result = false;
-
-        for (auto &&i : next_expected_token)
-        {
-            std::visit([&]<typename T>(T& entity){
-                if constexpr (std::is_same_v<T, ProductionRule>)
-                {
-                    switch (entity)
-                    {
-                        case ProductionRule::expression:
-                        {
-                            if (!m_currentTokenData.get().literalType.empty() or m_currentTokenData.get().isIdentifier)
-                            return true;
-                            else if (m_currentTokenData.get().isReserved)
-                            {
-                                if (m_currentTokenData.get().token == Lexer::rR_l or m_currentTokenData.get().token == Lexer::rFn)
-                                return true;
-                            }
-                            else if (m_currentTokenData.get().isSymbol)
-                            {
-                                if (m_currentTokenData.get().token == Lexer::sLparen or m_currentTokenData.get().token == Lexer::sHashedLparen)
-                                return true;
-                            }
-                        }
-                        case ProductionRule::statement:
-                        {
-
-                        }
-                    }
-                }
-                else
-                {
-                    if (m_currentTokenData.get().token == entity)
-                    return true;
-                }
-            }, i);
-        }
-        return false;
-    }
-
-
     bool Parser::expect(Lexer::TokenType tokenType, std::vector<U8string_view> tokenStr, const FailureCase& fc)
     {
         m_currentTokenData = m_lexer.getTokenDataList().at(m_currentTokenDataIndex);
@@ -2411,13 +2505,13 @@ namespace Nc
             }
 
             if (fc.shouldReport)
-            {
+            {   
                 std::string preposition = m_isEndofTokenList? "after" : "before";
-                
+
                 if (fc.optErrorMsg.has_value())
-                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
                 else
-                m_log.write("Expected reserved-identifier \033[48;2;10;6;26;32;1m", tokenStr, "\033[0m ", preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write("Expected reserved-identifier \033[32;1m", tokenStr, "\033[0m ", preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
     
                 start_log();
             }
@@ -2437,9 +2531,9 @@ namespace Nc
                 std::string preposition = m_isEndofTokenList? "after" : "before";
 
                 if (fc.optErrorMsg.has_value())
-                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
                 else
-                m_log.write("Expected an \033[48;2;10;6;26;32;1m<identifier>\033[0m ", preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write("Expected an \033[32;1m<identifier>\033[0m ", preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
     
                 start_log();
             }
@@ -2510,9 +2604,9 @@ namespace Nc
                 }
                 
                 if (fc.optErrorMsg.has_value())
-                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
                 else
-                m_log.write("Expected ", artical," \033[48;2;10;6;26;32;1m<", literalType, "_literal>\033[0m ", preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write("Expected ", artical," \033[32;1m<", literalType, "_literal>\033[0m ", preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
                 
                 start_log();
             }
@@ -2537,9 +2631,9 @@ namespace Nc
                 std::string preposition = m_isEndofTokenList? "after" : "before";
                 
                 if (fc.optErrorMsg.has_value())
-                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write(*fc.optErrorMsg, ' ', preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
                 else
-                m_log.write("Expected \033[48;2;10;6;26;32;1m", tokenStr, "\033[0m ", preposition, mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
+                m_log.write("Expected \033[32;1m", tokenStr, "\033[0m ", preposition, mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg);
 
                 start_log();
             }
@@ -2549,7 +2643,7 @@ namespace Nc
         case Lexer::TokenType::_miscellany:
         {
             if (fc.optErrorMsg.has_value())
-            m_log.write(*fc.optErrorMsg, " instead of", mapTokenToCategory(), " \033[48;2;10;6;26;31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg), start_log();
+            m_log.write(*fc.optErrorMsg, " instead of", mapTokenToCategory(), " \033[31;1m", m_currentTokenData.get().token, "\033[0m ", fc.extraErrMsg), start_log();
             else
             std::cout << "In fucntion Nc::Parser::expect, parameter function fc.optErrorMsg.has_value() is false under case Lexer::TokenType::_miscellany", panic(1234);
             
@@ -2578,80 +2672,7 @@ namespace Nc
     {
         m_log.log(true);
         
-        const auto& tokenData{ m_currentTokenData.get() };
-
-        if (tokenData.optLine.has_value())
-        {
-            auto start_line = tokenData.optLine.value();
-            auto end_line = tokenData.line;
-
-            m_log.write("   From [\033[1mline\033[0m: \033[48;2;10;6;26;36;1m", start_line, "\033[0m \033[1mcolumn\033[0m: \033[48;2;10;6;26;36;1m", tokenData.relativeColumn, "\033[0m] - [\033[1mline\033[0m: \033[48;2;10;6;26;36;1m", end_line, "\033[0m \033[1mcolumn\033[0m: \033[48;2;10;6;26;36;1m", tokenData.absoluteColumn, "\033[0m]");
-            m_log.log();
-
-            U8string lineContents{};
-            
-            for (auto current_line = start_line; current_line <= end_line; ++current_line)
-            {
-                std::uint32_t count{};
-                for (auto i = m_lexer.getLineNumToFilePos()[current_line], size = (std::uint32_t)m_lexer.getFileBuffer().size(); i < size; ++i)
-                {
-                    if (m_lexer.getFileBuffer()[i] == '\n'_u8)
-                    break;
-
-                    ++count;
-                }
-                lineContents.assign(m_lexer.getFileBuffer(), m_lexer.getLineNumToFilePos()[current_line], count);
-
-                m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
-                m_log.write("                │\033[1m");
-
-                if (current_line == start_line)
-                {
-                    auto temp = lineContents.size() - (std::size_t)(tokenData.relativeColumn - 1);
-                    m_log.write(U8string{lineContents.size(), ' '_u8}.replace(tokenData.relativeColumn - 1, temp, temp, "⇧"_u8));
-                }
-                else if (current_line == end_line)
-                {
-                    auto n_of_arrows = tokenData.absoluteColumn - 1uz;
-                    auto arrowPointers = U8string{lineContents.size(), ' '_u8}.replace(0uz, n_of_arrows, n_of_arrows, "⇧"_u8);
-
-                    m_log.write(arrowPointers.erase(arrowPointers.find_last_of("⇧"_u8) + 1));
-                }
-                else
-                {
-                    auto size = lineContents.size();
-                    m_log.write(U8string{size, ' '_u8}.replace(0uz, size, size, "⇧"_u8));
-                }
-
-                m_log.write("\033[0m"), m_log.log();
-            }
-        }
-        else
-        {
-            m_log.write("   \033[1mLine\033[0m: \033[48;2;10;6;26;36;1m", tokenData.line, "\033[0m from \033[1mcolumn\033[0m: [\033[48;2;10;6;26;36;1m", tokenData.relativeColumn, "\033[0m - \033[48;2;10;6;26;36;1m", tokenData.absoluteColumn, "\033[0m]");
-            m_log.log();
-
-            U8string lineContents{};
-            std::uint32_t count{};
-
-            for (auto i = m_lexer.getLineNumToFilePos()[tokenData.line], size = (std::uint32_t)m_lexer.getFileBuffer().size(); i < size; ++i)
-            {
-                if (m_lexer.getFileBuffer()[i] == '\n'_u8)
-                break;
-
-                ++count;
-            }
-            lineContents.assign(m_lexer.getFileBuffer(), m_lexer.getLineNumToFilePos()[tokenData.line], count);
-
-            m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
-
-            auto n_of_arrows = misc::safe_unsigned_sub(tokenData.absoluteColumn, tokenData.relativeColumn);
-            auto arrowPointers = U8string{lineContents.size(), ' '_u8}.replace(tokenData.relativeColumn - 1uz, n_of_arrows, n_of_arrows, "⇧"_u8);
-
-            m_log.write("                │\033[1m", arrowPointers.erase(arrowPointers.find_last_of("⇧"_u8) + 1), "\033[0m");
-
-            m_log.log();
-        }
+        lineRelated_log(m_currentTokenDataIndex);
 
         //ensures ast nodes aren't made anymore
         // m_ast.setDeadZoneFlag();
@@ -2767,73 +2788,115 @@ namespace Nc
 
     void Parser::afterTokenLog()
     {
-        if (m_isEndofTokenList)
+        //only tokens that are not on the same line gets this log
+        if (m_isEndofTokenList or m_lexer.getTokenDataList()[m_currentTokenDataIndex-1].line == m_currentTokenData.get().line)
         return;
 
-        auto& previousTokenData{ m_lexer.getTokenDataList().at(m_currentTokenDataIndex - 1) };
         spaceLog();
 
-        m_log.write("   Note: meaning it was expected after", mapTokenToCategory(&previousTokenData), " \033[48;2;10;6;26;33;1m", previousTokenData.token, "\033[0m");
+        m_log.write("   Note: meaning it was expected after", mapTokenToCategory(&m_lexer.getTokenDataList()[m_currentTokenDataIndex-1]), " \033[33;1m", m_lexer.getTokenDataList()[m_currentTokenDataIndex-1].token, "\033[0m");
         m_log.log();
 
-        m_log.write("   \033[1mLine\033[0m: \033[48;2;10;6;26;36;1m", previousTokenData.line, "\033[0m from \033[1mcolumn\033[0m: [\033[48;2;10;6;26;36;1m", previousTokenData.relativeColumn, "\033[0m - \033[48;2;10;6;26;36;1m", previousTokenData.absoluteColumn, "\033[0m]");
-        m_log.log();
-
-        U8string lineContents{};
-        std::uint32_t count{};
-
-        for (auto i = m_lexer.getLineNumToFilePos()[previousTokenData.line], size = (std::uint32_t)m_lexer.getFileBuffer().size(); i < size; ++i)
-        {
-            if (m_lexer.getFileBuffer()[i] == '\n'_u8)
-            break;
-
-            ++count;
-        }
-        lineContents.assign(m_lexer.getFileBuffer(), m_lexer.getLineNumToFilePos()[previousTokenData.line], count);
-
-        m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
-
-        auto n_of_arrows = misc::safe_unsigned_sub(previousTokenData.absoluteColumn, previousTokenData.relativeColumn);
-        auto arrowPointers = U8string{lineContents.size(), ' '_u8}.replace(previousTokenData.relativeColumn - 1uz, n_of_arrows, n_of_arrows, "⇧"_u8);
-
-        m_log.write("                │\033[1m", arrowPointers.erase(arrowPointers.find_last_of("⇧"_u8) + 1), "\033[0m");
-
-        m_log.log();
+        lineRelated_log(m_currentTokenDataIndex - 1);
     }
 
     void Parser::missingBraceLog(std::size_t savedTokenBraceDataIndex)
     {
         if (savedTokenBraceDataIndex == 0) return;
 
-        const auto& tokenData{ m_lexer.getTokenDataList().at(savedTokenBraceDataIndex) };
         spaceLog();
 
-        m_log.write("   To match \033[48;2;10;6;26;33;1m", tokenData.token, "\033[0m");
+        m_log.write("   To match \033[33;1m", m_lexer.getTokenDataList().at(savedTokenBraceDataIndex).token, "\033[0m");
         m_log.log();
 
-        m_log.write("   \033[1mLine\033[0m: \033[48;2;10;6;26;36;1m", tokenData.line, "\033[0m from \033[1mcolumn\033[0m: [\033[48;2;10;6;26;36;1m", tokenData.relativeColumn, "\033[0m - \033[48;2;10;6;26;36;1m", tokenData.absoluteColumn, "\033[0m]");
-        m_log.log();
+        lineRelated_log(savedTokenBraceDataIndex);
+    }
 
-        U8string lineContents{};
-        std::uint32_t count{};
+    void Parser::lineRelated_log(std::size_t tokenDataIndex)
+    {
+        const auto& tokenData{ m_lexer.getTokenDataList()[tokenDataIndex] };
 
-        for (auto i = m_lexer.getLineNumToFilePos()[tokenData.line], size = (std::uint32_t)m_lexer.getFileBuffer().size(); i < size; ++i)
+        if (U8string lineContents{}; tokenData.optLine.has_value())
         {
-            if (m_lexer.getFileBuffer()[i] == '\n'_u8)
-            break;
+            auto start_line = tokenData.optLine.value();
+            auto end_line = tokenData.line;
+            bool log_once{};
 
-            ++count;
+            m_log.write("   From [\033[1mline\033[0m: \033[38;2;249;128;33;1m", start_line, "\033[0m \033[1mcolumn\033[0m: \033[38;2;249;128;33;1m", tokenData.relativeColumn, "\033[0m] - [\033[1mline\033[0m: \033[38;2;249;128;33;1m", end_line, "\033[0m \033[1mcolumn\033[0m: \033[38;2;249;128;33;1m", tokenData.absoluteColumn, "\033[0m]");
+            m_log.log();
+
+            for (auto current_line = start_line; current_line <= end_line; ++current_line)
+            {
+                if (end_line - current_line <= 1 or current_line - start_line < 4)//if it is the last line or if 4logs have already been logged off
+                {
+                    std::uint32_t count{};
+                    for (auto i = m_lexer.getLineNumToFilePos()[current_line], size = (std::uint32_t)m_lexer.getFileBuffer().size(); i < size; ++i)
+                    {
+                        if (m_lexer.getFileBuffer()[i] == '\n'_u8)
+                        break;
+
+                        ++count;
+                    }
+                    lineContents.assign(m_lexer.getFileBuffer(), m_lexer.getLineNumToFilePos()[current_line], count);
+
+                    m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
+                    m_log.write("                │\033[1m");
+
+                    if (current_line == start_line)
+                    {
+                        auto temp = lineContents.size() - (std::size_t)(tokenData.relativeColumn - 1);
+                        m_log.write(U8string{lineContents.size(), ' '_u8}.replace(tokenData.relativeColumn - 1, temp, temp, "⇧"_u8));
+                    }
+                    else if (current_line == end_line)
+                    {
+                        auto n_of_arrows = tokenData.absoluteColumn - 1uz;
+                        auto arrowPointers = U8string{lineContents.size(), ' '_u8}.replace(0uz, n_of_arrows, n_of_arrows, "⇧"_u8);
+
+                        m_log.write(arrowPointers.erase(arrowPointers.find_last_of("⇧"_u8) + 1));
+                    }
+                    else
+                    {
+                        auto size = lineContents.size();
+                        m_log.write(U8string{size, ' '_u8}.replace(0uz, size, size, "⇧"_u8));
+                    }
+
+                    m_log.write("\033[0m"), m_log.log();
+                }
+                else
+                {
+                    if (!log_once)
+                    {
+                        log_once = true;
+                        m_log.write("               \033[32;5;1m...\033[0m"), m_log.log();
+                    }
+                }
+            }
         }
-        lineContents.assign(m_lexer.getFileBuffer(), m_lexer.getLineNumToFilePos()[tokenData.line], count);
+        else
+        {
+            m_log.write("   \033[1mLine\033[0m: \033[38;2;249;128;33;1m", tokenData.line, "\033[0m from \033[1mcolumn\033[0m: [\033[38;2;249;128;33;1m", tokenData.relativeColumn, "\033[0m - \033[38;2;249;128;33;1m", tokenData.absoluteColumn, "\033[0m]");
+            m_log.log();
 
-        m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
+            std::uint32_t count{};
 
-        auto n_of_arrows = misc::safe_unsigned_sub(tokenData.absoluteColumn, tokenData.relativeColumn);
-        auto arrowPointers = U8string{lineContents.size(), ' '_u8}.replace(tokenData.relativeColumn - 1uz, n_of_arrows, n_of_arrows, "⇧"_u8);
+            for (auto i = m_lexer.getLineNumToFilePos()[tokenData.line], size = (std::uint32_t)m_lexer.getFileBuffer().size(); i < size; ++i)
+            {
+                if (m_lexer.getFileBuffer()[i] == '\n'_u8)
+                break;
 
-        m_log.write("                │\033[1m", arrowPointers.erase(arrowPointers.find_last_of("⇧"_u8) + 1), "\033[0m");
+                ++count;
+            }
+            lineContents.assign(m_lexer.getFileBuffer(), m_lexer.getLineNumToFilePos()[tokenData.line], count);
 
-        m_log.log();
+            m_log.write("   \033[4;1mLine contents\033[0m│\033[48;2;10;6;26;37m" , lineContents, "\033[0m"), m_log.log();
+
+            auto n_of_arrows = misc::safe_unsigned_sub(tokenData.absoluteColumn, tokenData.relativeColumn);
+            auto arrowPointers = U8string{lineContents.size(), ' '_u8}.replace(tokenData.relativeColumn - 1uz, n_of_arrows, n_of_arrows, "⇧"_u8);
+
+            m_log.write("                │\033[1m", arrowPointers.erase(arrowPointers.find_last_of("⇧"_u8) + 1), "\033[0m");
+
+            m_log.log();
+        }
     }
 
     void Parser::spaceLog()

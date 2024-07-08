@@ -1,5 +1,4 @@
-
-format(type u8str x)
+fn format(type u8str x)
 {
     guess cut_string ::= x[type pair(x.find('i'), x.find('.'))]
 
@@ -7,9 +6,6 @@ format(type u8str x)
 
     ``Are none and nullptr that important to be reserved identifiers for their types?
 
-    "\##{emeka\n\t}##"
-    "\##{emeka}##"
-    "\{emeka}"
     "${emeka}"
     "{9*0} {{  }}"
     "\${2*2}"
@@ -27,30 +23,9 @@ format(type u8str x)
     f(1, +2)
 
     type int32 match ::= 3
-    
-    Error Recovery: is a process taken by the parser during the parsing of a production-rule when an unexpected token is found.
-
-    Error Recovery Strategies in nc:
-
-    1. Selfishness: is when the parser exhibits a degree of selfishness for the expected token by checking if the token after the unexpected token
-     matches the expected token. If true, the unexpected token is skipped with a meaningful error being logged, then parsing continues as if the
-     expected token was found first.
-    
-    2. Altruism/selflessness: is when the parser exhibits a degree of selflessness on behalf of the expected token that wasn't found by following
-     to rudimentary conditions:
-     - If the unexpected token is the next expected token to be found, the unexpected token should be left alone
-     - If the token after the unexpected token matches the next expected token, the unexpected token is to be skipped
-    
-    3. Cradling: is the process of limiting the amount of errors that get logged when an unexpected-token throws off parsing by skipping the parsing
-     of other entities in the production-rule. This is only successful when step(2)[altruism] returns true when any of its rudimentary conditions are
-     met, despite the actual expected token not been found. So in a way, it relies on deception
-
-    Cradling??????
-
-    Altruism should cover the entire production-rule
 }
 
-panny(typeof(class_mut) me) //for getting the type of a class easily
+fn panny(typeof(class_mut) me) //for getting the type of a class easily
 {
     #(1, 2, 3, 4) | fcn
 
@@ -86,81 +61,288 @@ fn main()
     type fn(int32)int32 {}
     //unnamed function
     fn(int32)int32{  }
+
+    match e:i{case 2: {}; default: 34}
+    match e:i{case(3, 4, 5): emeka}
+    println!("{}", match e:i{case 2: {} case<int32>: 2 default: 23})
+    
+    array[type pair(0, 3)]
+    array[0..3]
+    (0..3).to_it()
+
+    guess array ::= type f_array(3, 10112₃)
+    guess (a, b, c) ::= array
+    How will i:
+    1. Make **a** an immutable reference to element[1]
+    2. Make **b** a mutable reference to element[2]
+    3. Make **c** copy it's value
+
+    Can be done if the they are directly initialized:
+    guess (a, b, c) ::= #(imut_lref array[1], mut_lref array[2], cp array[3])
+
+    guess a ::= &imut a;
+    guess a ::= imut a;
+    gmem -> is back
+
+    :(2, 3, 4)|fcn
+    #(2, 3, 4)|fcn
+
+    iter _ : (1, 3, -1) output(2, 3)
+    rng _ : (1~7) output(2, 3)
+
+    named_pt red, blue, seal{}
+    named_st color{type red, type blue, type seal}
+
+    fn current_color(type color c) type any<?>
+    {
+        match c:i{ case<red, blue, seal>: give type any(i) }
+    }
+
+    fn main()
+    {
+        guess curr_color = current_color()
+    }
+    &d.goand
+
+    iter i:(desired_digits, 0, -1)
+    {
+
+    }
+    for infer i := desired_digits; i < 0; --i:
+    {
+
+    }
+    3,,4
+    3,,5
+    3,:4
+    3,:3
+    3~3
+
+    b = $(2, 4, 5, 6)
+    $(2, 3, 4, 5, 6) + $(2, 3, 4, 5)
+    type ustr a()
+    a[3,,5]
+
+    infer a := 2, 3
+    guess a := 3, 4
+    auto a := 3, 4
+
+    #[list_name_space_content(boost, no_namespaces, no_functions)]
+
+    3,,4
+    3,,4
+    3~4
+
+    - value references would different type different from non-value-reference, only it's mutability status would not be different
+    - stabilize the above: type si32:"imut [&]"
+    
+    fn var_arg(...)
+    fcn(1, _, _, 3)
+    fcn(1, default, default, 3)
+    ::@si32
+    nc(_, _, _, .start := )
+    nc(_, _, .start := 1)
+
+    \"emeka daniel"u8 := 3
+    \"emeka & daniel"p := 5
+    "emeka"u8
+    u8"emeka"
+    '÷'u8.info()
+    u8'÷'.info()
+
+    \"daniel & esther's bread"u8.
+    ``it shouldn't declare another literal when using as an identifer
 }
 
 `{
     [Slovable Notes]
+    * My language needs to be exception safe - read that rust's article about it
+    * Alias should take an <expression>
+    * How would i be able to return types?
+     - typeof()
+     - { type unamed_st<si32, si4> e; if e.get_current_type(): {}? }
+    * Think about how comparison of types with mutability should go
+    * Remove <jump_statement>s from conditional-expression
+    * No more boxed attribute: type si32:"[&]"
+    * Store the unicode-code-point along the utf8 character
+    * Think more about which things can be parsed as expressions, for example an <if_statement>
+    * If/loop-constructs statements should only just accept expressions only
+     - what of else if constructs
+    * For nc-happy-size types, copying is the default
+    * Something like this '\_' is parsable? 👀
+    * What would not be the discard identifier?
+    * '_' should be the default value identifier not the discard value
+    * Should i support any order function parameter entry like in mojo and python?
+     - {
+            fn e(type si32 a, type b32fp l, type d32fp k){}
+            e(.k := 2, _, _)
+       }
+    * Provide both the 'mut' and 'imut'
+    * Remove this @::si32
+    * How to design meta-programming
+     - like get line number?
+     - get identifier names
+     - get function-give-type
+     - get name_space contents
+    * Change guess to infer
+    * I need a refined semantic for <objetc_exp>
+     - Lifetime
+     - Being used as function calls to supply multiple arguments to named objects, redefine things like move and copy constructor
+     - Being used as standalone expressions
+    * Cement semantics around function declarations and how they can be treated like objects
+    * Should i create syntactic suger for working with sumTypes?
+    * Conditional expression should have a compulsory else expression
+    * The enforcement of using [mut &<expression>] should have a clear semantic definition, that allows override when it becomes inconvinient
+     - {
+            ``instead of:
+            io::out(mut &2, mut &3, mut &4, mut &5, mut &6)
+            ``do this instead:
+            io::cout(2, 3, 4, 5, 6)
+       }
+    * Create a concrete semantic definition around initialization, should they be allowed to be initialized after the fact?
+     - {
+            type si32 s
+            if i == 3: s = 2 else s = 4
+            b = i == 3?(2:4)
+            b = { if i==3: give 2 else give 4 }
+       }
+    * [3,,4] for pair expression and [3~4] for inclusive range
+     - how would i parse them, as operators? or sole expressions?
+    - Change cp to copy, mv to move and imut to mut. And think about how i should parse them
+     - like this: copy(a) + b or this: copy(a + b)
+     - Liken them to how rust parses their own
+    * Really think about what and what compiler communication interface can do
+     - should it be used in an expression
+     - should it deduce function return types #[fn::getGiveType(dama)]
+     - they should embody meta programming and nothing else right?
+     - they shouldn't be used to affect async and await right?
+    * Should defer accept multiple arguments?
+    * Pre and post condition entry
+    * Change what happens when a real-number literal type is found on an integer and vice-versa
+    * Since assembly languages compute the result of a division as it's quot and remainder, find out if llvm provides a similar function
+    * <alias_decl> should accept an <expression>
+    * should the nc-decimal-fp format be refactored?
+    * When validating real numbers, dynamically pick the right nc-decimal-fp to use depending of the precision and exponent size, only when it isn't
+     in deadzone mode
+    * Why is odd an operator
+    * In real number validation, i don't need to normalize nc decimal floating implementation twice, so change it
+    * check if rust does that annoyning stuff of this std::uint32_t(std::int8_t{-3})
+    * reason more about the sumTypes in my language, becuase initialization of them are horrendous compared to rust's way
+    * since we already know what type the identifer has, assignment to accept an arg
+     - and also, me function assign synmonous with assignment
+    * change i32[...] to si32[...]
+    * nc should be immutable first because a programmer should have a clear reason while coding of what object needs to be mutable, it essentially forces the programmer to reason more about his/her code
+     - Due to that, standardize how the new [mut] keyword is going to be used
+    * iter has a problem down below:
+    * can i write something like this: [for (auto i = operand_digit_count - desired_digits; ; ){}] in nc
+    * make looping dynamic using compiler attributes like:
+     - in for and iter loop, the modifier should not always be at the end
+     {
+        iter i:(mut 5, 1)
+        {
+            #[loop::after_modification_do_this]
+            {
+
+            }
+            ``or
+            #[loop::modify_instead];
+        }
+        
+        for infer a:= 5; a < 1; --a:
+        {
+            #[loop::after_modification_do_this]
+            {
+
+            }
+            ``or
+            #[loop::modify_instead];
+        }
+     }
+    - in while to help when [continue] is used and it skips the modification expression there causing an infinite loop
+    {
+        while a < 7:
+        {
+            if a == 5: continue
+            #[loop::modification_exp_mark] ++i;
+        }
+    }
+    * swapping should use that xor way
+
+    * check how you did the syntax for the C for loop
+    * block is going to be parsable in the global space for things like match os::which_os {case(os::windows): case(os::linux): case(os::mac): }
+
+    * should a <block> accept <type_space> and <name_space>?
+    * Look for a more convenient name for guessing type instead of 'guess'
+    * Reason about why raw identifers should escape reserved identifers?? what is the purpose
+    * Warn about something like this: [__]
+    * Addition of mem operator for to replace & which is now a reference operator
+    * Adding [type_space] and replacing [namespace] with [name_space]
+    * Add an alternate parameter entry: [me, imut me, &me, imut &me] -> ['imut']['&']'me'
+    * How would i solve the problem of function overloading semantics example:
+     - for objects, if an object can reference an overloaded function through its identifier, should objects with function type have the ability to
+       overload themselves using <function_exp> as their source?
+     - For overloaded functions and function-objects with multiple call operator overloads, when guessing the function-type, how would that go
+    * Addition of <qualified_ident_list> for the declarations that need
+    * Integers of variable sizes according to what llvm supports
+    * Break character for integer and real number entry, becuase of how large it can potentially be
+    * Add support for decimal floating point 8 and 16
+    
     * Remember to add a condition in character function for getting the size when unicode name(\{}) and entity(\()) are introduced
     * unicode name and entity entry would be left for another time
     * unicode name check and replacement with the code-point entry be addressed
     
+    * Real and integer number literal optimaization checking
+
     * Try to outline what the production-rule expands to when logging like in <r_l>, when <r_l_arg_list> is not found or <relational_op>
+    * Error recovery to be done
+     - find a fix for something like: (+) or r_l(+)
+
+    * Support for range loops; possible syntax: 'rng' <identifier_list> ':' <expression_list> <statement>
+     - A range operator for number literals -> [1..3]
+    * A pair operator for entry of value pairs -> [ e:.3 ] -> [e .: 3] -> [e:.3] -> [e-:3] -> [e:-3]
+    * add catch block; syntax: 'catch' ['(' [<parameter_list>] ')'] <block>
+     - until i study exception implementation
+    * Add the file name of the current file it is compiling, like: current file is main.nc
+
+    * Think more about how expressions at the end of a block would qualify as return values?
+    if e * 2 = 3:{
+        2
+    }
     * [panic], output and input shouldn't be a reserved word no more
-    * add the colon-type thing for <enum_decl>
-    * Update <jump_statement> and <block_item>'s BNF syntax to reflect the goto_label and lable changes
-    * Conditional expression must always have an else expression
     * An optimization for conversion between bases should be implemented for integer and real number lexing,
         so that only numbers within nc's range are converted
-    * Change the outcome of what happens when a multiLine comment is unterminated
-     - instead of that, do something similar to rust's raw string output that has the [...] stuff in-between
-    * Think more about this : [type ::int32][type int32::fromType int]
-    * A range operator for numbers -> [1..3]
-    * A pair operator for entry of value pairs -> [ e:3 ]
-    * literal types should be entered and directly parsable by the lexer
-    * rebrand the conditional operator to this: <expression> '?' '(' <expression>|<jump_statement> ':' [<expression>|<jump_statement>] ')'
-    * find a fix for something like: (+) or r_l(+)
-    * add support for lambdas: syntax 'lambda' [ '['<expression_list>']' ] '('<parameter_list>')' <block>
-    * provision for platform agnostic integers: for signed(int) and for unsigned(uint); respective literals are: i and ui
-    * think more about how allocators would fit in my language, specifically arena-wise allocation
-    * addition of grouped initialization: guess (a, b, c) ::= type unamed_pt{1, 2, "e"}
-    * add catch block; syntax: 'catch' ['(' [<parameter_list>] ')'] <block>
-    * a special marker should be used to distinctly identify a variable as an expression: asExp(type malloc_ptr<int32> a())
-    * add the file name of the current file it is compiling, like: current file is main.nc
 
-    * support for range loops; possible syntax: 'range' <identifier_list> ':' <expression_list> <statement>
-    * add support generics, varadic generics and specialization of said generics
-    * constraints should be added to enrich generics after things like ncType and ranges have been defined concretely    
+    * Provision for platform agnostic integers: for signed(int) and for unsigned(uint); respective literals are: i and ui
+
+    * Add generics, varadic generics and specialization of said generics support
+     - Constraints should be added to enrich generics
+
     * think about how multiple files would interact with one another[nc_impl, nc_inf, nc and (the import system)]
-    * think about how attributes should be and used in my language(they should have namespace like syntax though: function_body::forLoop::eval_once)
-    * arena_ptr and malloc_ptr are the two heap allocation objects we have in nc
+     - i.e think more about the import system of nc
+
+    * Think about how attributes should be used in my language(they should have namespace like syntax though: function_body::forLoop::eval_once)
+    * CompileTime code runablity
+    * Compiler ability to force things like: [must be a return value of a function] or [must call a particular function after object initialization]
+
+    * arena_ptr and non_arena_ptr are the two heap allocation objects we have in nc
     * think more about slices
-    * reflect more on the part of the static analyzer that enforces memory safety
-    * think about error handling for my language .i.e things like: error_code, error_msg, panic, exceptions and so on
-    * a general concept is needed to classify range data structures and that concept would be iterators
-    * a negative index should be interpreted from the back for subscripting
-    * support for interpolated strings - for embedding expressions within strings: "Emeka is = [$|@]{2 + 3}", then either $ or @ would need to be escaped
-    
+     - A general concept is needed to classify range data structures and that concept would be iterators
+     - And the common interface for using data-structures
+    * Reflect more on the part of the static analyzer that enforces memory safety
+     - How safe are pointers going to be
 
-    * compiler ability to force things like: [must be a return value of a function] or [must call a particular function after object initialization]
+    * Think about error handling for my language .i.e things like: error_code, error_msg, panic, exceptions and so on
 
-    * template parameter should not contain an expression, because compile-time ability to evaluate expressions is already present
+    * A negative index should be interpreted from the back for subscripting
+    * What happens when a <rng> references a range mutably and one tries to modify the range(collection)?
+    {
+        guess int32_darr := type d_array(_v, 1, 2, 3, 8, 9, 0)
+        rng i : i32_darr
         {
-            type f_array<2> a()
-            ``and
-            type f_array a(2)
-
-            are the same if the parameter has been declared as compile-time
-
-            fromType f_array::_construct_(&[compileTime] type int32 size);
-
-            because i don't want let there be confusion on things like this; and due to this, marking a function as compileTime or maybe_compileTime
-            is not going to be supported
-
-            figure out how the size of a data structures would be taken at construction, i.e. type f_array<#int32, 2> a(1, 2) =? type f_array<#intt32> a(.size: 23, )
+            io::out(i)
+            i.erase(2, 3, 5)
         }
-    * match expression should be like this:
-        {
-            match a: i
-            {
-                case type int32:"immutable":
-                case 23:
-                case fcn()()[23]:
-                case(23, 3, 5):
-                case(34):
-                case(type int32:"immut"):
-                default:
-            }
-        }
+    }
     _______________________________________________________________________________________________________________________________________________    
 
     something like this is very dangerous:
@@ -174,15 +356,17 @@ fn main()
     _______________________________________________________________________________________________________________________________________________
 
     [Unsolvable Notes]
+    * The convention of defining relational operators is to encourage defining only equality and lessthan
+    * My string implementation would be [copy-on-write], meaning it initially has a view to the string until a write operation is triggered
+    * imbedding of markup languages like html and styling languages like css in my language to be used in the web
     * temporary objects will not be allowed to have type qualifiers
-    * think about how [defer] can be implemented
-    * they should be like a function that gets executed at the start and end of an nc program like the .basrc script
+    * They should be like a function that gets executed at the start and end of an nc program like the .basrc script
     {
         type io::fd cout();
         attach_at_begin(cout.boolalpha)
         attach_at_end(fuck_off_fcn)
         
-        main()
+        fn main()
         {
 
         }
@@ -192,11 +376,10 @@ fn main()
             The above won't work, just tell the user that default arguments are compileTime constructs while member objects are runtime
             constructs, but it can be achieved by overloading
         }
-    * warn about function identifiers not being called
-    * varadic agruments should be entered starting with are reserved-identifier
-    * moving should be the default instead of coying
-    * when implementing unsigned addition, make it like this: max(lhs, rhs) - min(lhs, rhs); to prevent reckless overflow
-    * when converting from a lesser signed to a greater unsigned integer, disregard the sign and perform a clean conversion
+    * Warn about function identifiers not being called
+    * Moving should be the default instead of coying
+    * When implementing unsigned addition, make it like this: max(lhs, rhs) - min(lhs, rhs); to prevent reckless overflow
+    * When converting from a lesser signed to a greater unsigned integer, disregard the sign and perform a clean conversion
         {
             (type int8 -> type uint32) != (type int8 -> type int32 -> type uint32)
             but this:
@@ -235,9 +418,11 @@ fn main()
             - during comparsion, a pair should be taken indicating the start position for comparsion for the two operands, similar to find_from
         }
     * my own regex implementation that embodies clarity and brevity - inspired by EBNF
+     - it's syntax won't be conventional
+     - it will support extraction without checking
+     - it give clear error messages if the syntax is wrong
+     - it will support error recording of unmatched strings
     * my own list implementation that provides random access without that need of an internal array
-    * allocation of stack memory would be location dependent, unless in a loop, which would therefore allow the specification the size to be a runtime value.
-
     _______________________________________________________________________________________________________________________________________________
 
     The advent of high-level abstractions should not cost little to no overhead unless need be
@@ -297,7 +482,6 @@ fn main()
     dark days are coming
     "Emeka Daniel"
     """
-
     u8"Emeka Daniel is amazing"
 
     u8"
@@ -314,129 +498,6 @@ fn main()
     "
     «Emeka, Daniel»
 
-
-    arg(1, 2, 3, 4, 5) | fcn
-    ag(1, 2, 3, 4, 5) | fcn
-    fcn(1, 2, 3, 4, 5)
-    fcn(d(b(c())))
-    c() | b | d | fcn
-
     d(i, f(e, 9))
     i.::d(e.::f(9))
-    
-    Logical operators in nc are divided into two categories, [Boolean-logical-operators] and [Bit-logical-operators]
-    List of the operators:
-    - and
-    - or
-    - not(!)
-    - nand
-    - nor
-    - xor
-    - nxor
-    + ∧=
-    + ∨=
-    + ⊻=
-    + and_eq
-    + or_eq
-    + xor_eq
-    + nand_eq
-    + nor_eq
-    + nxor_eq
-    
-    The following are to be used for both boolean and bit logical operators
-
-    Expanding upon the traditional set of operators found in C++ can indeed add versatility and expressiveness to your programming language. Here are a few suggestions:
-
-    1. **String Concatenation Operator**: While C++ supports string concatenation using the `+` operator, having a dedicated concatenation operator like `.` in languages such as Python or `&` in Visual Basic could enhance readability and consistency, especially in contexts where string manipulation is prevalent.
-
-    2. **Safe Navigation Operator**: Popularized by languages like Kotlin and Groovy, a safe navigation operator (often denoted as `?.`) can simplify code when dealing with potentially nullable references, allowing for more concise and safer navigation through object hierarchies.
-
-    3. **Elvis Operator**: Also inspired by Kotlin, the Elvis operator (`?:`) provides a concise way to express a default value when dealing with nullables. It's often used as a shorthand for conditional expressions.
-
-    4. **Range Operator**: Languages like Swift and Ruby offer range operators (`..` or `...`), which facilitate iterating over a sequence of values within a specified range. This can be particularly useful in scenarios where iteration over a range of numbers or characters is common.
-
-    5. **Membership Test Operator**: Adding an operator like `in` from Python, which checks for membership in a collection, can simplify code when dealing with collections and sets.
-
-    6. **Bitwise Rotation Operators**: While C++ provides bitwise shift operators (`<<` and `>>`), adding bitwise rotation operators (`<<<` and `>>>`) as found in languages like Java or JavaScript can be useful for certain bitwise manipulation tasks.
-
-    7. **Matrix Multiplication Operator**: With the increasing use of linear algebra in programming, having a dedicated operator for matrix multiplication, such as `@` in Python, could improve readability and maintainability of mathematical expressions involving matrices.
-
-    8. **Pipeline Operator**: Inspired by functional programming languages like F#, Elixir, and JavaScript (with proposals like TC39's pipeline operator), a pipeline operator (`|>` or `>>`) allows for chaining functions or transformations in a clear and concise manner.
-
-    9. **Null-Coalescing Operator**: Commonly used in languages like C#, the null-coalescing operator (`??`) provides a succinct way to handle null values by returning a default value if the operand is null.
-
-    When considering adding new operators, it's essential to maintain a balance between expressiveness and complexity, ensuring that the language remains intuitive and easy to learn while offering powerful features for developers. Additionally, thorough documentation and examples can help users understand and leverage these operators effectively.
-
-    Sure, logical operators are used to perform logical operations on boolean values. In most programming languages, common logical operators include AND, OR, NOT, NAND, NOR, XOR, and XNOR. Here's a list of these operators along with their symbols and descriptions:
-
-    Logical Operators[Boolean and Bit Logic operators ]
-
-    1. **AND**:
-    - Symbol: `&&` (double ampersand)
-    - Description: Returns true if both operands are true; otherwise, returns false.
-
-    2. **OR**:
-    - Symbol: `||` (double vertical bar)
-    - Description: Returns true if at least one of the operands is true; otherwise, returns false.
-
-    3. **NOT**:
-    - Symbol: `!` (exclamation mark)
-    - Description: Returns true if the operand is false, and vice versa. It negates the input value.
-
-    4. **NAND** (NOT-AND):
-    - Description: Returns true if at least one operand is false; otherwise, returns false. It's the negation of the AND operation.
-
-    5. **NOR** (NOT-OR):
-    - Description: Returns true if both operands are false; otherwise, returns false. It's the negation of the OR operation.
-
-    6. **XOR** (Exclusive OR):
-    - Symbol: `^` (caret)
-    - Description: Returns true if exactly one operand is true and the other is false; otherwise, returns false.
-
-    7. **XNOR** (Exclusive NOR):
-    - Description: Returns true if both operands are either true or false; otherwise, returns false. It's the negation of the XOR operation.
-
-    Certainly! Here's a comprehensive list of various text editing options you can use with ANSI escape codes in a terminal:
-
-    **Text Color:**
-    - Black: `30m`
-    - Red: `31m`
-    - Green: `32m`
-    - Yellow: `33m`
-    - Blue: `34m`
-    - Magenta: `35m`
-    - Cyan: `36m`
-    - White: `37m`
-
-    **Background Color:**
-    - Black: `40m`
-    - Red: `41m`
-    - Green: `42m`
-    - Yellow: `43m`
-    - Blue: `44m`
-    - Magenta: `45m`
-    - Cyan: `46m`
-    - White: `47m`
-
-    **Extended Colors (8-bit):**
-    - Use `38;5;<color_code>m` for text color
-    - Use `48;5;<color_code>m` for background color
-
-    **Extended Colors (24-bit):**
-    - Use `38;2;<r>;<g>;<b>m` for text color
-    - Use `48;2;<r>;<g>;<b>m` for background color
-
-    **Text Styles:**
-    - Reset: `0m`
-    - Bold: `1m`
-    - Underline: `4m`
-    - Italic: `3m`
-    - Blinking: `5m`
-    - Inverse: `7m`
-    - Conceal: `8m`
-    - Strikethrough: `9m`
-
-    **Special Effects:**
-    - Reset background: `49m`
-    - Reset text color: `39m`
 }`

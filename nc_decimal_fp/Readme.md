@@ -81,6 +81,7 @@ The various storage format
     [ s:1 ][ integer_part:4 ][ real_part:20 ][ exponent:7  ]
 
     * offers a precision of 6 digits i.e. [0 - 999'999]
+    * offers 5 digits of calculative precision //modify for all
     * offers an exponent range of [-64 to 63]
 
 (2). using 64 bits for storage
