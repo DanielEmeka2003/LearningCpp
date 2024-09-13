@@ -74,3 +74,32 @@ start = time.time()
 digits_count_iter = count_digits_iteratively(number, base)
 end = time.time()
 print(f"Iterative Method: {digits_count_iter} digits, Time: {end - start} seconds")
+
+import time
+import decimal
+
+# Setup decimal context
+decimal.getcontext().prec = 7
+
+# Test values
+a = 1.234567890123456789
+b = 9.876543210987654321
+da = decimal.Decimal('1.234567890123456789')
+db = decimal.Decimal('9.876543210987654321')
+
+# Timing float addition
+start_time = time.time()
+for _ in range(1000000):
+    c = a + b
+float_addition_time = time.time() - start_time
+
+# Timing decimal addition
+start_time = time.time()
+for _ in range(1000000):
+    dc = da + db
+decimal_addition_time = time.time() - start_time
+
+print(f"Float addition time: {float_addition_time} seconds")
+print(f"Decimal addition time: {decimal_addition_time} seconds")
+
+# Similar benchmarking can be done for other operations like multiplication and division

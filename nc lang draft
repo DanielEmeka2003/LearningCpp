@@ -1,0 +1,53 @@
+ITEM:
+An item in nc refers to either a declaration, a statement or an expression
+
+PART-ITEMS:
+A part-item in nc is the part of an item that isn't a declaration, a statement or an expression. A (data)type with or without it's qualifiers and
+grouping syntax is the only part-item in nc
+
+WHOLE-ITEM:
+A whole-item in nc retains the same meaning as an item
+
+ENTITY:
+An Entity in nc refers to individual tokens, part-items(a type specification) or whole-items
+
+SCOPE:
+A scope in nc is the visibilty area of identifers, meaning the area where identifers can be seen and by extension used
+To be a bit metaphoric, a scope is the resident country of an identifer. Passport and what not would be used to further explain this ....
+
+TYPES OF SCOPE IN NC:
+- Block scope
+- Type(space) scope
+- Name space scope
+- Module scope
+
+CLASSIFICATION OF SCOPES IN NC:
+- Named scope:
+    - type(space) scope
+    - name space scope
+- Unnamed scope:
+    - module scope
+    - block scope
+
+SCOPE ACCESSOR SYMBOL '::' :
+Read like this, in <scope_name>, get <identifier>
+- type (space) scope   : '@'<type>'::'<identifer>
+- name space scope     : <identifier>'::'<identifer>
+- module scope         : '::'<identifier>
+- There is no way to access the items from a block scope
+
+IDENTIFIERS DEFINED BY THE COMPILER AVIALABLE AT GLOBAL SCOPE
+function main
+LANGUAGE IDENTIFIERS START WITH '_'
+
+TYPE TO SCOPE SYMBOL '@'
+
+[BRINGING DIFFERENT MODULE OR GROUP OF MODULES(PACKAGE) SCOPE INTO ANOTHER MODULE'S SCOPE]
+[WHAT OF HOW IDENTIFIERS ARE SEEN? BLOCK HAS (TOP->DOWN) WHILE MODULE HAS (UNIVERSAL)]
+
+TYPE ITEM SEMANTICS:
+Type items are classified into two, members and non-members. Member items are owned by objects of the type, while Non-members are owned by the type
+scope. [ This is why are member types not defined like this (type @a::color) instead of this (type c.color) ]
+
+TYPE SYNTAX AND SEMANTICS:
+A type in nc, also called a data type, is the only part-item in nc, it has features like qualifiers.

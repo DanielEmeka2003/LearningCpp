@@ -474,6 +474,19 @@ namespace Nc
             m_tokenString.assign(m_fileBuffer, formerFilePos, count);
         }
         
+        auto found_first_sequential = [&]()
+        {
+            if (auto first_digit_seperator_index = m_tokenString.find('\''_u8); first_digit_seperator_index != U8string::npos)
+            {
+                for (auto i = first_digit_seperator_index+1, count = 0uz, n = m_tokenString.size(); i < n; ++i)
+                {
+                    if (count >= 2)
+                    break;
+                }
+            }
+        };
+
+
         U8string baseAndLiteralType{};
         std::optional<TokenData> optionalTokenData{};
         U8string trustedTokenString{std::move(m_tokenString)};
@@ -1188,27 +1201,27 @@ namespace Nc
 
             if (literalType == lt_d32)
             {
-                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 6);
+                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 6, immutable_lref);
                 decfp = nc_misc::normalize_realNum(temp.append(exponent_it, decfp.end()), immutable_lref);
             }
             else if (literalType == lt_d64)
             {
-                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 15);
+                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 15, immutable_lref);
                 decfp = nc_misc::normalize_realNum(temp.append(exponent_it, decfp.end()), immutable_lref);
             }
             else if (literalType == lt_d128)
             {
-                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 34);
+                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 34, immutable_lref);
                 decfp = nc_misc::normalize_realNum(temp.append(exponent_it, decfp.end()), immutable_lref);
             }
             else if (literalType == lt_d256)
             {
-                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 72);
+                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 72, immutable_lref);
                 decfp = nc_misc::normalize_realNum(temp.append(exponent_it, decfp.end()), immutable_lref);
             }
             else if (literalType == lt_d512)
             {
-                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 148);
+                temp = nc_misc::approximate_base10_real(std::string{decfp.begin(), exponent_it}, 148, immutable_lref);
                 decfp = nc_misc::normalize_realNum(temp.append(exponent_it, decfp.end()), immutable_lref);
             }
         };
@@ -1216,7 +1229,7 @@ namespace Nc
         auto approximate_real_to_max_real = [&](std::string& realNum)
         {
             auto exponent_it = std::ranges::find(realNum, '@');
-            std::string temp = nc_misc::approximate_base10_real(std::string{realNum.begin(), exponent_it}, 148);
+            std::string temp = nc_misc::approximate_base10_real(std::string{realNum.begin(), exponent_it}, 148, immutable_lref);
             return nc_misc::normalize_realNum(temp.append(exponent_it, realNum.end()), immutable_lref);
         };
 

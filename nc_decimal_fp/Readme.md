@@ -81,7 +81,6 @@ The various storage format
     [ s:1 ][ integer_part:4 ][ real_part:20 ][ exponent:7  ]
 
     * offers a precision of 6 digits i.e. [0 - 999'999]
-    * offers 5 digits of calculative precision //modify for all
     * offers an exponent range of [-64 to 63]
 
 (2). using 64 bits for storage
@@ -99,7 +98,7 @@ The various storage format
 (4). using 256 bits for storage
     [ s:1 ][ integer_part:4 ][ real_part:240 ][ exponent:11  ]
 
-    * offers a precision of 72 digits i.e. [0 - 999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999'999]
+    * offers a precision of 72 digits i.e. [0 - 999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999_999]
     * offers an exponent range of [-1024 to 1023]
 
 (5). using 512 bits for storage
@@ -155,12 +154,13 @@ for 32bit, sign is 1bit, exponent is 8bit and mantissa is 23bits
 Now to show that this is how it is stored, using C++(which uses binary32 IEEE compliant format known as float), this simple example would
 verify the above:
 Fisrt, [ 0 ][ 10000111 ][ 01011001000011001100110 ] = 1135380070₁₀
+```
 int main()
 {
     //with the help of highly unsafe void* casting
     float x = 345.05;
     void* v_ptr = &x;
-    unsigned* i_ptr = (unsigned*)v_ptr;
+    unsigned* i_ptr = (unsigned*)v_ptr; //perform a pointer cast directly from here
     io::cout.writews_nl("x as base(10): ", *i_ptr);
 
     /*
@@ -171,7 +171,7 @@ int main()
     * objects .i.e things like: std::cout and the infamous operator<<
     */
 }
-
+```
 Now let me show you how a sample real-number is stored using nc's decimal floatingPoint format:
 345.05
 (1) Normalize the real-number
@@ -229,22 +229,28 @@ The reasons are quite explained here:
     numbers > 1'048'575, any attempt to store it would result in an errorenous sequence of bits for the entire storage, and in case you are
     thinking that why don't you just round the number when it maxes out, i.e for example: 1.1'048'576 would get rounded to 6digits instead thus
     becoming 1.1'048'58, well, that's where the unintuitive part comes in, having to check that every time is simply highly unintuitive and
-    no something i would like to defend in the nearest future.
+    not something i would like to defend in the nearest future.
     Advantages of not utilizing the full range:
     (1) Having to store numbers from 0 to 999'999(for 32bit storage for example) is way more intuitive, those six digits are always going to
         cover the max range that is from 0 to 999'999 and any real_part greater can just be simply rounded up, example:
         1.9'999'999 when stored would be appropriately rounded to this 2.0
-        It's just more sensible to reason about it from that pov.
+        It's just more sensible to reason about it from the base(10) pov.
     (2) The unused range isn't just forgotten, as you read initially, they are used to indicate underflow, if the exponent is negative, and
-        overflow, if the exponent is positive fo values greater than the maximum for that storage format.
+        overflow, if the exponent is positive for values greater than the maximum for that storage format.
 
-(2) (+/-)nan: meaning not a number, defined values of (+/-)nan dictates that an [integer_part] bit contains the ununsed values expect zero and
+(2) nan: meaning not a number, defined values of nan dictates that an [integer_part] bit contains the ununsed values expect zero and
     an optional [real_part] bit section, meaning the [real_part] bit section is not considered when NAN is detected, so the [real_part] can
     contain any value including ones > the maximum defined for that storage format
 
 (3) (+/-)0: due to the real-number always being normalized for storage, zero can never logically be attained, so an exception is made, the same
     exception is made for zero when normalizing. Defined value of zero dictates that the [integer_part] bit section contains a value of zero and
     an optional [real_part] bit section.
+
+To enable optimizations when performing pre-condition checks, we assign precedence to the following special values:
+- (+/-)0 and nan
+- (+/-)inf - lowest precedence
+
+(+/-)0 is zero regardless
 
 Incase you are wondering about why i didn't mention the [exponent] bit section in any of these, it is because it is entirely irrelevant in
 deciding the special values, so just imagine that the [exponent] bit section is irrelevant for all defined special values.

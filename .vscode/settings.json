@@ -169,9 +169,10 @@
     "editor.tabCompletion": "onlySnippets",
     "emmet.showSuggestionsAsSnippets": true,
     "C_Cpp.suggestSnippets": true,
-    "editor.fontWeight": "510",
+    "editor.fontWeight": "520",
     "editor.fontSize": 15,
     "python.analysis.typeCheckingMode": "basic",
-    "editor.fontFamily": "consolas, \"cascadia code\", monospace",
+    "editor.fontFamily": "'Noto Mono Regular', 'cascadia code', monospace, consolas",
+    "makefile.configureOnOpen": false,
 }
 

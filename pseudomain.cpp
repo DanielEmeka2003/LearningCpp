@@ -2105,6 +2105,8 @@ bool real_lt(const std::string& lhs, const std::string& rhs)
             auto rhs_real_part_size = rhs_real_part.size();
             auto max_size = std::max(lhs_real_part_size, rhs_real_part_size);
 
+            //appending is wasteful, slices would be used when i get to my language in my language
+
             //fill with leading zeros, if they aren't equal
             if (lhs_real_part_size != rhs_real_part_size)//i.e. these become (00345, 09) => (00345, 09000)
             lhs_real_part.append(max_size - lhs_real_part_size, '0'), rhs_real_part.append(max_size - rhs_real_part_size, '0');
@@ -2140,7 +2142,7 @@ bool real_lt_eq(const std::string& lhs, const std::string& rhs)
 { return real_eq(lhs, rhs) or real_lt(lhs, rhs); }
 
 bool real_gt_eq(const std::string& lhs, const std::string& rhs)
-{ return real_eq(lhs, rhs) or real_gt(lhs, rhs); }
+{ return real_eq(lhs, rhs) or !real_lt(lhs, rhs); }
 
 
 void max_normal(int n_of_mantissa, int exponent_bais)
@@ -2225,12 +2227,12 @@ class d32fp//specialized exponential function for the arthimetic calculations
 
 /*=====================================================================================================================================*/
 
-    //Note: me.rb is modified after during in this function and it returns a pair contianing ib_and_rb first then it's zero_count
+    //Note: me.rb is modified after during in this function and it returns a pair contianing ib_and_rb first
     auto merge_ib_and_rb()
     {
         //merges the integer_bits and real_bits in a way that handles special case(2):
 
-        d32fp& me = *this;
+        d32fp me = *this;
 
         auto ib_and_rb = std::uint32_t(me.ib);
         
@@ -2284,14 +2286,15 @@ class d32fp//specialized exponential function for the arthimetic calculations
         auto zeros_count = 0u;
 
         //since it is after removal of trialing zeros, no value entering here would have trailing zeros
-        if (ib_and_rb_digit_count > 2)//The problem starts from 3digits values
+        if (ib_and_rb_digit_count > 2)//The problem starts from 3digits values[i.e things like 10, 1 and so on are not to be considered]
         {
-            base10_raised = std::uint64_t(std::pow(10.0f, float(ib_and_rb_digit_count-2/*because of counting starts from 1 and i also want the second to the last digit*/)));
+            base10_raised = std::uint64_t(std::pow(10.0f, float(ib_and_rb_digit_count-2/*because of counting starts from 0 and i also want the second to the last digit*/)));
 
             while ((ib_and_rb / base10_raised)%10u == 0)
             ++zeros_count, base10_raised /= 10u;
         }
-        base10_raised = std::pow(float(10), float(--ib_and_rb_digit_count));
+        //remember, counting starts from 0, so ib_and_rb_digit_count gets 1 subtracted from it
+        base10_raised = std::pow(float(10), float(ib_and_rb_digit_count-1));//because i wish to give the integer-part 1 base(10) digits and the real-part the rest of the digits
 
         ib_rb_pair.second = std::uint32_t(ib_and_rb % base10_raised);
         ib_rb_pair.first = std::uint8_t(ib_and_rb / base10_raised);
@@ -2306,10 +2309,11 @@ class d32fp//specialized exponential function for the arthimetic calculations
 
     static auto remove_trailing_zeros(std::uint64_t& x)
     {
-        if (x == 0) return;
-
         //handles special case(1):
-        while (x % 10ull == 0) x /= 10ull;
+        if (x != 0)
+        {
+            while (x % 10ull == 0) x /= 10ull;
+        }
     }
 
 public:
@@ -2370,7 +2374,7 @@ public:
                     }
                     else
                     break;
-                }    
+                }
             }
             //remove all the unsafe/unwanted digits
             operand = right_shift(operand, last_safe_digit/*the last_safe_digit is also synonmous to the amount of unsafe_digits*/);
@@ -2378,9 +2382,22 @@ public:
         return operand;
     }
 
+    bool isZero() { return ib == 0; }
+    bool isNan() { return ib > 9; }
+    bool isInf() { return rb > 999'999u; }
+
+    static d32fp zero(){ d32fp nan{}; return nan.ib = 0, nan; }
+    static d32fp nan(){ d32fp nan{}; return nan.ib = 10, nan; }
+    static d32fp inf(std::uint8_t sb = 0){ d32fp inf{}; return inf.sb = sb, inf.ib = 1, inf.rb = 1'000'000, inf; }
+
     auto operator*(d32fp rhs)
     {
         d32fp lhs = *this;
+
+        if (lhs.isNan() or rhs.isNan()) return nan();
+        else if (lhs.isZero()) return rhs.isInf()? nan() : zero();
+        else if (rhs.isZero()) return lhs.isInf()?  nan() : zero();
+        else if (lhs.isInf() or rhs.isInf()) return inf(lhs.sb xor rhs.sb);
 
         std::int8_t added_lhs_rhs_eb = lhs.eb + rhs.eb;
 
@@ -2388,41 +2405,64 @@ public:
         {
             auto lhs_rb_digit_count = digit_count(lhs.rb);
             auto rhs_rb_digit_count = digit_count(rhs.rb);
-            
-            //digit_count must be collected before merging
 
             auto lhs_ib_rb = lhs.merge_ib_and_rb(), rhs_ib_rb = rhs.merge_ib_and_rb();
+            std::uint64_t multiplied_lhs_rhs_irb{};
 
-            auto multiplied_lhs_rhs_irb = std::uint64_t(lhs_ib_rb) * std::uint64_t(rhs_ib_rb);
+            if (lhs_ib_rb == 1)
+            {
+                multiplied_lhs_rhs_irb = rhs_ib_rb;
+            }
+            else if (rhs_ib_rb == 1)
+            {
+                multiplied_lhs_rhs_irb = lhs_ib_rb;
+            }
+            else
+            {
+                multiplied_lhs_rhs_irb = std::uint64_t(lhs_ib_rb) * std::uint64_t(rhs_ib_rb);
 
-            auto multiplied_lhs_rhs_irb_digit_count = digit_count(multiplied_lhs_rhs_irb);
-            
-            if (multiplied_lhs_rhs_irb_digit_count - (lhs_rb_digit_count + rhs_rb_digit_count) != 1)
-            added_lhs_rhs_eb += 1;
+                auto multiplied_lhs_rhs_irb_digit_count = digit_count(multiplied_lhs_rhs_irb);
+                
+                if (multiplied_lhs_rhs_irb_digit_count - (lhs_rb_digit_count + rhs_rb_digit_count) != 1)
+                added_lhs_rhs_eb += 1;
 
-            remove_trailing_zeros(multiplied_lhs_rhs_irb);
-            multiplied_lhs_rhs_irb = approximate_ui64(multiplied_lhs_rhs_irb, 7, added_lhs_rhs_eb);
-            remove_trailing_zeros(multiplied_lhs_rhs_irb);
-            
+                remove_trailing_zeros(multiplied_lhs_rhs_irb);//multiplied_lhs_rhs_irb_digit_count + n_of_zeros_removed
+                multiplied_lhs_rhs_irb = approximate_ui64(multiplied_lhs_rhs_irb, 7, added_lhs_rhs_eb);
+                remove_trailing_zeros(multiplied_lhs_rhs_irb);
+            }
+
             //split the ib and rb as base(10) numbers
             ib_and_rb_pair = demerge_ib_and_rb(multiplied_lhs_rhs_irb);
         }
         //relationship between signs([-] * [+]) with [-] as 1 and [+] as 0 is xor i.e (1 xor 0)
         std::uint8_t xored_lhs_rhs_sb = lhs.sb xor rhs.sb;
 
-        // instead of creating a new d32fp object, why not just use either lhs or rhs, because they aren't references anyway
         d32fp result{};
+
+        if (added_lhs_rhs_eb > 63)//overflow
+        result = inf(xored_lhs_rhs_sb);
+        else if (added_lhs_rhs_eb < -64)//underflow
+        result.ib = 0;
+        else
         result.sb = xored_lhs_rhs_sb, result.ib = ib_and_rb_pair.first, result.rb = ib_and_rb_pair.second, result.eb = added_lhs_rhs_eb;
+        
         return result;
     }
 
     auto operator/(d32fp rhs)
     {
         d32fp lhs = *this;
-        if (lhs.ib == 0)
-        {
-            return d32fp{};
-        }
+
+        if (lhs.isNan() or rhs.isNan())
+        return nan();
+        else if (lhs.isZero())
+        return rhs.isZero()? nan() : zero();
+        else if (rhs.isZero())
+        return lhs.isZero()? nan() : inf(0 xor lhs.sb);//because zero is always positive in nc's decimal floating-point
+        else if (lhs.isInf())
+        return rhs.isInf()? nan() : inf(lhs.sb xor rhs.sb);
+        else if (rhs.isInf())
+        return lhs.isInf()? nan() : inf(lhs.sb xor rhs.sb);
 
         std::int8_t subtracted_lhs_rhs_eb = lhs.eb - rhs.eb;
 
@@ -2488,19 +2528,49 @@ public:
         //relationship between signs([-] * [+]) with [-] as 1 and [+] as 0 is xor i.e (1 xor 0)
         std::uint8_t xored_lhs_rhs_sb = lhs.sb xor rhs.sb;
 
-        // instead of creating a new d32fp object, why not just use either lhs or rhs, because they aren't references anyway
         d32fp result{};
+        if (subtracted_lhs_rhs_eb > 63)//overflow
+        result = inf(xored_lhs_rhs_sb);
+        else if (subtracted_lhs_rhs_eb < -64)//underflow
+        result.ib = 0;
+        else
         result.sb = xored_lhs_rhs_sb, result.ib = ib_and_rb_pair.first, result.rb = ib_and_rb_pair.second, result.eb = subtracted_lhs_rhs_eb;
+
         return result;
     }
     
     auto operator+(d32fp rhs)//requires 9 base(10) digits
     {
         d32fp lhs = *this;
-        /*zero case is not handled*/
+
+        if (lhs.isNan() or rhs.isNan())
+        return nan();
+        else if (lhs.isZero())
+        {
+            if (bool(rhs.sb))//zero is always positive in nc's decimal floating-point
+            return rhs.isInf()? inf(1) : (rhs.sb = 1, rhs);   
+            else
+            return rhs.isInf()? inf() : rhs;
+        }
+        else if (rhs.isZero())
+        return lhs;
+        else if (lhs.isInf())
+        {
+            if (bool(lhs.sb xor rhs.sb))
+            return rhs.isInf()? nan() : lhs;
+            else
+            return lhs;
+        }
+        else if (rhs.isInf())
+        {
+            if (bool(lhs.sb xor rhs.sb))
+            return lhs.isInf()? nan() : rhs;
+            else
+            return rhs;
+        }
 
         /*
-        * lagerOperandDigitCountBeforeTheSmallerOperandStarts: as the name implies, is the larger number count of digits it has before the smaller
+        * largerOperandDigitCountBeforeTheSmallerOperandStarts: as the name implies, is the larger number count of digits it has before the smaller
         * number digits starts. Example:
         * [1] lhs(5.26@+5) and rhs(2.63@-1)
         * largerOperandDigitCountBeforeTheSmallerOperandStarts is |5--1| = 6
@@ -2524,12 +2594,13 @@ public:
         * precision) i aim to compute, or if the largerOperandDigitCountBeforeTheSmallerOperandStarts is >= 8, that the smaller operand is
         * just too small to be computed and therefore the larger operand should be return as it is. 
         */
-        std::uint8_t lagerOperandDigitCountBeforeTheSmallerOperandStarts = std::abs(lhs.eb - rhs.eb);
+        std::uint8_t largerOperandDigitCountBeforeTheSmallerOperandStarts = std::abs(lhs.eb - rhs.eb);
         bool is_lhs_exponent_greater = lhs.eb > rhs.eb;
         auto larger_exponent = is_lhs_exponent_greater ? lhs.eb : rhs.eb;
         std::pair<uint8_t, uint32_t> ib_and_rb_pair{};
+        std::uint8_t lhs_rhs_sb{};
 
-        if (lagerOperandDigitCountBeforeTheSmallerOperandStarts >= 8)
+        if (largerOperandDigitCountBeforeTheSmallerOperandStarts >= 8)
         return is_lhs_exponent_greater? lhs : rhs;
         else
         {
@@ -2548,7 +2619,7 @@ public:
             }
             else
             {
-                std::uint32_t count_of_digits_the_smaller_operand_must_have = 8 - lagerOperandDigitCountBeforeTheSmallerOperandStarts;
+                std::uint32_t count_of_digits_the_smaller_operand_must_have = 8 - largerOperandDigitCountBeforeTheSmallerOperandStarts;
                 if (is_lhs_exponent_greater)
                 {
                     if (lhs_digit_count < 8)//increase it to it's calculative precision
@@ -2573,7 +2644,10 @@ public:
 
             if (bool(lhs.sb xor rhs.sb))
             {
-                std::uint64_t subtracted_lhs_rhs_irb = std::max(lhs_ib_rb, rhs_ib_rb) - std::min(lhs_ib_rb, rhs_ib_rb);
+                if (lhs_ib_rb < rhs_ib_rb and !bool(lhs.sb))//to gaurd against something like this: -1 + 2
+                lhs_rhs_sb = 1;
+
+                std::uint64_t subtracted_lhs_rhs_irb = lhs_ib_rb < rhs_ib_rb? rhs_ib_rb - lhs_ib_rb : lhs_ib_rb - rhs_ib_rb;//requires only 8 base(10) digits
                 
                 remove_trailing_zeros(subtracted_lhs_rhs_irb);
                 subtracted_lhs_rhs_irb = approximate_ui64(subtracted_lhs_rhs_irb, 7, larger_exponent);
@@ -2584,6 +2658,8 @@ public:
             }
             else
             {
+                lhs_rhs_sb = lhs.sb bitor rhs.sb;
+
                 /*change to std::uint32_t later*/ std::uint64_t added_lhs_rhs_irb = lhs_ib_rb + rhs_ib_rb;
                 
                 //because normally, addition only results in at most 8 base(10) digits or less, anymore and it means an extra digit was added as a result of the operation
@@ -2597,12 +2673,17 @@ public:
                 ib_and_rb_pair = demerge_ib_and_rb(added_lhs_rhs_irb);
             }
         }
-        //relationship between signs([-] +/- [+]) with [-] as 1 and [+] as 0 is or i.e (1 xor 0)
-        std::uint8_t ored_lhs_rhs_sb = lhs.sb bitor rhs.sb;
 
         // instead of creating a new d32fp object, why not just use either lhs or rhs, because they aren't references anyway
         d32fp result{};
-        result.sb = ored_lhs_rhs_sb, result.ib = ib_and_rb_pair.first, result.rb = ib_and_rb_pair.second, result.eb = larger_exponent;
+
+        if (larger_exponent > 63)//overflow
+        result = inf(lhs_rhs_sb);
+        else if (larger_exponent < -64)//underflow
+        result.ib = 0;
+        else
+        result.sb = lhs_rhs_sb, result.ib = ib_and_rb_pair.first, result.rb = ib_and_rb_pair.second, result.eb = larger_exponent;
+
         return result;
     }
 
@@ -2622,8 +2703,14 @@ public:
     {
         d32fp lhs = *this;
 
-        if (lhs.ib == 0 and rhs.ib == 0)
-        return true;//to prevent something like 0.0@+3 not-equaling 0.0@-34
+        if (lhs.isNan() or rhs.isNan()) return false;
+        else if (lhs.isZero()) return rhs.isZero(); //to prevent something like 0.0@+3 not-equaling 0.0@-34
+        else if (rhs.isZero()) return lhs.isZero();
+        else if (lhs.isInf()) return rhs.isInf()? lhs.sb == rhs.sb : false;
+        else if (rhs.isInf()) return lhs.isInf()? lhs.sb == rhs.sb : false;
+
+        //check if the sign is not equal
+        if (lhs.sb != rhs.sb) return false;
 
         //check if the exponent is not equal
         if (lhs.eb != rhs.eb) return false;
@@ -2643,9 +2730,15 @@ public:
     {
         d32fp lhs = *this;
 
-        if (lhs.ib == 0 and rhs.ib != 0) return true;
-        else if (lhs.ib != 0 and rhs.ib == 0) return false;
-        else if (lhs.ib == 0 and rhs.ib == 0) return false;
+        if (lhs.isNan() or rhs.isNan()) return false;
+        else if (lhs.isZero()) return rhs.isZero()? false : !bool(rhs.sb);
+        else if (rhs.isZero()) return lhs.isZero()? false : bool(lhs.sb);
+        else if (lhs.isInf()) return bool(lhs.sb)? !rhs.isInf() : false;
+        else if (rhs.isInf()) return bool(rhs.sb)? false : !lhs.isInf();
+
+        //sign comparison
+        if (lhs.sb == 1 and rhs.sb == 0) return true;
+        else if (lhs.sb == 0 and rhs.sb == 1) return false;
 
         //exponent comparsion
         if (lhs.eb < rhs.eb) return true;
@@ -2656,23 +2749,41 @@ public:
         else if (lhs.ib > rhs.ib) return false;
 
         //real-part comparison
-        if (lhs.rb < rhs.rb) return true;
-        else if (lhs.rb > rhs.rb) return false;
-        /*reminder that real-parts of .0003 are stored as this .3000*/
-        
-        //an optimization can be used here, by just removing the last (else if) and return false, or should nc-compiler be capable of optimizing it away?
+        {
+            //This is due to special case of dfp storing real-part leading zeros as trialing zeros i.e .005 is stored as .500
+
+            auto lhs_leading_zeros_count = 0u, rhs_leading_zeros_count = 0u, lhs_rb = lhs.rb, rhs_rb = rhs.rb;
+            
+            if (lhs_rb != 0)
+            {
+                while (lhs_rb % 10ull == 0) lhs_rb /= 10ull, ++lhs_leading_zeros_count;
+            }
+            if (rhs_rb != 0)
+            {
+                while (rhs_rb % 10ull == 0) rhs_rb /= 10ull, ++rhs_leading_zeros_count;
+            }
+
+            if (lhs_leading_zeros_count < rhs_leading_zeros_count) return false;
+            else if (lhs_leading_zeros_count > rhs_leading_zeros_count) return true;
+
+            if (lhs_rb < rhs_rb) return true;
+            //else {return false if lhs_rb >= rhs_rb}
+        }
 
         return false;//must be equal
     }
 
     auto operator>(d32fp rhs)
-    { return *this != rhs and !(*this < rhs); }
+    {
+        if (this->isNan() or rhs.isNan())
+        return false;
+
+        return *this != rhs and !(*this < rhs);
+    }
     
-    auto operator<=(d32fp rhs)
-    { return *this == rhs or *this < rhs; }
+    auto operator<=(d32fp rhs) { return *this == rhs or *this < rhs; }
     
-    auto operator>=(d32fp rhs)
-    { return *this == rhs or *this > rhs; }
+    auto operator>=(d32fp rhs) { return *this == rhs or *this > rhs; }
 
     static auto tcast_cstr(const char* char_ptr_d32fp)
     {
@@ -2801,11 +2912,11 @@ std::ostream& operator<<(std::ostream& out, d32fp x)
     auto sign_to_display = (x.sb == 1? '-':(should_show_pos_sign? '+': '\0'));
 
     if (x.ib > 9)
-    return out << "nan";
-    else if (x.rb > 999'999)
-    return out << sign_to_display << "inf";
+    return out << "\033[31;1mNAN\033[0m";
     else if (x.ib == 0)
     return out << sign_to_display << '0' << '.' << '0';
+    else if (x.rb > 999'999)
+    return out << sign_to_display << "\033[31;1mINF\033[0m";
 
     auto isfixed = bool(out.flags() & std::ios_base::fixed);
     
@@ -2898,10 +3009,10 @@ int main()//test d32fp with that conversion of base(10) real_part to base(n)
         // io::cout.setPrecision(8). write_nl(1.892523476f * 5.262253376f * 1.892523476f * 5.262253376f * 1.892523476f * 5.262253376f);
         // 1.8952e-8 * 6.5267e-2 ``highlights the true difference between nc's-decimal-fp and IEEE's-binary-fp
         /*
-        * 1. handle special cases like zero, nan and inf
-        * 2. remove implicit trailing zeros from the real-part after each calculation
+        * 1. handle special cases like zero, nan and inf - done
+        * 2. remove implicit trailing zeros from the real-part after each calculation - done
         * 3. test your multiplication of decimal-fp against binary-fp using the conversion of base(10) real to base(n)
-        * 4. My decimal implementation can't store a real-nuber like this: 1.000001 or 1.02
+        * 4. My decimal implementation can't store a real-nuber like this: 1.000001 or 1.02 - solved
         * 
         * Special case(1) for the exponent:
         * Using d32fp as an example. Exponents are stored as signed integers using the two's complement. Now the problem comes when extractions
@@ -2954,31 +3065,46 @@ int main()//test d32fp with that conversion of base(10) real_part to base(n)
         */
 
         // io::cout.setFmtf(std::ios_base::fixed);
-        io::cout.setPrecision(7);//try rounding this 9'999'999
+        io::cout.setPrecision(6);//try rounding this 9'999'999
         //Now it's time for definig operations on special values
-        auto lhs = d32fp::tcast_cstr("2.0002@-3"), rhs = d32fp::tcast_cstr("1.02@-6");
-        io::cout.writews_nl(lhs, "<", rhs, '=', lhs < rhs);
-        //52 ÷ 234
+        io::cout.write_nl(-d32fp::tcast_cstr("1.0")/d32fp::tcast_cstr("0.0"));
+        auto lhs = d32fp::tcast_cstr("3.333333@+6"), rhs = d32fp::tcast_cstr("6.0");
+        io::cout.writews_nl(-lhs, "+", rhs, '=', -lhs +rhs);
 
-        /*misc::Timer timer{};
+        using boost_d100fp = boost::multiprecision::cpp_dec_float_100;
+        
+        // 2.225074e-324;
+        // 4.940656458412e-324; IEEE b64 is doing something really weird here
+
+        misc::Timer timer{};
         timer.start();
-        for (size_t i = 0; i < 100; i++)//try it with 10'000 again
+        for (size_t i = 0; i < 75; i++)//try it with 10'000 again
         {
-            io::cout.write_nl(result);
-            result = result * rhs;
+            lhs = lhs / rhs;
+            // io::cout.write_nl(lhs);
         }
         timer.pause();
-        io::cout.writews_nl("d32fp =", result, "time:", timer.getTicks());
+        io::cout.writews_nl("\033[47;30;1md32fp", "time:", timer.getTicks(), "\033[0m");
 
-        boost::multiprecision::cpp_dec_float_50 y{ 3.333333e6 * 6.0 };
+        boost_d100fp y{ 3.333333e6 }, y2{ 6.0 };
         timer.restart(), timer.start();
-        for (size_t i = 0; i < 100; i++)
+        for (size_t i = 0; i < 75; i++)
         {
-            io::cout.write_nl(y);
-            y = y * 6.0f;
+            y = y / y2;
+            // io::cout.write_nl(y);
         }
         timer.pause();
-        io::cout.writews_nl("boostfp =", y, "time:", timer.getTicks());*/
+        io::cout.writews_nl("\033[47;30;1mboost_d100fp", "time:", timer.getTicks(), "\033[0m");
+
+        auto x{ 3.333333e6f };
+        timer.restart(), timer.start();
+        for (size_t i = 0; i < 75; i++)
+        {
+            x = x / 6.0f;
+            // io::cout.write_nl(x);
+        }
+        timer.pause();
+        io::cout.writews_nl("\033[47;30;1mb32fp", "time:", timer.getTicks(), "\033[0m");
 
         //only add numbers of the same sign, if they are of different sign, subtract
 
@@ -2986,6 +3112,13 @@ int main()//test d32fp with that conversion of base(10) real_part to base(n)
         // max_normal(10, 15), max_normal(23, 127), max_normal(52, 1'023), max_normal(112, 16'383);
         // std::cout << '\n';
         // min_denormal(10, -14), min_denormal(23, -126), min_denormal(52, -1'022), min_denormal(112, -16'382);
+        io::cout.write_nl("");
+        for (auto i = 0u; i < 255; ++i)
+        {
+            io::cout.write_nl("[1m", std::bitset<8>{i}, "[0m");
+        }
+        for (auto i : "🙂‍↔️"_u8str)
+        i.info();
     }
     catch(const std::exception& e)
     {
