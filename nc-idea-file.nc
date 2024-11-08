@@ -1,326 +1,22 @@
-fn format(type u8str x)
-{
-    guess cut_string ::= x[type pair(x.find('i'), x.find('.'))]
-
-    cut_string.insert("XXXXX", 2)
-
-    ``Are none and nullptr that important to be reserved identifiers for their types?
-
-    "${emeka}"
-    "{9*0} {{  }}"
-    "\${2*2}"
-
-    "@{emeka}"
-    
-    iter 4 0 : (default, =, .step ::= 2)
-    r_l(+)
-    type int32 match
-    type match int32
-    (1, 2, 3 4, 5)
-    f(1, 2, 3, 4 5)
-    f(1, 2, +, 4, 5)
-    f(1, +2)
-
-    type int32 match ::= 3
-}
-
-fn panny(typeof(class_mut) me) //for getting the type of a class easily
-{
-    #(1, 2, 3, 4) | fcn
-
-    iter e : (1, 10, -2)
-    {
-
-    }
-
-    do: type int a(3)
-    emeka(), #()|emeka
-    while true;
-}
-
 fn main()
 {
-    type fn (type int, type int)type int ::= main
-    type fn (int32, int32, int32) bin32
-    type (int32, int32, int32) bin32
-    guess g ::= fn();
+    for e : (1, 10, -2) ``I might want to specify an incremental or a decremental operation other than an operator to use, example in the incase of the integer, a function that allows overflow
+    {}
+    .step_control= +=
+    .step_ctrl= si32::overflow_add()
+    .step= e += 3
+    : What of a comparison function?
+    .comparison= #op<
+    .comparison= islt(me, 34)
 
-    fcn(fn open(){})
-    type fn(u8string)int32: "imut_lref" a ::= fn master(){}
-    type fn(u8string)int32: "imut_lref" a ::= fn(){}
+    1234343'@-334;
 
-    plain_ptr<fn(u8string)int32> g ::= fn(){}
-
-    fn gas(int32 a, int8 int8){}(2, 0`i8)
-
-    gasup(fn kase(){})
-    fn(){}()
-
-    //temporary object of function type
-    type fn(int32)int32 {}
-    //unnamed function
-    fn(int32)int32{  }
-
-    match e:i{case 2: {}; default: 34}
-    match e:i{case(3, 4, 5): emeka}
-    println!("{}", match e:i{case 2: {} case<int32>: 2 default: 23})
-    
-    array[type pair(0, 3)]
-    array[0..3]
-    (0..3).to_it()
-
-    guess array ::= type f_array(3, 10112₃)
-    guess (a, b, c) ::= array
-    How will i:
-    1. Make **a** an immutable reference to element[1]
-    2. Make **b** a mutable reference to element[2]
-    3. Make **c** copy it's value
-
-    Can be done if the they are directly initialized:
-    guess (a, b, c) ::= #(imut_lref array[1], mut_lref array[2], cp array[3])
-
-    guess a ::= &imut a;
-    guess a ::= imut a;
-    gmem -> is back
-
-    :(2, 3, 4)|fcn
-    #(2, 3, 4)|fcn
-
-    iter _ : (1, 3, -1) output(2, 3)
-    rng _ : (1~7) output(2, 3)
-
-    named_pt red, blue, seal{}
-    named_st color{type red, type blue, type seal}
-
-    fn current_color(type color c) type any<?>
-    {
-        match c:i{ case<red, blue, seal>: give type any(i) }
-    }
-
-    fn main()
-    {
-        guess curr_color := current_color()
-    }
-    &d.goand
-
-    iter i:(desired_digits, 0, -1)
-    {
-
-    }
-    for infer i := desired_digits; i < 0; --i:
-    {
-
-    }
-    3,,4
-    3,,5
-    3,:4
-    3,:3
-    3~3
-
-    b = $(2, 4, 5, 6)
-    $(2, 3, 4, 5, 6) + $(2, 3, 4, 5)
-    type ustr a()
-    a[3,,5]
-
-    infer a := 2, 3
-    guess a := 3, 4
-    auto a := 3, 4
-
-    #[list_name_space_content(boost, no_namespaces, no_functions)]
-
-    3,,4
-    3,,4
-    3~4
-
-    - value references would different type different from non-value-reference, only it's mutability status would not be different
-    - stabilize the above: type si32:"imut [&]"
-    
-    fn var_arg(...)
-    fcn(1, _, _, 3)
-    fcn(1, default, default, 3)
-    ::@si32
-    nc(_, _, _, .start := )
-    nc(_, _, .start := 1)
-
-    \"emeka daniel"u8 := 3
-    \"emeka & daniel"p := 5
-    "emeka"u8
-    u8"emeka"
-    '÷'u8.info()
-    u8'÷'.info()
-
-    \"daniel & esther's bread"u8.
-    ``it shouldn't declare another literal when using as an identifer
-
-    infer \"fn" := fn(type fn(infer)si32 fcn, infer a){ fcn(a); }
-    infer temp := fn(type fn(infer)si32 fcn, infef a){ fcn(a); }
-    infer \"t" := fn(infer arg1, infer arg2, type fn(infer, infer)void: "mut&" callback){ callback(arg1, arg2) }
-    34343⤸
-    4334344334049'⤸ //that shouldn't be possible
-    234343434344340458309580
-
-    110100000000000000000000000000000000000000000000000000000111111111111111111111111111111111111111111111111111111100000000000000000000000000⤸
-    1001110101₂`si32
-
-    1010''0010'''''''''''''''''''''''''''''1001010010100'101010010
-
-    infer html := imbed html{ <p>Emeka Daniel</p> }
-    infer c++ := imbed c++{ #include<iostream> int main(){ std::cout << "Hello world" << '\n'; } }
-    infer c++ := imbed c++{ #include "io.h" auto main(){ io::cout.write_nl("Hello world"); } }
-    infer nc := imbed nc{ use pkg (stdio, time) fn main(){ io::outf("Hello world { {type chrono::clock a(); a.now().\"time-zone"() } }"); } }
-    infer html := "<html>Emeka = {122123232323₁₆}</html>"
-
-    type si32:"[]" e;
-    infer:"[]" e;
-
-    abstract-values are mutable by default
-    fcn(1,,2, 3,,4, 1.2,,3.4)
-    fcn(1., _)
-
-    match e{
-        case(1, 2) give 2
-        case(5) give 4
-        case<si34> give 2
-    }
-    match f
-    {
-        case(23) io::out.setOutDevice(\"hp-printer-2902").("<html>emeka<html>")
-        case(34) 34
-    }
-    *i.fcn()
-    ++i.fcn()
-
-    infer frac := type fraction(1, 2)
-
-    1.2 + $(_v, 1.2, 1.2, 4.5, 6.7, 9.7, 9.0, 2.0)
-
-    named_pt binary_exp, prefix_exp, postfix_exp {}
-    named_st expression{type binary_exp, type prefix_exp, type postfix_exp}
-    type darray<expression> exp_list
-    (
-        type expression(type binary_exp()),
-        type expression(type binary_exp()),
-        type expression(type prefix_exp()),
-        type expression(type postfix_exp())
-    )
-    type darray<expression> exp_list
-    (
-        type binary_exp(),
-        type binary_exp(),
-        type prefix_exp(),
-        type postfix_exp()
-    )
-
-    enum Expression{Binary_exp(), Postfix_exp(), Prefix_exp()}
-    let exp_list := Vec::new(Expression::Binary_exp{}, Expression::Binary_exp{}, Expression::Postfix_exp{}, Expression::Prefix_exp{})
-    
-    type @expression::binary_exp()
-
-    named_st expression{type binary_exp, type postfix_exp, type prefix_exp}
-    named_st expression{type(binary_exp, postfix_exp, prefix_exp)}
-
-    type_space expression{
-        named_pt binary_exp, postfix_exp, prefix_exp{}
-    }
-
-    infer d_array := type d_array(type @expression::binary_exp())
-
-    type si32 a := type si32(3)
-    infer a := type si35(3)
-    infer b := type dArray(type expression(type bExp()))
-    infer c := type dArray<expression>(type bExp := 3, type uExp := 4)
-
-    fn fcn(type si32 _, type si37 _){
-        infer html := html"
-        <html>
-            <head>
-                <p>Emeka Daniel</p>
-            </head>
-        </html>
-        "
-
-        infer sql := sql"
-        from {\"generic-table"} get fancy
-        "
-    }
-
-    fn assign(type u8str:"[]" me){
-        me.1
-        me.2
-        me.3
-        break(1)
-        break(2)
-    }
-    assign(imut &type u8str(e))
-    type si32 a := type si32(3)
-
-    fcn(_i_, e, _d_, _f_, _j_, _l_o)
-    fcn(i_, 3`sec)
-    fcn(_v, 1, 3, 9, _v)
-
-    b := 122222200000344309989900012344490002323⤸
-'2334334'3454555
-
-\iter
-\"iter"
-\rng := 34
-
-while 2 == 9 : {}
-for infer i := 2; i == 2; ++i: {}
-iter i : (2, 9) {}
-iter i : |mut vector| {}
-iter i : |2~5| {}
-
-    12343434233333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333123243222222223232.⤸
-2323232948393940943040443093490939348988888888888888888888888888888888888833333333333333333333333333333333333333333333333333333333333333333333333390⤸
-99999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999900000900⤸
-93400358099999999999999999999999999999999999999999999999999999999999943333333333333333333333333333333333333333333333333333333333333333333333333333332⤸
-9000000000000000000000000000000000000000000000000000000000000000000000000099999999999999999999999988888888888888888888888888888888888888888888888888
-
-    10110100111111111111111111111111111111111111111111111111111111111111111111111111110000000000000000000000000011111111111111111111111111111000000⤸
-100000000000000000000000000000000001111111111111111111111111111111111111111110101100101001010101010100000000000000111111111111111100000001111101010⤸
-000000000000000000000000111111111111110101010010111111100000100011111100010010101010000001010000000000000101010111111100000000000000000000011001001
-
-    1234343'@-'3'3'4';
-
-    type unicode uchar(10'fff₁₆)
-    tcast<u32>(uchar)
-    bcast<u32>(uchar)
-    uchar|tcast<u32>
-    u8""
-    u32""
-    u16""
-
-    attribToExp(#[lineNumber::fn::call_site])
-    #[runTime(false)] infer meta
-    meta := intoExp(#[ast(true)])
-
-    type achar a('÷')
-    '2' '👀' '⤸'
-
-    type_space achar
-    {
-        fn _construct_(#[requires \"basic latin"] type literal::charWise::char ){}
-        
-        fn _construct_(#[requires \"si32"] type literal::charWise::char ){}
-
-        typeof(asExp{#[literal::()]}) s
-
-        a := '\(basic_latin[9])'
-    }
-    
-    ``defining 2d arrays in nc
-    infer \"2d uint array"
-
-    \"2d uint array" := type farray(type farray(1, 2, 4, 0), type farray(1, 2, 3, 4), type farray(1, 2, 3, 4))
-
-    type farray<farray> a(type farray(2), type farray(4), type farray(5))
-
+    `` From swift, try to replicate in nc
     let arrayOfArrays: Array<Array<Int>> = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    int a[2][3] = {1, 2, 3, 4};
+
     - normal arrays in c++ cannot take arrays of different type than itself
     - std::arrays in c++ cannot take arrays of different size
-    - my arrays can
+    - nc arrays can
 
     + Try accepting input from both (linux and window)s system, to test what encoding they use
     + There should be a platform agnostic way for file entry($root::user::document::learningCpp or $root::home::emeka::document::learningCpp)
@@ -329,224 +25,158 @@ iter i : |2~5| {}
     while true:
     {
         printf("{atom}")
+        printf("%0 + %0", 1)
+
         use mod thread
         thread::sleep(12`sec)
         atom.energy_spike(3.4`kv)
     }
 }
 
-named_p red, blue, green{}
-named_s color{type red, type blue, type green}
-
-type_space color{
-    fn current_variant_type(me){
-        type plain_ptr<si32> \"si32*"
-    }
-}
-
-named_pt color{type red x, type ui16 curr_i}
-
 `{
-    Circular referencing is not allowed....
-
-    infer a = type u8str('a', ...[4])
-    a + tcast<u8str>(3, .\"show pos sign?"=true)
-
-    cast<`*type to*`>(`*type from*`)
-    cast<si32>("345₂₄")
-    type str(3, _, _, _)
-
-    try type str(3, _, _, _)
-    s"345" + handle type str(3, _)
-
-    unichar x{"÷", @encoding::utf32LE}
-    try unistr c{file_data, @encoding::utf8} handle {}
-    : The error is bundle together
-    (lazy 2 * 3) + 3
-    type file x => handle(error){}
-    : Okay i now know how to bundle the error, by using a sumtype, but how do i enable efficient work with it?
-    : And also, in single error situations, i already know how to propagate an error, but how do i propagate in multiple error scenarios
-
-    prop divide(2, 3)
-    prop (2/3)
-    (2/3).unwarp()
-    prop *ptr
-    divide(2, 3) => (error) {}
-    divide(2, 3) => |34|
-    divide(2, 3) => |34| { log("something bad happened") }
-    type str x(@encoding::utf8, file) => continue
-    type ui64 x("2343@") => |0|;
-    : This approach is too simplistic in practice, as it does not tell what the function gives therefore leaving a vunerablity to FFI
-    : Instead of making a particular subset of types "error types", make it such that a sumtypes have a special set of syntaxes that only work
-    for sumtypes that have two fields, one must be a generic field and the other either an enum or subtype of the error productType
-
-    named_s result<type data, type \"subtypeof error or enum">: #constriant_error_sumtype(\"...") {...}
-    match divide(2, 3): i, j, k{
-        case<si45> i * 3
-        case<dividebyzero> "divide by zero: sepcific{j}"|printf
-    }
-    try divide(2, 3) * 3
-    divide(2, 3) => (error){ printf("divide by zero: specific {j}") }
-    divide(2, 3) => |34|{}
-    prop divide(2, 3) * 3
-    give type result(3, &mut )
-    : What of giving multiple error types in the same function
+    : Self referential types Like lists and tree structures(ast for example)
     {
-        fn some_function() type result<?, ?>
+        : Circular referencing is not allowed, read up on it
+
+		struct node<type t> { type *node<t> next, type t value }
+		type node<si16> a(34`si16, .next= type )
+
+		: Something like this is not allowed for inferred argument entry
+		{
+			fn _init_<type t>(type some<t> _){}
+
+			fn _mInit_()!
+			fn _cInit_()!
+			fn _cleanup_()!
+		}
+    }
+    : There is no need for casting since typespaces can be extended to have more constructors
+    : Not pertinent to the problems of nc
+    {
+        Encapsulation: information/data hiding
+        Abstraction: is the hiding of unnecessary complexity
+        Interface: is a shared communication point that allows different but functionality related entities to interact with those functionalities
+
+        The advent of high-level abstractions should cost little to no overhead, and if it needs to, a compromise should provide
+
+        How i will type operations be treated when meta-programming?
+
+        ranges: what is it?
+        Type Concept: is an abstract idea that groups types into specific categories
+        : is an abstract idea that groups types into specific categories, to operate on them in uison
+        : an idea or mental image which corresponds to some distinct entity or class of entities, or to its essential features, or determines the
+        application of a term (especially a predicate), and thus plays a part in the use of reason or language.
+        a general interface?
+
+        [progressive disclosure complexity]
+    }
+    : How would type any and sum work? Because these are things that need to give/return types
+    {
+		: They don't wotk like that
+        : How would i store the current type of a sumtype
         {
-            prop (2/3) ``error: enum dividebyzero
-            prop (2.0/3.0) ``error: enum errorneous{ dividebyzero, dividebynan, dividebyinf }
-            prop type deserialize x(file, @format::json) ``named_p error {type jsonData}
+            named_p red, blue, green{}
+            named_s color{type red, type blue, type green}
+
+            type_space color{
+                fn current_variant_type(me){
+                    type plain_ptr<si32> \"si32*"
+                }
+            }
         }
+		#statement::\"str->code"
+		#decl::\"str->decl"("struct made{}")
+
+		index.ncml
+		{
+			use mod timer
+			struct s_counter { type si32 x, type chrono::clock c }
+			type s_counter c()
+			fn action()
+			{
+				c.x += 1
+				io::out.writef("%{c.x} ;;; %{c.c.now(_)}") ``variadic one or more would not allow this
+			}
+
+			<mouse>
+			{
+				onClick: action()
+			}
+			<p>
+			{
+				action() + 34
+			}
+		}
     }
-    
-    : How would inheritance be implemented so that extension typespaces aren't eager to allow inheritance
+    : New syntax emission for both object expressions and functions
     {
-        use type error
-        use mixin error
-        use interface error
-        use pkg error
-        use mod error
+		<type> [<initializer>]
+		'fn' <identifier> ['('<type_parameter>{',' <type_parameter>}')'] <block>
+		'fn' ['('<type_parameter>{',' <type_parameter>}')'] <block>
     }
+    : For resolving overloaded identifiers [to<*>(*)]
+    : Define the scope of what gets seen globally in a scope? only objects cannot be seen globally
+	{
+		: Search what lexically scoping means
+		: And what rust, go and other modern languages call their type of scoping for function and types
+	}
+	: Only way to discard a value
+	{
+		infer _ = <expression>
+	}
+	: Statements parsing
+	{
+		: All statements [if, while, do, for, match and jump]
+		: <match> statement new syntax
+		{
+			<match_branch> := 'br' <statement>
 
-    error::panic(s"emeka daniel {0, 1, 2}".insert(2, 4, 5))
-    
-    : There is no need for casting since constructors can be extended
+			'match' [<object_decl> {',' <object_decl>} ';'] <expression> [':' <identifer>|'('<identifier_list>')'] '{' <match_branch> {',' <match_branch>} '}'
+		}
+		: <for> statement new syntax
+		{
+			'for' [<object_decl> {',' <object_decl>} ';'] <identifier> ':' ('('...')' | '|'...'|') <statement>
 
-    
-    m_tokenString should change to m_token and it should be an object of type U8string_view, even line_content
-
-    Encapsulation: information/data hiding
-    Abstraction: is the hiding of unnecessary complexity
-    Interface: is a shared communication point that allows different but functionality related entities to interact with those functionalities
-
-    The advent of high-level abstractions should cost little to no overhead, and if it needs to, a compromise should provide
-
-    [META PROGRAMMING: CCI - compiler communication interface]
-    
-    How i will type operations be treated when meta-programming?
-
-    ranges: what is it?
-    Type Concept: is an abstract idea that groups types into specific categories
-    : is an abstract idea that groups types into specific categories, to operate on them in uison
-    : an idea or mental image which corresponds to some distinct entity or class of entities, or to its essential features, or determines the
-      application of a term (especially a predicate), and thus plays a part in the use of reason or language.
-    a general interface?
-    
-    [progressive disclosure complexity]
-
-    #type::is_eq(si32, #exp::getType(a))
-    #{type si32 == #exp::getType(a)}
-    #type(si32) == #type(si56)
-    #place_id(4)
-
-    #[type(si32)(is_mutable)]
-    #type::is_mutable(type si32) #type::give(type si32) #expression::give(34) #expression::getType(2)
-
-    ``how would type any and sum work? Because these are things that need to give/return types
+			for x : |&mut collection| {}
+		}
+    	: Statements [if, while, for and do] when used as a substatement must be done so in blocks
+		: Addition of U+D7 as the alternate multiplication operator
+		: How should jump_statements be parsed?
+		{
+			- 'give' [<expression>]
+			- 'break'|'continue' ':' [<integer_number_literal>]
+		}
+	}
+    : Primitive string and character definition
     {
-        type #type 
-    }
-    : Object declaration and expression has a conflict when parsing enclosed grouping stuff
-    {
-        type si32 [a, c, x]
-        type si32 [a, c, v] [z, x, c, v]
+		: Primitive type u8str
+		{
+			Memory model:
+			- If it is defined in the stack space and the size is below 64, it would be allocated on the stack
+			- Else it would be allocated on the readonly section of program memory
 
-        It is disqualified for object expression because it is meant to embody a singular entity like a literal
-    }
-    : Object_expression can be without initialization and functions can be without parenthesis
-    : Designing LCI to have full language capability, treat types and other entities as data
-    {
-        : There should be a distinction between code and language-communication-subjects, like async, give or break should not be avialable in the
-        LCI
-        user-code
-        language-code
-
-        : Passing and giving of types should work how in nc? : try C++'s way of returning types
-        : Returning of types would be handle in LCI but i don't even know how to implement that
-    }
-    : Varadic expression parameter entry is the only one that would be supported and not varadic type parameter entry
-    {
-        fn my(type #varadic _, type #varadic bat){}
-    }
-    : Think about how operator overloading and literal definition would go
-    : Specialization and overloading think more: tcast<u8str>() is going to be overloaded not specialized
-    : Casting is going to be fixed for only identifier overload resolution and enabling subtyping - both for non-references and references
-    {
-        subtypecast<>()
-        resolve<>()
-        refcast<>()
-        : What of reference casting?
-    }
-    : A way to define and apply constraints
-    : A way to store LCI in variables instead of on demand evaluation
-    : How would the elispe [...] be used to auto complete expressions
-    : Define the scope of what gets seen globally in a scope? [type, functions, aliases, namespaces, typespaces]
-    : What of the semantics of discarding an abstract value?
-    {
-        To be discarded only through object declarations like: infer _ = 4
-    }
-    : Giving a value at the end of a function is not defined, so define it
-    {
-        : A distinction between giving values in blocks used in an expression vs used in an expression statement
-        : When a block is used in an expression, the value given would be it's resultant value while when it is used as an expression statement,
-        function or handle-error block, the value given would be the give value of the function
-        : Blocks have the unique property of promoting the last expression, if any, in itself to be the give value of the block, to supress such
-          promotion, a semicolonis used
-        { ``the resultant value won't be (no type), but it would just ignore the last expression statement as it's give type
-            give type date()
-            34;
-        }
-        
-        [if][while][for][iter][do][match][exp][jmp]
-        
-        : [else] would be defined for loops [for, iter and while]
-        : Statements [if, while, for and iter] when used as a substatement must be done so in blocks
-
-        : There should be a special give for constructing sumtypes
-        {
-            give type unamed_s<si32, d32fp>(56)
-            give type unamed_s<si32, d32fp>(56.78)
-
-            give : 34
-            give : 34.5
-            give :
-        }
-    }
-    : Differentiate between using value-ignorant type void and the void for returning nothing during a function call
-    {
-        : Absence of type would be represented by the '!' symbol
-        : While absence of value would be reprensted by 'type void'
-        fn mave() ! {}
-        type fn()! main()
-        
-        type void: &mut x
-        !: &mut
-    }
-    : Strings and character parsing, how should it go?
-    {
-        type char x
-        type u8str: & x
-        
-        : What of this byte and bytestream that i was going to incorprorate to be reading external data that may possibly have no representation
-        like a non-encoded compressed file
-
-        type byte x
-        alias bytebuffer = type darray<byte>
-        
-        infer x = s"34456568898495849589849384384939349349348834" ``it would make sense for this to be allocated on the .data section
-        infer x = s"2334334" ``it wouldn't make sense at all if this was allocated on the .data section
+			Description:
+			It has two and-fields, the data, it's size and it's character size, the data stores string values as a utf8 encoded bytes
+		}
+		: Primitive type char
+		{
+			Description:
+			It has just one and-field, the codepoint
+		}
     }
     : Multiline string and integer parsing
     {
         : For strings
         {
-            "
-            emeka
-            "
-            same as: "emeka"
+            : [ \ ] would be used to escape any whitespace after it, leading and trailing newline are ignored
+            {
+                infer y = "     \
+                emeka
+                "
+                infer x = "     emeka"
 
-            and \ + (LF and CR) for mutliline unbreaking strings that also dosen't regard leading whitespace
+                assert(x == y) ``assertion is true
+            }
         }
         : For multiline integers that dosen't regard leading whitespace
         {
@@ -555,1896 +185,3138 @@ named_pt color{type red x, type ui16 curr_i}
             2343
         }
     }
-    : Addition of U+D7 as the alternate multiplication operator
-    : How should jump_statements be parsed?
+    : Error handling
     {
-        (give [<expression>]) | (break|continue [<integer_number_literal>])
-    }
-    : Error Handling
-    {
-        Errors would be bundle with the item that can fail, there would be special syntax for error handling
-        The special entities that would be in use: [try, prop, _propagate_, _panic_, =>]
-        Example:
+        Errors in nc are treated just as values but with special language syntax to make working with them easier.
+        A type that uses the special syntax of errors is called an error handling type, the following are constraints of an error
+        handling type:
+        - The type-creator must be a sumtype of binary or-fields
+        - Both or-fields must be a type parameter
+        - Neither or-fields are allowed to be an error handling type
+		- Neither or-fields are allowed to an optional handling type
+		- Neither or-fields are allowed to be a zero-sized type
+        - The language treats the first or-field as the expected value while the second or-field as the error value.
+        LCI make_error_handling_type directive is used to make type-creators error handlers
+
+        example:
         {
-            ``type char decoding a utf8 stream of bytes, which maybe be failiable in ways such as the ones in wikipedia
-            try type char x(byte_stream, @encoding::utf8) ``try and fail if something errorneous is found
-
-            prop type char x(byte_stream, @encoding::utf8) ``propagate the error if it was found
-
-            type char x(byte_stream, @encoding::utf8) => (err) {} ``handle the error if it was found
-            
-            type char x(byte_stream, @encoding::utf8) => |type char('�')| ``handle the error by suggesting an alternate value of the same type
-
-            type char x(byte_stream, @encoding::utf8) => |type char('�')| {} ``handle the error by suggesting an alternate value of the same type and still doing some extra stuff like logging or reporting it
-
-            type char x(byte_stream, @encoding::utf8) => (err) |err.alternate_value()| ``handle the error by suggesting an alternate value from the error object of the same type
-
-            type char x(byte_stream, @encoding::utf8) => (err) |err.alternate_value()| {} ``handle the error by suggesting an alternate value from the error object of the same type and doing some extra stuff
-
-            ``If multiple errors were found it can be handle by the doing the following
-
-            type char x(byte_stream, @encoding::utf8) => (err1, err2) {}, {}
-
-            type char x(byte_stream, @encoding::utf8) => |type char('�')|
-
-            type char x(byte_stream, @encoding::utf8) => |type char('�'), type char('받')|
-
-            : When an alternate value is suggested, specification of give would not be allowed
-            : The error syntax is specific to binary sumtypes whoose first or-field is a non sumtype and second or-field that is of a different type than the first
+            #dir::make_error_handling_type
+            union result<type [expected, error]>{ type [expected, error] }
         }
-    }
-    : infer's semantics around object-declaration is still wonky - solved
-    {
-        infer [a, b, c] = [mut [1, 2], imut 4]
-        infer [a: mut, b, c] = [1, 2, 3]
-        
-        : infer can only use indirect construction
-    }
-    : Think more about moving by default, what of integers which can be copied without consequence?
-    {
-        stealing instead of moving would be better and stealing can only be done for pointers that are of heap origin
 
+        : Special error syntax and semantics
+        {
+            ``using type char's constructor for decoding utf8 bytes, which maybe be failiable in ways such as the ones in wikipedia
+
+            ``trying the expression gives the expected value if it is the current alternative and panics if not
+            try type char(*) ``panic if the current alternative is second or-field
+
+            ``propagating the error if it is the current alternative, a multiple type variadic sumtype is choosen to propagate multiple errors in the same function
+            prop type char(*) ``propagate the second or-field up the call-stack if it is the current alternative
+
+            ``handling the error section
+            type char(*) => (*) {...}       ``handle the error. The block must contain a <jump_statement>
+            type char(*) => |*|             ``handle the error by suggesting a fallback value
+            type char(*) => |*| (*) {...}   ``handle the error by suggesting a fallback value and doing some extra stuff with the error like logging. The block must not contain a <jump_statement>
+            type char(*) => (*) |*|         ``handle the error by suggesting a fallback value from the error
+            type char(*) => (*) |*| {...}   ``handle the error by suggesting a fallback value from the error and doing some extra stuff with the error like logging. The block must not contain a <jump_statement>
+
+            ``example of how [try] panics { panicf("on line(%{}), error: [%{}] was found") }
+			``NOTE: only expression can use the error syntax
+			``All error syntax allows the programmer to treat the error prone value as the expected value
+        }
+		: Functions related to error handling
+		{
+			- panic
+			- panicf
+			- assert
+			- exit or libc::exit
+		}
+    }
+	: Optional handling
+	{
+		The special syntax for error handling are also used for optional handling. The following are constraints of an optional handling type:
+		- The type creator must be sumtype of binary or-fields
+		- Only the first or-field is allowed to be a type parameter
+		- The second or-field must be a zero-sized type
+		- The first or-field is not allowed to be an optional handling type
+		- The first or-field is not allowed to be an error handling type
+		- The first or-field is not allowed to be a zero-sized type
+
+		To make a type an optional handling type, the LCI dir::make_optional_handling_type is used:
+		```
+		#dir::make_optional_handling_type
+		unit
+		{
+			union maybe<type t>{type [t, void]}
+
+			union optional<type t>{type [t, void]}
+		}
+		```
+
+		The only special syntax not allowed for it is [prop], everything else is allowed for optional handling.
+	}
+	: [!] and [type void] semantics
+	{
+		: [void] is the language's default value-abesent type which is zero-sized
+		: [!] is the embodiement of type absence
+	}
+	: [infer] used in function parameters and as the give type do not have the same meaning
+    : CHECKOUT
+    {
+		print(&1, &2, &45)
+		print(&[1, 2, 45])
+		write(&[34, 56, 78, 23, 56])
+		write(&32, &45, &34)
+		eprint()
+		error_write("34 + 56 =", 123)
+		write(34, &type expensive(34, 5), 90)
+
+		#allow_efficient_pass<t:?>
+		fn write<type t:?>(...){}
+		fn read() type str{}
+
+        io::write(&emeka, daniel)
+
+		write(&2345999999999999999999999999999999999999999999999999999999999999999000000000000000000000000000000000000000000000000000005`si3456)
+    }
+    : Resolving identifiers is not needed for delay construction infact it is not allowed
+    {
+        type [si32, si345, si89] x
+		x := type si32
+		x := type si345
+		x := type si89
+
+		infer [x, x, x]
+		x := type si32
+		x := type si34
+		to<si45>(x) := type si45 ``is not allowed even though it is inituitive
+    }
+	: Mutability resolved semantics
+	{
+		: Mutability is a feature of stack objects or objects allocated on the stack
+		: Mutability is not a feature of and-fields
+	}
+	: Think more about how types 'farray' and 'u8str' would be treated
+	{
+		: Both require static sizes
+		: Both require sizes that won't be directly modifyable in member-functions
+		: Both are in desperate need of assignment regardless
+		: There would be no functions to mutate them except the assignment operators
+
+		: Dealing with type 'u8str'
+		{
+			: Remember the individual bytes and characters cannot be modified -- "emeka daniel"(3) = 5
+
+			x(2) + x(3) + x(5)
+			x(56) => { `* do something *` } + try x(78) + try x(45)
+		}
+		: Dealing with type 'farray'
+		{
+			: 'farray' is the special type that one needs if allocation of multiple stack objects is required
+			: It's size would both be readonly and static -- meaning the size disappears at runtime
+		}
+		: A definition of what a primitive type
+		{
+			: Are types that are provided as builtins by nc-lang and also consists of types that cannot be created directly in user-code
+			examples: type [integers, floating-point, farray, u8str]
+		}
+	}
+    : Copy and move semantics
+    {
         : Only [copy] would be added
+        : What of this -> copy &a
+        : Types that have a move/steal constructor are chosen as the default constructor for indirect constructor
         : Since moving is the default indirect constructor to use when it is specified in a type, adding [move] isn't necessary
-
-        : types that have a steal constructor are chosen as the default constructor for indirect constructor
-        : on-demand product and sum types cannot participate in stealing and cannot have items of their own
     }
+    : Formula that relates the dividend, divisor, quotient and remainder [divisor * quotient + remainder = dividend]
+	: For now <alias> would not accept expressions
+	: Introduction of platform integers
+	{
+		type [si, ui] x
+		: How would something like this be implemented without the compiler's help
+	}
+	: Lexer cannot tokenize the following
+	{
+		- 2.add()
+		- Can literal types take raw-identifiers? example: \"emeka"'👀' or 12343`\"daniel" ?
+	}
+    : Primitive types integers and real-numbers error handling initiative
     {
-        : [divisor * quotient + remainder = dividend]
-        : Addition of [memoryof] operator
-        : [$] is now the dereference operator
-        : New syntax of pointers [type si32: *], [type si32: *mut], [type si32: &*] and [type si32: &*mut]
-        : For integers and their hardware overflow property, they would panic if encountered
-        : Integer divide by zero would panic if encountered
-        : [_rl_] to be used for relational and logical expressions
-        : [_v_] to be used for delimiting varadic arguments
-        : [subcast<>()] casting a subtype to a supertype and [supercast<>()] casting a supertype to a subtype
-        {
-            A    A   B
-            ↓     ↘ ↙
-            B      C
-            ↓
-            C
-        }
-        
-        {
-            2.checked_add(0)
-            2.unchecked_add(0)
-            2.precision_add(0)
-            2.saturate_add(0)
-            : unsigned subtraction would be a safe subtraction that prevents overflow
-        }
-        {
-            type arbitrary_si x
-            type arbitary_ui x
-        }
-        : Abstract and concrete values have wonky semantics
-        {
-            2 = 3
-            "emeka" = 3
-        }
-        : Operator overloading solid semantics must be defined
-        : Solidify the semantics that would make the primitive string type(u8str) only be avialable as a reference
-        : [iter] would be merged with [for]
-        : Discuss enums at length i.e how exactly they would be used in my language
+		: For integers
+		{
+			: For integers and their hardware overflow property, they would panic if encountered
+			: Integer divide by zero would panic if encountered
+			: Functions for signed integers to have control over arithmetic operations
+			{
+				: For error operations like divide by zero
+				- checked functions
+				- unchecked functions
 
-        type si32: &*mut = &mut addressof x
-        type si32: &*mut(x)
-        type si32: *mut
-        try $ptr
-        ptr->
-        infer x = malloc(#type(si1024).sizeof(), 4) => (err) |!: *mut ()|
-        
-        
-        s"3 " + '👅' + '0'
-        ('3'+'4')
-        '3'+'👀'+'👂'
-        type u8str:& x
-
-        fn fcn() type si32 ~> #{} {}
-        
-        type sd32fp [x, c]
-        named_p x { #private type [si32, si45, si82] x }
-        
-        #access::private
-        typespace x
-        {
-            fn main(){}
-        }
-
-        type mem x(type vector())
-        type mem y(type vector())
-        
-        x xor x
-
-        fn \"external data from file"(type str: & x){}
-        try (type sui32(2) * 23)
-
-        use pkg std::[io, string, unicode::[], regex_all, nc_regex, regex]
-
-        type [lang::dart, lang::cpp, lang::c, lang::python, lang::nclang, lang::bython, lang::rust] x
-        type lang::zig x
-        type lang::go x
-        type lang::swift x
-        type lang::java x
-        lang::{dart, cpp, c, python, nclang, bython, rust}
-
-        resolve<lang::java>(x).function_def("fn pub static main(Strings[] args){ System::println("Hello World!") }")
-        resolve<lang::java>(x).class(main_func, type type_alias())
-        resolve<lang::java>(x).compile().run()
-
-        fn fcn<type [t, t2]>(type [iterator, mass][it, kg]) :: #{
-            if iterator.fromTheSameObject(): give
-            if not _windows_
-            give ?
-            ?: &mut
-        } {}
-        #[comptime, directive(), {}, {}]
-        
-        
-        : The LCI that has block as it's focus would be used for type manipulation
-        : The focused block is only allowed to give a boolean expression that would be used as a constraint when used in certain places
-        : The LCI square brace focus would be used for mutilple LCI focuses expect the sqaure brace focus itself
-        : The LCI parenthesis brace focus would be used for assignment of other LCI focuses
-
-        : How to store boolean values to be used as storage for defining of complex constraints
-
-        #(emeka) = #[comptime, {false}, lifetime_promotion]
-        : LCI functions
-        {
-            - extend_lifetime
-            - private
-            - readonly
-            
-            - directives(dir namespace)
-            {
-                - private
-                - readonly
-                - public
-                - extend_lifetime
-                - callFirst
-                - callLast
-                - explain_code
-
-                - static
-                - if_static_eligble
-                - is_static
-            }
-            - marking
-            {
-                - <>
-            }
-            - functions(fcn namespace)
-            {
-                - getLineNumber
-                - getStartColumn
-                - getEndColumn
-                - getColumnPair
-                - getCallSiteLineNumber
-                - getCallSiteStartColumn
-                - getCallSiteEndColumn
-                - getCallSiteColumnPair
-                - type_hash
-                - typename
-                - explain_code
-            }
-            - type(ty namespace)
-            {
-                - exp
-                - decay
-                - \"rm &"
-                - \"rm *"
-                - rmRef
-                - rmPtr
-                - \"rm &"
-            }
-            
-            fn priv(type si32 x = #fcn::getLineNumber()){}
-            priv()
-            try api_call()
-            apicall() => (err)
-            {
-                log::log(#fcn::getLineNumber())
-            }
-            
-            #<e> match apicall: i
-            {
-                case<error>{
-                    #fcn::getLineNumber(<e>)
-                }
-            }
-        }
-        
-        #private named_pt Daniel { #public type }
-
-        {
-            : variadic argument entry
-            : Would a type parameter match a function type?
-            : Think more about the for loop for ranges semantics
-            {
-                for i : |&mut x| {}
-                for &i : x print(4)
-                //and also this:
-                for i, j, k : ([1, 2, 3], 4, 5) {}
-            }
-            : Format for variadic entry in nc
-            {
-                fn integer_galore(type si32 x...)!;
-                fn anything_galore<type t...>(type t x...)!;
-            }
-            : [...] would be the spread operator that works for types dependant on type parameters and on types that have the function operator overloaded for them that takes an integer argument
-            : [_vself_] would be introduced to deal with self binary operations
-            : Having things like [x(1) and .len]
-
-            
-            
-            
-            
-            
-            fn #op()(&me, type si32 x)
-            {
-                #if_comptime_eligble
-                if x < me.len :
-                {
-                    if is_comptime :
-                    #comptime panic(1, 2, 3)
-                }
-                panic(#exp::lineNumber_callsite)
-            }
-
-            for infer sum = 3`si90; i : |mut x| sum += x(i)
-            for i, j : ((0, 2), 3, (2, 3), #op <, (#op *=, #op +=)) {}
-            
-            #dir::shallow_explain lad(_, _, _, _, _, _, _, 6)
-            #dir::explain_comprehensive
-            #dir::explain(true) lad()
-            #dir::explain(false) lad()
-            
-            
-            fn march<type ?>(type #ty::variadic<?> x)
-            {
-                puts(x.expand())
-                
-                print(x)
-                _ncputs_(type bytestream x(1, 2, 4, 5, 6, 7, 8, 9, 3).getData())
-            }
-
-            typespace darrat<type t>
-            {
-                fn _construct_(type char x...)
-                {
-                    push(x)...
-
-                    for i : |x| push(i)
-                    for i : (.end= x.len) push(x(i))
-
-                    x... * [2, 3, 4, 5]
-                    
-                    #dir::comptime
-                    for i : |&mut x|
-                    {}
-
-                    _expand_(x, push)
-                    push(1, 2, 3, x, 3)
-                }
-            }
-            
-            : How would something like this be called in nc?
-            {
-                pass(somefunction(args)...)
-                somefunc()[3, 4, 5, 6, 5]
-            }
-
-            : How would i work with an attribute like i would an expression?
-
-            : How would something like jthread work in my language
-            {
-                type concurrency::jthread x(fcn, (function args)?)
-            }
-            : What of this [ fcn(&arg...) ]
-
-            : Reality of what a type like farray and darray
-            {
-                type farray<si32, si32, si34, si90>
-                type darray<si32, si8, si34, si89>
-                => if it's 
-
-                similar to:
-                type unamed_p<si83, si89, si90>
-                which it is something i don't want
-
-                There is a difference when a type is dependant on type parameters in the type itself than in the typespace, so
-                named_p farray<type t> { type [t: *,  size] x }
-
-                t.areFunctionArgs(args...)
-                std::jthread x(fcn, 1, 2, 3, 4)
-
-                _ty(e...).varadic_size()
-            }
-            
-            type unamed_p<si32, si34, si8, si90>
-            (...).mustBeFunctionArgs(fn(...)?)
-            e := 34
-            _ty_(#ty::expType(z)).decay()
-
-            : use aliases for types that
-            : [!] should not be aliased
-            : No more void:& for [!]
-
-            alias functionType = type fn()!;
-            : Wouldn't [any] be more adept with the function that this [!: ?] has
-            
-            type any x = 2 --> is it syntacticly equalivant to [void*] in c++
-            
-            
-            
-            : What of when deducing expression types
-            {
-                : There is to be no conflict what so ever
-                : If the expression type already has qualifiers, then another may not used on it unless the expression type is decayed
-
-                type s::decay<t> x
-
-                type #ty::exp(23) x
-                _ty(#ty::decay<t>) == t
-                _ty(decay<t>) == si32
-                
-                alias decay<t> = #ty::decay<t>
-            }
-            : How to use default implementations in a trait in rust? like add
-        }
-        
-        {
-            std::uint32_t count{};
-            for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
-            ++count;
-
-            m_tokenString.assign(m_fileBuffer, formerFilePos, count);
-        }
-        {
-            type ui32 count()
-            iter i : (formerFilePos, void)
-            {
-                ++count
-                if m_isEndofFile? (i <= m_filePosition : i < m_filePosition):
-                break
-            }
-        }
-        
-        [monomorphic code, polymorphic code]
-        
-        type ? [len, ]
-        type mixin(default_assignment) x
-        type interface(soliders) x
-        type subtype(massive) x
+				: For overflow
+				- saturate functions
+				- overflow functions
+			}
+			: Functions for unsigned integers to have control over arithmetic operations
+			{
+				: no_overflow_sub
+			}
+		}
+		: For reals
+		{
+			: Arithmetic operators and math functions would use the already IEEE error values i.e nan, +/-inf
+			: For control and alert purposes
+			{
+				For now it is stalled and nothing is thought of yet
+			}
+		}
+        : Think about the nan types(qnan and snan)
     }
-    : Problems concerning LCI
+	: Operator removal/addition
+	{
+		: [$] is now the get-internal-type-representation operator
+		: [×] (U+D7) the alternate multiplication operator
+		: [memoryof]
+		: [addressof]
+        : [++|--] going to be removed
+		: Total ordering operator: '<=>' would be introduced in nc
+		: Add elementof operator to my language[ 2 ∈ 2~4 ]
+	}
+    : Operator overloading semantics
     {
-        if i can do this:
+		Only operators not overloadable are
+		- assignment operators
+		- pipe operator
+		- try and prop
+		- value-reference operator
+
+        fn #op+(&lhs, &rhs) infer{
+            lhs + rhs
+        }
+    }
+	: Loop mechanics
+    {
+        std::uint32_t count{};
+        for (size_t i = formerFilePos; m_isEndofFile? i <= m_filePosition : i < m_filePosition; ++i)
+        ++count;
+
+        type ui32 count()
+        for i : (formerFilePos, void)
         {
-            named_p vector<type t>{}
-            typespace vector<type t>
+            if m_isEndofFile? (i <= m_filePosition : i < m_filePosition):
+            break
+
+            ++count
+        }
+
+        : Warn for while-loops that have true or false as their condition and error for for-loops that don't have a termination condition
+        : Warn for recursive functions that dosen't have a termination condition
+    }
+    : No more iter loop, it's all merged with the for loop now
+    {
+        : The normal for-loop variant needs to allow functions that also modify the loop counter, not only operators, and cement what the functions
+        should so take as expression arguments and what they give also
+
+        : Think more about the for loop for ranges semantics
+        {
+            : Define the languages iteration model first, go watch that video of iterators in different languages
+
+            for i : |&mut x| {}
+            for &i : x print(4)
+            //and also this:
+            for i, j, k : ([1, 2, 3], 4, 5) {}
+        }
+    }
+	: Iterator model in nc
+    {
+        : [<expression> ~ <expression>] ranges?
+		: What are generators and how can they be implemented with iterators
+    }
+    : Delayed assignment [:=] semantics
+    {
+		: Only statements it can be in are sure runtime constructs i.e if-else and match
+    }
+    : No more end-expression being promoted to the give value of the block
+    : If a type is dependant on type parameters due to it's field, during typespace declaration for the type, the type parameter must be present
+    {
+        struct farray<type t>{...}
+        type farray<type _>{} or typespace farray<type t>{}
+    }
+    : Integer literal fix on what gets put in the constructor and what dosen't
+    {
+        type si34 x = 12`si34
+        type si34 x(12)
+    }
+    : Type parameter oddities
+    {
+        : A type parameter can only accept the exact type it asked for, to make a type parameter appilicable to all, use the type extension [?]
+        {
+            fn fcn<type _>(){}
+            fcn<si32>()
+
+            fn fcn<type _:&>(){}
+            fcn<si32:&>()
+
+            fn fcn<type _:&*>(){}
+            fcn<si32:&*>()
+
+            fn fcn<type _:?>(){}
+            fcn<si32>()
+            fcn<si32:&>()
+            fcn<si32:&*>()
+            fcn<si32:**>()
+
+            struct some<type t>{type t:& x}
+            struct some<type t>{type t:? x}
+        }
+        : When an unextended type parameter is used in an expression parameter it can have multiple versions of itself all defined in the expression parameter
+        {
+            fn fcn<type t>(type [t:&, t:?, t:&*] x){ if #exp::is_same<t, t:?>: print(&["not equal"]) }
+
+            : An extended type parameter cannot participate in such
             {
-                fn flip(me)type si8 `:
-                #{
-                    if t == bool:
-                }
-                {}
-                filesystem::copy(path, dest_path, _) => {}
-            }
-            named_p
-            {
-                #private:
-                type si32 x: mut
-                #readonly:
-                ronly:
-                type si67 c: mut
+                fn fcn<type t:&>(type t:* _){} ``ERROR extended type parameters cannot participate in such
+
+                ``Reason is because it is less ambiguous to have this
+
+                fn fcn<type t>(type t:& _){}
+                fcn<si32>(&23)
+
+                ``Than this
+
+                fn fcn<type t:&>(type t:* _){}
+                fcn<si32:&>(type si32:*(23))
             }
         }
     }
-    : match statement has additional syntax
+    : I can't take [:=] out because i need it for value referencing construction delay { type heap }
+	: Why the assignment operators now give [!]
+	{
+		Because the rule of all expression being used undermines assignment operators giving themselves after an operation. And now due to this, i
+		can now have an additional way to discard values [_ = 23]
+
+		```
+		_ = [34, 45, some()]
+		infer _ = [34, 45]
+		```
+
+		: Assignment chaining in C/C++ are done with grouping syntax instead
+		```
+		b = x = y = 4			``deals with precedence and associavity
+		[y, x, b] = [4, y, x]	``deals normal
+		```
+	}
+	: Special case for 'infer' when used in grouping syntax
+	{
+		Since the type isn't specified along with the declaration, a grouped construction can act on a single identifier just like expressions can.
+		```
+		infer x = [2, 3`si34, true]
+		```
+	}
+    : Primitives that are non empty constructed
     {
-        match type si34 z; x : i {}
-        match type si34 z; x : [i, _ k] {}
+		- value-reference types
+		- function types
     }
+	: Should sum types not rely on pattern matching
+	{
+		?? like supporting other means of matching like using the [if]
+
+		match x: i { br<> i += i }
+	}
+	: Constructor stuff [join up]
+	{
+		: Three types of constructors provided by default by the language
+		{
+			- Empty constructor -> if any other constructor is specified, the empty constructor would not be specified
+			- Copy constructor -> if a copy constructor is specified, the copy constructor would not be specified
+		}
+		: Why copy and move constructors aren't value reference based like they should
+		{
+			So they would not be limited semantically to simple value-reference and mutability, meaning semantically an immutable object can
+			be moved. To also allow for value-reference construction and assignment semantics.
+
+			Also the same reason why destructors aren't value-reference based, due to the semantic limitation of it.
+		}
+	}
+	: Value categories
+	{
+		- abstract value : are values that do not have some sort of identity to refer to for later use
+		- concrete value : are values that have some sort of identity to refer to for later use
+
+		Make a decision whether objects are constructed on the fly and destructed when no longer used or end of block scope
+	}
+    : What qualifies as an unused value?
+    {
+        A value that is not used in an expression with the exception of the lhs of an assignment operator, mind you not the compund assignment
+		operators.
+		Unused values are not allowed in nc.
+    }
+	: Type reference extension
+	{
+		type si32: &
+		type si32: *
+		type si32: ? ``not allowed because it is simply not monomorphic
+
+		: Mutable cannot bind to immutable
+	}
+    : Value reference bind semantics
+    {
+		: Binds to everything
+		{
+			type si32:& x(&45)
+			type si3:&*mut(&type si3:*)
+		}
+		: Type identity duality
+		{
+			An already constructed value-reference object discards it type identity and only retains it during assignment.
+			Example:
+			```
+			type si32:& x
+
+			#dir::eval if #exp::typeEq<si32, #ty::exp(x)> : print("Ref(㑖)")
+
+			x := &type si32
+
+			#dir::eval if #exp::typeEq<si32, #ty::exp(x)> : print("!Ref(㈲)")
+
+			x = 34 ``the type identity of the value-referenced type
+
+			x = &34 ``the type identity of the value-reference
+			```
+
+			This is done in order for an object of value-reference type to mirror the object's type. This is true even for object expressions
+			```
+			fn fcn(type si32:& _){}
+
+			fcn(type si32:&)``ERROR expected [type si32:&] because the expression above loses it's type identity afer construction
+			fcn(&type si32:&) ``correct
+			```
+		}
+		: Value reference types now support object mutability and assignment
+        {
+			type si32:& x:mut(&34)
+
+			x = &45
+			_ = &45
+        }
+        : Immutable non-reference and reference objects cannot bind to mutable-reference objects
+		{
+			type si32 x:mut = 34`si32
+			type si32:* ptr(addressof x)
+			type si32:*mut x(type ui(ptr)) ``forbid something like this
+		}
+		: Direct and indirect construction for value referencing are the same
+        {
+            type si32:& x(&23)
+            type si32:& x = &23
+        }
+    }
+    : Memory-address reference bind semantics
+    {
+		: New syntax of memory-address-references/pointers [type si32: *], [type si32: *mut], [type si32: &*] and [type si32: &*mut]
+		{
+			type si32: &mut*mut
+			type si32: &*mut = & addressof x
+			type si32: &mut*mut x
+			type si32: *mut
+		}
+		: Get internal type representation operator [$] for memory-address-reference gives an optional
+		: Only operator overload for it would be the plus and minus operators
+		: Memory address reference constructor semantics
+		{
+			: No more
+			{
+				type si32:*mut x = addressof 34
+				type si32:* _(x)
+
+				--instead--
+				type si32:*mut x = addressof 34
+				infer _ = {match $x: (i, _) {br<si32> give addressof i br<void> give type si32:*}}
+			}
+			: Memory-address reference mutability guarantees
+			{
+				type si32 a
+
+				type si32:*mut _ = addressof a ``cannot bind, a is immutable
+				type si32:* x = addressof a
+				type si32:*mut _ = addressof (try $x) ``cannot bind the memory referenced by x because it references it immutably
+
+				type si32:&mut _ = &a ``cannot bind, a is immutable
+				type si32:& y = &a
+				type si32:&mut _ = &y ``cannot bind, y is immutable
+			}
+		}
+		: Binds to everything except a value-reference
+		{
+			type si32: *& x ``not even parsable, should be parsable right
+			--reason--
+			??
+		}
+        : [addressof] operator would be used to give the memory address of an object
+		{
+			type si32:* x = addressof 23
+
+			: The address of a memory-address-reference cannot be queried, therefore disqualifying the C/C++ pointer->pointer
+		}
+        : Then for memory-address referencing regardless of the memory-value type [?:*] is used
+		{
+			type ?:* x = malloc()
+			``getting the internal type representation is not defined for the type
+
+			#dir::language_safety_violation
+			type u8:* _(x)
+		}
+		: Differences between what the ? memory-address reference and typed memory-address reference takes in the constructor
+		{
+			- [typed:*] takes untyped/any memory-address reference. Is a language safety violation
+			- [?:*] takes typed memory-address reference. Is not a language safety violation
+		}
+		: Getting the memory-address as an integer
+		{
+			type ui _(addressof 23)
+		}
+    }
+    : Compound statement has additional syntax
+    {
+        : <match>
+        {
+            match type si34 z; x : i {}
+            match type si34 z; x : (i, _, k) {}
+        }
+        : <if>
+        {
+            if type si32 x, type si67 c; true: {}
+            if type [si32, si67][x, c]; true: {}
+        }
+        : <while>
+        {
+            while type si32 x, type si67 c; true: {} else {}
+            while type [si32, si67][x, c]; true: {} else {}
+        }
+        : <for>
+        {}
+        : <do>
+        {
+            do type si34 x, type si67 v; {}
+            do type [si34, si67][x, v]; {}
+        }
+    }
+	: No more conditional operator
     : A bitwise shift operator
     {
         8 >>> type pair(2, .base = 4)
-        8 >> 2
-        8 >> type pair(2, .base = 8)
+
+        4 >> type math::circular_shift(3, _)
+        4 >> type math::norm_shift(2, _)
+        4 >> type math::recovery_shift(3, _)
+
+        : Remove [>>> and <<<]
     }
+    : Dereference operator is renamed to the get operator
     : No more do-while but just a do-loop similar to rust's loop
     {
-        do: #compileTime type si8 x = 4;
+        do: #dir::static type si8 x = 4;
         {
             alias size = x;
             type heap<si1024> x(size, .init= 34)
         }
     }
-    : Abstract values and concrete values are equally valid in cases of referencing
-    : Also only unused abstarct values are errored against
-    : Warn against object-declarations inside loop blocks, because of repitition is bad
-    : Strong and weak typing and static and dynamic typing
-    : Semantic unified definition of operator overloading
+    : Only an unextended type can be aliased
     {
-        generic code
-        - static and dynamic dispatch
-        
-        we can also have constraints on them, that can define semantic and syntax restrictions on them
+        alias d = type si32:*
+    }
+    : Various uses of the 'use' reserved-word
+    {
+        use mixin|interface|mod|pkg <identifier>
 
-        OOP concepts
-        1. Encapsulation
-        2. Abstraction
-        3. Inheritance
-           - Polymorphisim
-
-        NC concept
-        #implemts(#op(+, -, /, %)) type any x
-
-        x := 3
-        x * 2
-        #def(type t, type t)
+        : It would use grouping syntax also
         {
-            if t == t:
+            use pkg std::[io, string, unicode::[], regex_all, nc_regex, regex]
+            use [pkg, mod] [std, boost::io]
+            use mixin [myMixin, myMixin2]
         }
 
-        type any<> x(@constraint::arithmetic)
-        type mixin() x
-        type interface() x
-        type subType() x
+        : Using modules, pakages, files and directories
+        {
+            -- not yet
+        }
+    }
+    : How encapsulation would be handle
+    {
+        [dir::private]       : can be accessed only within the current module. Conversely, cannot be accessed outside the current module
+        [dir::private(pkg)]  : can be accessed only within the current package. Conversely, cannot be accessed outside the current package
+        [dir::private(type)] : can be accessed only within the type. Conversely, cannot be accessed outside the type
+        [dir::readonly]      : can be read-from and written-to only within the current module. Conversely, can only be read-from outside the current module
+        [dir::readonly(pkg)] : can be read-from and written-to only within the current package. Conversely, can only be read-from outside the current package
+        [dir::readonly(type)]: can be read-from and written-to only within the type. Conversely, can only be read-from outside the type
+    }
+    : Type parameter specialization is not allowed, instead an inline version is supported for functions
+    {
+        named_p darray<type t>
+        {
+            #{t == bool} type bytestream x
+            #{t != bool} type heap<t> x
+            type ui64 size
+        }
 
-        : a form of dynamic typing under polymorphisim
-        : I have defined an abstract idea of heterogenous type entry
+		#{give #exp::is_same<si32, t>}
+		fn fcn<type t>(){}
 
-        type vec<any<#constraintarithmetic>> x(11, 3.4, 9.0, 4.3, 67.2)
-        x[0] + 1
-        x[1] * 2.9 = ?
+		#{give #exp::is_same<si3, t>}
+		fn fcn<type t>(){}
+    }
+    : [type me: &] is the type of the function parameter syntax -> [ '&'['mut'] <identifer> ]
+    : Construction and Destruction semantics - even the type argument entry for constructor supposed to be here
+    {
+        : Constructors give value type must either be a reference to the type itself or error-handling type
+        : <struct> construction
+        {
+            : Has the concept of the following constructors [_construct_, _cConstruct_ and _mConstruct_]
+            : For _construct_
+            {
+                Language provides default empty and member constructors only when these conditions are met, no access restrictions on the member-
+                objects/and-feilds and no specification of the same constructor
+            }
+            : For _cConstruct_
+            {
+                : Only used when the move constructor is not defined or when explicit copy is requested via the [copy] operator/marker
 
-        type mixin(default_addition)
+                Language provides default copy constructor only when not provided by the programmer
 
-        mixin default_arithmetic{
-            fn #operator(+, -, /, %, *)(&me, &other){
-                if #operator_arg == operator+:
-                me + other
-                else if #operator_arg == operator-:
-                me - other
-                else if #operator_arg == operator/:
-                me / other
-                else if #operator_arg == operator%:
-                me % other
-                else if #operator_arg == operator*:
-                me * other
+                fn _cConstruct_(&mut me, &src) type me:&;
+            }
+            : For _mConstruct_
+            {
+                Language only provides a default move constructor if one or more and-fields has one
+
+                fn _mConstruct_(&mut me, &mut src) type me:&;
+            }
+            : All member-object/and-feilds must be constructed in constructors and no member function is to be called in a converting constructor
+        }
+        : <union> construction
+        {
+            Only converting constructors are a concept for sumtypes and among those converting constructor, only two constructors are defined
+            - empty constructor which selects a default value for construction
+            - a constructor that askes for argument to assign to the sumtype
+
+            of the two the only on that can be specified by the programmer is the empty constructor
+        }
+        : <enum> construction is the same thing with the <union>
+        : Defined identifiers for various type member functions are
+        {
+            : operators
+            {
+                - [lhs and rhs] for binary operators
+                - [rhs] for prefix operators
+                - [lhs] for postfix operators
+            }
+            : for the first identifier of a member function
+            {
+                - [me]
+            }
+            : for the second identifier of copy and move constructors
+            {
+                - [src]
             }
         }
-
-        : Regarding not being able to refer to type members for constructs like aliasing and default parameter entry, i don't want that, i want my
-        language to be more flexible than that
+        : <struct> destruction
         {
-            fn fcn(&me, type os::si end_column = me.end_column)
-            {}
+            Language provides default destructors only if one or more and-fields have one
 
-            fcn()
-            a.fcn(s = a.end_column)
+            fn _destruct_(&mut me)!
+
+            The language has special semantics for destructors, it coerces any any immutable object to a mutable for destructing this is known as
+            destructor value-reference
+
+            Destructors cannot be called explicitly, example
+            {
+                struct x{ type [str, ui8][x, y] }
+                typespace x{
+                    fn _destruct_(&mut me){ x._destruct_() y = 34567 }
+                }
+            }
         }
-        
-        emulate through sumTypes
-        composition and interfaces
-        emulate through interface inheritance
-        mixins
-        Polymorphisim: dynamic dispatch
-        extensibility of enums
-    }
-    : Reverse the doc and discard comment syntax
-    {
-        `|em|`
-        `|emeka daniel|`
-        `{emeka daniel}`
+        : <union> destruction
+        {
+            Destructors are not to be specified by the programmer, it is handled by the language i.e if the current alternative or or-field has a
+            destructor, it would be called
+        }
+        : <enum> dosen't have the concept of destructorion
+        : No more object type parameters, instead there would be type argument entry for constructors
+        {
+            struct bag {}
+            typespace bag{
+                fn _construct_<type t>(type si67 x){ type t x = x `*shouldn't i error against this?*` }
+            }
 
+            : For objects
+            {
+                type bag x<si89>()
+            }
+            : For object expression
+            {
+                type bag<><si89>()
+            }
+        }
+    }
+    : All declarations that have both disclosures and definitions must be defined above all and the disclosures only be for FFI purposes
+    : Type-creators disclosures semantics
+    {
+        : When a type-creator disclosure is found any use of it would be done so through indirection
+        named_p s;
+        type s:* x()
+    }
+    : Default arguments that need member data shall be specified like so:
+    {
+        fn fcn(&me, type os::si end_column = me.end_column)
+        {}
+    }
+    : New syntax for multi-line doc comment
+    {
         `*emeka daniel*`
-        ``emeka daniel
     }
-    : There cannot not be more than two references to the same data at a time
-    : Change type_space and name_space to typespace and namespace
     : What are enums really?
+    {
+        : Is a type creator that creates a type out of a fixed list of integer-number-literal or character constants
+        {
+            integer-number-literal have addition to keep it going, but characters don't
+        }
+        : Similar to
+        {
+            struct unicode_properties{}
+            typespace unicode_properties{
+                type ui8 [block, script, whitespace, math][0, 1, 2, 3]
+
+                fn operate_on_unicode_properties(&me){
+                    match me{
+                        arm(@unicode_properties::block){}
+                        arm(@unicode_properties::script){}
+                        arm(){}
+                    }
+                }
+            }
+
+
+            ``but what the programmer is free to enter any value of type si8 they want
+            ``example
+            operate_on_unicode_properties(45`ui8)
+            operate_on_unicode_properties(200`ui8)
+
+            ``but with enums
+            enum unicode_properties: type ui8{block, script, whitespace, math}
+
+            typespace unicode_properties{
+                fn operate_on_unicode_properties(&me){
+                    match me{
+                        arm(@unicode_properties::block){}
+                        arm(@unicode_properties::script){}
+                        arm(){}
+                    }
+                }
+            }
+
+            operate_on_unicode_properties(45`ui8) ``not an enum value of the unicode_properties enum type
+        }
+        : enum typespaces cannot contain non-member-objects because of collision with enum values
+        : Noteable default member function provided by the compiler
+        {
+            - tobasetype()
+        }
+    }
+    : Object Discuss
+    {
+        : Because literals are not objects
+        No because they refer to data(data-value) itself. An identifier can both be a data-value and an object
+        objects give values and values give it's type
+
+        Every literal is a value
+        Every identifier is a value
+        Every anonymous object is a value
+
+		Object declaration [type si32 x]
+		Object/Object-Identifier [x]
+
+		Objects are instances of a type [look into what groupings called them]
+    }
+    : [######]
+    {
+        ────────
+
+		: Can one inherit from a memory-address-reference?
+		{
+			struct ptr<type t>: type *t{}
+		}
+        : Figure out how to get more metadata
+        {
+            : member data names
+            : enumerator names
+
+            #default_output
+            strcut hyper{type [si32, u8str, d32fp][volume, detail, density]}
+            typescope hyper
+            {
+                #default print
+            }
+
+            #enumerator_names<enum_color>
+            for i : |#enumerator_names<enum_color>|
+            {
+                i|io::out
+            }
+        }
+
+        type si32:* x
+        type si32:&* x
+
+        type si32:* b(x)
+        type si32:* c(addressof x)``address of a memory address reference cannot be queried
+
+        : String use to be merged with the other issue
+        {
+            type u8str x
+            type char x
+            type str x
+
+            - copy-on-write or stack-happy string
+
+			[copy-on-write: Needs to know when the string is moved or dies so that it the contents can be copied]
+
+            : Problem lifetime
+            {
+				type slice y
+
+                fn scholar
+                {
+					y := type slice(& s"Daniel Emeka")
+					...
+                }``dies here
+
+                fn use_here
+                {
+					me.someDarray.pushBack(y)
+                    ... ``which causes a nasty runtime error that would be spent hours debugging
+                }
+            }
+        }
+        : Singular slice type for referencing of heap data
+        {
+            type slice x ``how would it be implemented
+
+			: Would be implemented using the abstract requirements for ranges
+        }
+        : Value reference types are the only odd types in the language
+        {
+            - It dosen't have the concept of direct and indirect construction
+            - It loses it's type identity after construction
+        }
+        : typescope cannot have userscope, mixin and interface
+		: The [@] cannot be used for dynamic and function types
+		: Dynamic and function types are banned from typescope extention
+        : Open vs Closed system
+        {
+            C++'s namespace is an open system
+            typescope and userscope are closed systems
+            type-creators are closed systems along with inheritance possibility
+        }
+        : [.] is only for type members no more [b.::]
+    }
+    : Special semantics --add to the bit about constructors and change the name to factory functions--
+    {
+        Copy and Move Semantics
+        ───────────────────────
+        Even though the copy and move constructors are defined to take value references, they are a different concept entirely that the language
+        dosen't equate to the constructors that are defined to accept them. There are two reasons why the language has them defined that way:
+        1. For copy and move to be defined more intuitively on semantics that make it clear when a copy or more is happening
+        2. For value reference semantics to work
+
+		Destructors are similar in as the special semantics does not reflect conventional semantics
+
+		When Special Semantics Discards conventional Semantics
+		────────────────────────────────────────────────────
+		1. Copy constructors
+		2. Move constructors
+		3. Destructors
+
+        A copy is the default indirect construction unless a move is defined for that type. After a move, the moved value cannot be touched without
+        an re-assignment.
+    }
+    : Because all values must be used, the assignment operators must give [!]
+	: Non overloaded operators
+	{
+		- memoryof
+		- addressof
+		- assignment operators
+	}
+	: Introduction of new items
+	{
+		- [unit]
+		- [typescope]
+		- [userscope]
+	}
+    : The memory address of a memory-address-reference|pointer cannot be queried in nc
+    : Parameter
+    {
+        Parameter
+        ─────────
+        in relation to programming, is a list of one or more requests made by an item to be fufilled when it is used.
+
+        Types of Parameter
+        ──────────────────
+        1. Expression parameter
+        2. Type parameter
+
+        Type parameter
+        ──────────────
+        is the type of parameter that is used for requesting types. It can only be used in <function_decl>, <struct_decl> and <union_decl> items.
+
+        ```
+        fn fcn<type t>(){}
+
+        struct dac<type t>{}
+        ```
+
+        Expression parameter
+        ────────────────────
+        is the parameter type that is used for requesting expressions. It can only be used in the <function_decl> item.
+
+        ```
+        fn fcn(type si32 x){}
+        ```
+    }
+    : Argument
+    {
+        Argument
+        ────────
+        in relation to programming, is a list of one or more answers to the request of a parameter when it is used. Since there are only two types
+        type of parameters, there are also only two types of arguments namely:
+
+        1. Type arguments - (fcn<>()) can be entered without consequence and has no effect on resolving overloads
+        2. Expression arguments
+
+        ```
+        fcn<si32>()
+        dac<b32r>()
+
+        fcn(34)
+        ```
+
+        Argument Entry
+        ──────────────
+        is simply the entry process of one or more arguments to their parameters. Same applies for argument entry types, namely:
+
+        1. Expression argument entry
+        2. Type argument entry : If the arguments are zero the angle braces can be omitted
+
+        Argument Special Entry Types
+        ────────────────────────────
+        1. Explicit default argument entry
+        2. Implicit default argument entry
+        3. Argument inference entry
+        3. Parameter-argument entry
+
+        Explicit Default Argument Entry
+        ───────────────────────────────
+        parameters can specify arguments for themselves to use, these arguments are called default arguments. To use a default argument, the
+        placeholder identifier [_] is used. The use of the placeholder identifier[_] is known as explicit default argument entry. Explicit default
+        argument entry is a feature of both expression and type argument entry.
+
+        ```
+        fn fcn(type si32 _ = 45){} ``fcn(_)
+
+        struct lose<type _ = si56>{} ``type lose<_> x()
+        ```
+        For an expression parameter that is based on a type parameter to specify default argument for itself, the type parameter must first have
+        a specified default argument.
+
+        ```
+        fn fcn<type t= si34>(type t x = 90`si34){}
+        ```
+
+        Implicit Default Argument Entry
+        ───────────────────────────────
+        With implicit default argument entry, the placeholder identifer[_] need not be used only when they are the last arguments to be entered.
+        Implicit default argument entry is only a feature of type argument entry.
+
+        ```
+        fn fcn<type t = si89>(){} ``fcn<>() or fcn()
+        ```
+
+        Argument Inference Entry
+        ────────────────────────
+        This is the scenerio where an argument of one argument entry type can be infered from another argument entry type, when infered, the argument
+        behaves as if it the parameter provided a default argument and therefore is subject to default argument features. Argument inference is
+        only a feature of type argument entry, meaning a type argument can be infered from an expression argument. And since it is only a feature of
+        type argument entry, implicit default argument entry can be used.
+
+        ```
+        fn fcn<type t>(type t _){} ``fcn<_>(45) or fcn(45) [behaves exactly like this] fcn<type t = si32>(type t _){}
+        ```
+
+        Argument inference is only possible if the parameter being inferred dosen't already specify a default argument.
+        ```
+        fn fcn<type t = si90>(type t _){}
+        ``fcn<si567>(89`si567)
+        ```
+
+        Parameter-Argument Entry
+        ────────────────────────
+        This type of argument entry simply provides a way yo associate arguments with their parameter identifers. Parameter-argument entry is only
+        a feature of expression argument entry.
+
+        Syntax
+        ──────
+        '.'<identifier> '=' <expression>
+
+        Parameter-Argument entry is not valid for variadic expression parameters and [_] parameters.
+
+        Types of Parameter-Argument Entry
+        ─────────────────────────────────
+        1. Ordered parameter-argument entry
+        2. Unordered parameter-argument entry
+
+        Ordered Parameter-Argument Entry
+        ────────────────────────────────
+        Is when parameter-arguments are entered orderedly. Because they are ordered, they can be mixed with non parameter-arguments.
+
+        ```
+        fn dex(type [si32, si32] [x, y]){ infer [_, _] = [x, y] }
+
+        ``dex(.x= 34, .y= 56)
+
+        fn dex(type [si32, si32, si89, si34] [a, b, c, d]){ infer [_, _, _, _] = [a, b, c, d] }
+
+        ``dex(23, .b= 34, 45`si89, .d= 34`si34)
+
+        ```
+
+        Unordered Parameter-Argument Entry
+        ──────────────────────────────────
+        Is when parameter-arguments are entered unorderedly. The language allows this because it can be solved easily by requiring that from the
+        starting point of the unordered parameter-argument entry, only parameter-arguments are allowed from then on.
+
+        ```
+        fn dex(type [si32, si32, si89, si34] [a, b, c, d]){ infer [_, _, _, _] = [a, b, c, d] }
+
+        ``dex(23, .c= 34`si89, .b= 45, .d= 34`si34)
+        ``dex(.d= 34`si34, .c= 34`si89, .b= 45, .a= 23)
+
+        ```
+    }
+	: Identifier Items semantics
+	{
+		Identifier Item
+		───────────────
+		are items that declare identifers
+
+		Examples
+		────────
+		- <mixin_decl>
+		- <interface_decl>
+		- <type_creators_decl>
+		- <function_decl>
+		- <object_decl>
+        - <alias_decl>
+
+		There are two properties that govern the behaviour of identifier-items namely
+		1. Scope
+		2. Namespace
+
+		Namespace
+		─────────
+		refers to the naming space of identifer-items where the language requires each identifier of an identifier-item in a namespace be unique
+		so as not to have an identifier conflict. It basically means that in any particular identifer-item namespace, an identifier must appear only
+		once. Identifier-items in distinct namespaces can never have identifier conflict with one another while identifer-items with the same
+		namespace have more room for identifier conflict since it now has to make sure that there is no identifer conflict between itself and the
+		other identifer-items it shares namespace with. The language does have an exception for idenifier conflict which would be discussed later.
+
+		Examples
+		────────
+		- mixin namespace
+		- interface namespace
+		- type creators namespace
+		- userscope namespace
+		- function and object namespace
+
+        <alias_decl>'s namespace is dependent on the identifer-item it is currently aliasing.
+
+		Techinal Pharse
+		───────────────
+		If multiple identifier-items are in the same namespace, it is said that they share the same namespace. Keyword here is 'share' because the
+		same identifier-item is does not share namespace with itself, it dosen't make sense to say that.
+
+		SCOPE
+        ─────
+		refers to the area where identifiers are declared and made accessible. All identifier-items have their own scope which would be discussed
+		briefly.
+
+		Examples
+		────────
+		- Identifier-item scope
+		- Expression block scope
+		- Global or module scope
+
+		Scope and Namespace
+		───────────────────
+		With the definition of both scope and namespace, it is further defined that identifier-items in the same namespace and scope must have
+		unique names for their identifers.
+		Meaning something like this:
+		```
+		userscope sameIdentifier
+		{
+			userscope sameIdentifier{}
+		}
+		```
+		Is possible because they are not in the same scope even though the are in the same namespace.
+
+		There are two types of scope:
+		1. Anonymous scope
+		2. Known scope
+
+		Anonymous Scope
+		───────────────
+		this type of scope does not have an identifier or any special syntax to refer to it.
+
+		Known Scope
+		───────────
+		this type of scope does has an identifier and special syntax to refer to it.
+
+		Scope Access
+		────────────
+		From the various definitions of scope types particularly the known scope type, it is insinuated that an identifier-item declared in a scope
+		can be accessed from outside the scope, which is true, there are two symbols used to exactly this, [::] and [.], one is just a plain symbol
+		which acts like an operator and the other is an operator which acts like a symbol.
+
+		For Every Other Known-Item except Type Creators
+		───────────────────────────────────────────────
+		[::] which is called the scope accessor symbol is used.
+
+		Syntax
+		──────
+		<identifier>{'::' <identifier>}
+
+		The left <identifier> been a scope or whole-identifier-item idenifier while the right been any part-identifier-item.
+
+		For Type Creators
+		──────────────────
+        Type creators have a special operator for accessing member operators [.]
+        There is no current alternative for [.] when it comes to accessing member data.
+        b.fcn() ==> @<type>::fcn(b)
+        b.data
+
+		External Scope Access
+		─────────────────────
+		Take this example:
+		```
+		userscope some
+		{
+			fn fcn{}
+		}
+
+		struct kafa{}
+
+		typescope kafa
+		{
+			fn kafa_something(&_){}
+		}
+		```
+		Function [fcn] in the userscope is accessed like this some::fcn, while member function [kafa_something] in the kafa typescope is accessed
+		like this:
+		```
+		type kafa x()
+		x.kafa_something()
+		```
+
+		Internal Scope Access[1]
+		────────────────────────
+		Inner self scope access is not allowed in nc.
+
+		Take this example:
+		```
+		userscope some
+		{
+			fn fcn{}
+
+			userscope some2
+			{
+				fn callfcn
+				{
+					fcn() ``our focus
+				}
+			}
+		}
+		```
+		How is the inner scope(userscope some2) able to access the outer scope's(userscope some) function 'fcn'?
+
+		It is possible because of the following language exception:
+		- During inner scope access, if there is no identifier conflict between any of the outer scope's items and the inner scope's item,
+		  scope access can be done without the scope accessor symbols.
+
+		When the exception applies:
+		```
+		userscope some1
+		{
+			fn fcn{give 4000}
+
+			userscope some2
+			{
+				fn fcn{give '8'}
+
+				fn another()
+				{
+					give fcn() ``to access the outer scope's fcn, [some1::fcn()] is used
+				}
+			}
+		}
+
+		userscope some
+		{
+			fn fcn{give 450}
+
+			userscope some
+			{
+				fn fcn
+				{
+					give fcn()
+					``to access the outer's scope function fcn [some::fcn()]
+					``but there is one problem with this, the inner and outer scope's userscope both have the same identifier [some]
+					``But since inner self scope access is not allowed, can't the language just assume it is from the outer scope? No the language
+					``would not assume that because inner self scope access is not allowed period. But then how is the inner scope(userscope scome)
+					``supposed to access the outer scope's(userscope some) function fcn? The outer scope's(userscope some) is accessed by using it's
+					``outer scope(i.e the global scope in this case) to clear the ambiguity, which is [::some::fcn()]
+				}
+			}
+		}
+		```
+		Same with the above example but more complicated
+		```
+		{
+			userscope g
+			{
+				userscope f
+				{
+					userscope v
+					{
+						fn fcn(){}
+
+						userscope v
+						{
+							fn fcn(){
+								g::f::v::fcn ``which??
+							}
+
+						}
+					}
+				}
+			}
+		}
+		```
+
+		Scope Visibility
+		───────────────
+		refers to the range at which the identifers of an identifer-item can be seen and therefore used within a scope, or it refers to the
+		visibility range of identifiers of an identifer-item. There are two types of scope visibility namely
+		1. Universal scope visibility
+		2. From-declaration scope visibility
+
+		Universal Scope Visibility
+		─────────────────────────
+		In this type of scope visibility, the identifer of an identifier-item visibility range begins from the start to the end of the scope it is
+		declared in, meaning it can be seen and therefore used everywhere within the scope.
+
+		Examples
+		────────
+		- <mixin_decl>
+		- <interface_decl>
+		- <type_creators_decl>
+		- <userscope_decl>
+		- <function_decl>
+
+        <alias_decl>'s scope visibility is inherited from the item-identifer it is aliasing.
+
+		From-declaration Scope Visibility
+		────────────────────────────────
+		In this type of scope visibility, the identifier of an identifier-item visibility range begins from the declaration of the identifier-item
+		to the end of the scope it is defined in.
+
+		Examples
+		────────
+		- <object_decl>
+
+        Scope visibility types cannot mix in code, example:
+        ```
+        type si32 [a, b] = [fcn(), a]
+
+        fn fcn(){give b}
+        ```
+        [Error: a's construction depends on function fcn which violates scope visibility by using b which isn't visible to a during construction]
+
+		Overloading
+		───────────
+		As mentioned in the definition of namespace, the language has an exception for identifier conflict which is called overloading. Overloading
+		is a language feature that allows identifier conflict for both the <function_decl> and <object_decl> identifier-items only when the data type
+		of each identifer is different. This is done because the language has mechanisms for resolving each identifier.
+
+		Term
+		────
+		- overload: refers to the individual identifer of an identifier-item involved in the idenifier conflict
+
+		Overload Resolution
+		───────────────────
+		Is the solution that empowers the overloading language feature. Overload resolution is the process of resolving an overload to it's
+		identifier-item. There are two types of overload resolution namely
+
+		1. Using the language overload resolution function [to]
+		2. Using the call operator on function overloads
+
+		Using the language overload resolution function
+		───────────────────────────────────────────────
+		[to<>()] simply accepts the data type you wish to resolve to and the overload. It is the most unambiguous form of overload resolution.
+
+		```
+		fn fcn() type si8{} ``to<fn()si8>(fcn)
+		fn fcn() type si90{} ``to<fn()si90>(fcn)
+
+		type si89 fcn() ``to<si8>(fcn)
+		```
+
+		Using the call operator on function overloads
+		─────────────────────────────────────────────
+		This method is limited - in as it is only avialable to function overloads and then only works for certain function overloads - and ambiguity
+		prone.
+		```
+		fn fcn(type si34 _){} ``fcn(234`si34)
+		fn fcn(type d32fp _){} ``fcn(23.0)
+		```
+
+		But it can't work for function overloads with the same parameter type and number but different give type.
+        ```
+		fn voice() type sound{} ``fcn() ??
+		fn voice() type image{} ``fcn() ??
+		```
+
+		It is also ambiguous when it comes to certain function overloads with type parameters, this is because argument inference entry is a feature
+        of type argument entry.
+		```
+		fn fcn<type t, type t2>(type t2 _){} ``fcn<si32>(45`si9) without the previous overload, this function would have been called
+		fn fcn<type t>(type t _){} ``fcn<si32>(45`si9)
+		```
+		The language resolves this by resolving to the best match.
+
+		If it the call operator method is not preferred, you can always use the function [to] method.
+		```
+		fn fcn<type t, type t2>(type t2 _){} ``to<fn(si9)>(fcn<si32, si9>)(34`si9)
+		fn fcn<type t>(type t _){} ``fcn<si32>(45`si9)
+		```
+
+        Note: the function [to] overload resolution method is not possible for constructors, only the call operator method, that means constructors
+        are limited in function type specification
+
+        Overload Resolution Conflict With Internal Scope Access
+        ───────────────────────────────────────────────────────
+        For the <function_decl> and <object_decl> identifer-items, the overload resolution methods would to be an alternative for scope access during
+        internal scope access when identifier conflict is encountered, but this is not allowed by the language which forces the use of scope access
+        regardless of the alternative.
+
+        Take this:
+        ```
+        userscope some
+        {
+            fn fcn{}
+            userscope son
+            {
+                fn fcn()type si9{give type si9}
+
+                fn dac
+                {
+                    give to<fn()!>(fcn) ``Scope access is expected here, although function [to] can do this, scope access is still preferred
+                }
+            }
+        }
+        ```
+
+        But since the expression block item has an anonymous scope, thereby making scope access impossible, this alternative is allowed to be used
+        for scope access during internal scope access. Because of this, the overload rule is appiled and thus preventing items <function_decl> and
+        <object_decl> who both share the same namespace, from identifier conflict across scope.
+        ```
+        {
+            fn fcn{}
+            {
+                fn fcn{give 56}
+                infer _ = to<fn()!>()
+            }
+        }
+        ```
+	}
+    : Code-reuse and polymorphism
+    {
+        - static-dispatch/monomorphism and dynamic-dispatch/polymorphism
+		- entry of heterogenous types is supported in nc through dynamic objects(mixin, interface and subtyping) and sumtypes
+
+        Mixins
+        ──────
+        Are identifier-items which define functionality to be mixed-in with types. They are part of the language to introduce a modular system
+        for sharing functionality amongnst types. The only items allowed in them are <function_definition_decl>s.
+        Mixins are added to types via the 'use' syntax:
+        ```
+        struct bigData{...}
+
+        mixin copy_data
+        {
+            fn whole(&me){...}
+        }
+
+        typescope bigData
+        {
+            use mixin copy_data
+        }
+
+		type bigData x
+		x.whole()
+		x.mixin(copy_data)::whole() ``is to be used when identifer conflict is encountered, unless the mixin items should act as if it is from the type
+
+        ```
+        The term used for the above is type [] uses mixin []. Multiple mixins can be used in a type and in the case of identifier conflict, the
+		mixin's items are protected by qualification, only operators don't allow this.
+
+		```
+		mixin x_y { fn cause{} }
+		mixin y_z { fn cause{} }
+
+		typescope si32 { use mixin [x_y, y_z] }
+
+		@si32::mixin(x_y)::cause()
+		@si32::mixin(y_z)::cause()
+
+		``for operators
+
+		mixin add{ fn #op+(lhs, rhs){ ... } }
+		typescope si32 { use mixin add } ``already has operator+ defined for it
+
+		``SEMANTIC ERROR: The rule that allows multiple mixins or interfaces to be used in a despite despite identifier conflict is not applicable
+		to operators because they are operators not identifiers
+		```
+
+        Interfaces
+        ──────────
+        Are identifier-items which disclose functionality for types to define. They are part of the language to introduce a modular system for
+        defining contracts between types. The only items allowed in them are <function_disclosure_decl>s.
+        Interfaces are added to types via the 'use' syntax:
+        ```
+        struct someType{...}
+
+        interface output
+        {
+            fn output(&me)!
+        }
+
+        typescope someType
+        {
+            use interface output
+            ``Then the type must define the functions
+            fn output(&me)! {...}
+        }
+        ```
+		Multiple interfaces can be used in a type and in the case of identifier conflict, the interface's item are protected by qualification, only
+		operators don't allow this.
+
+		```
+		x.interface(output)::output()
+		```
+        Interfaces can also contain <function_definition_decl>s used for specifying default definitions that can be overriden when used in types.
+
+        Generic Typing and Monomorphism among Mixin and Interface items
+        ───────────────────────────────────────────────────────────────
+        The function definitions in both mixins and interfaces are monomorphic therefore they support generic typing same with functions that have
+        type parameters. [type me] the language type for in house types is the only type to be specified for declaring member functions, along with
+        the special syntax for it [&<idenifier>]
+        ```
+        mixin some_mixin
+        {
+            fn fcn(&me)
+            {
+				me.c = me.b + me.a ``without knowing what type me.c, m.b and m.a is
+            }
+        }
+
+		struct some{type si32 [a, b, c]}
+		typescope some{use mixin some_mixin}
+        ```
+
+		Inheritance
+		───────────
+        Inheritance is the mechanism that allows same identifier-items to share their items with one another.
+
+        Types of Inheritance
+		────────────────────
+        1. Mixin Inheritance
+        2. Interface Inheritance
+        3. Type Inheritance
+
+		Mixin and Interface Inheritance
+		───────────────────────────────
+		These type of inheritance does not allow identifier conflict between the inheriting item's items and the inherited items.
+
+		Type Inheritance
+		────────────────
+		This type of inheritance allows identifier conflict between the inheriting item's items and the inherited items because it has a way of
+		resolving the conflict by using the [tosuper<>()] function.
+
+		The [tosuper] Function
+		──────────────────────
+		It is used to get the supertype from a subtype, and can be used in overload resolution.
+		```
+		struct a{...}
+		struct b: a{...}
+
+		typescope a{ fn fcn(&me){} }
+		typescope b{ fn fcn(&me){} }
+
+		type b x()
+		type a _ = tosuper<a>(&x)
+
+		tosuper<a>(&b).fcn()
+		```
+
+		Non Inheritance Types
+		─────────────────────
+		1. Reference types
+		2. Dynamic types
+		3. Function types
+
+		Use And Inheritance Conflict
+		────────────────────────────
+		1. The same mixin and interface cannot be used or inherited more than once
+		```
+		mixin output {fn output(&me){}}
+		mixin input {fn input(&me){}}
+		mixin io { use mixin [output, input] }
+
+		typescope si32
+		{
+			use mixin [output, io] ``io already contains the items of output through mixin inheritance
+			``or
+			use mixin [output, output]
+		}
+		```
+        Dealing With Redundant Inheritance
+        ──────────────────────────────────
+        A          A				A
+        B: A       B: A				B
+        C: A       C: B + A + A		C: A + B
+        D: B + C					D: C + B
+
+        Due to the fact that more than one identifier-item can be inherited at the same time, the problem of redundant inheritance is brought
+        to light. When left unchecked, it leads to terible inheritance chain like the diamond problem and ambiguous situations, for these
+        reasons it is redundant inheritance is disallowed in the language and when encountered, an error is given urging the programmer to
+        fix the problem.
+
+
+		[NOTE] Only value references are disallowed from typescope extention because of thier type identity duality
+
+
+        Dynamic Object
+        ──────────────
+        {
+            type (mixin: mad) x
+            type (interface: mad) y
+            type (subtypeof: mad) z
+        }
+
+        [GENERAL RULE]
+        {
+            : Interfaces as a dynamic object is only applicable in the context of type use and not getting items from a type(@- fromType)
+             - same with function types and subtypeof
+        }
+    }
+	: Constraint block
+	{
+		fn fcn(me)type si32 -> {} {}
+
+		: Constraint blocks are only allowed for generic functions(functions that support generic typing)
+		: Constraint blocks must contian type related quering and nothing else
+
+		: Both type parameters and type query block are semantically not allowed for function expressions
+		{
+			fn<type t> -> {give false} {}
+		}
+	}
+	: Additional LCI
+	{
+		#exp::is_parameter_arg_result_of_function(to<fn(si32)!>(normalize))
+		#literal
+		#ty::integer_number_literal
+		#ty::real_number_literal
+		#ty::string_literal
+		#ty::character_literal
+	}
+	: Defining custom literals
+	{
+		#at::static
+		unit
+		{
+			fn #literal(type #ty::integer_number_literal<si4> sec)
+			{give type chrono::second(sec)}
+
+			fn #literal(type #ty::real_number_literal<b32r> complex)
+			{give type math::complex(complex)}
+
+			fn #literal(type #ty::string_literal c++_lang)
+			{give type lang::c++(c++_lang)}
+
+			fn #literal(type #ty::character_literal u8)
+			{give type unicode::utf8(u8)}
+
+			The literal data-types are only to be used as parameters for [#literal] function
+		}
+	}
+	: [##] Implementation of autocompletion of my editor
+	{
+		: Let's say the user types a word and the sugggestions there are of different case, change the particular character that is of different case and suggest that word to the user
+		{
+			Cov - [but there is only coverage, so suggest it as Coverage] - Coverage
+		}
+		: [some different case] should not suggest [another different case]
+		{
+			t - [X] - T
+		}
+		: How would choosing symbols for end-to-end completion work
+		{
+			Example: entering '(' then ')' auto completes itself, same for ["]
+			
+			In normal text mode, only brace symbols(expect '<' '>') should be used
+			In source code mode, it is choosen by the language
+
+			It also covers the symbols that performs end-to-end completion on selected text
+		}
+		: Replace the quotation marks with square braces and watch what happens '(' ')'
+		: Indentation of the file and moving between indentation like ctrl+home but selective
+		: Selecting words but with a different command than ctrl+d
+	}
+	: Coverage of (if-else) and (match)
+	{
+		This coverage is used when (if-else) and (match) are used in expressions, delay initializing and assuring that a give statement would
+		be in a function thereby not causing undefined behaviour.
+
+		1. For (match) and (if-else) when operating on known value sets such as sumtypes or enums, a full list of the possible branches is
+		   sufficient or a default branch, same for (if-else) when using enums.
+		2. For (match) and (if-else) when operating on unknown or undetermined value sets such as integers, a default branch must be present.
+
+		: When used in expressions
+		{
+			Too lazy to define it, but you know what you want!!
+
+			b = { if true: give 34 } ``no error
+			b = { if #at::eval fcn(): give 45 } ``no error
+			b = { if fcn(): give 45 } ``error
+			b = { if fcn(): give 45 else give 32 } ``no error
+		}
+		: When used in delay initializing
+		{
+			Same as the above essentially
+		}
+		: When assuring that a give statement is present
+		{
+			Could occur in two case
+			: Explicitly specifying the give type
+			: Only specifying a give type in one branch of (if-else) and/or (match)
+		}
+	}
+	: What is the difference between the following
+	{
+		if #at::eval fcn():
+		give 45
+
+		#at::eval
+		if fcn():
+		give 45
+
+		2 == 3 ``evaluated at compile time
+		2 == b ``evaluated at run time
+		
+		#at::eval
+		type si32 b
+		type si32 c
+
+		b == c ``evaluated at run time
+		For an expression to be static time, all parties must be static time
+	}
+	: If the error isn't going to be used, instead of using the placeholder identifier, the parenthesis can be ommited completely
+	{
+		x => {continue}
+		x => {give}
+	}
+	: Something like this will cause a conflict
+	{
+		fn fcn(type [si32, b32r]_ [_empty_, 34`b32r]){}
+		fn fcn(type [si32, d32r]_ [_empty_, 34`d32r]){}
+
+		fcn(34, _) ``cannot resolve, the language shouldn't even permit such
+	}
+	: How would slice be defined, crucial to this problem's solution => type slice<char>(str, ...) or type slice(str, ...)
+	{
+		typescope slice<type t>
+		{
+			fn _construct_(type t<t> x)
+		}
+	}
+	: For loop safety on number iteration
+	{
+		for i: (.end= void)
+		{
+			``The compiler must know that the loop would break and it is given this assurance by checking for code that relates the iteration 
+			``identifier [i] to a break jump_statement, how it does this is by checking for any (if-else) whoose conditional expression queries
+			``the iteration identifier[i] and executes the body which contians a break jump_statement or checking for any expression that uses
+			``the iteration idenitifier and performs a safety check that gives an error when failed and the expression uses the jump statement
+			``in the event of the error been given
+
+			``examples 
+			if i == 45
+			break: 1
+
+			``or
+			match str(i, control)
+			{
+				br<char> {...}
+				br<error> {break: 1}
+			}
+
+			``or
+			str(i, control) =>{break: 1}
+		}
+	}
+	: Can my for loop work for list iteration
+	{
+		for infer it = list; x != end; x.next()
+		{}
+
+		--make it work goddamn it--
+	}
+    : What did i later settle on regarding UFCs
+    {
+        x.::fcn()
+        --remember the pointer conomdrum i.e calling from a userscope and how value references seem ambiguous due to it--
+    }
+	: Look at std::bitset member functions to add to integers
+	: [unsafe] semantics
+	{
+		Language default [unsafe] operations:
+		- initializing a typed MAR with an untyped MAR
+		- accessing a mutable global object(?)
+
+		: Individual expressions can be marked as [unsafe]
+		: If a converting initialization function is marked [make_unsafe] then the whole type declaration is to be marked [unsafe]
+		: A function declaration can be marked as [make_unsafe] meaning any use of it is marked as [unsafe]
+		: A function declarations not marked as unsafe can still be called unsafely as an expressions if the boolean [is_unsafe] is used in them
+	}
+	: Init
+	{
+		[_init_] should not have the same value as the type, because that would meain it is a copy initialization
+
+		fn _init_(&me, &src){}
+		fn _init_<type t...>(&me, type d_array<t>... x){  }
+
+		Think more about this in relation to having array of arrays
+
+		: I forgot syntax for variadic only parameter name entry --[...me] ?--
+	}
+    : Owning MARs introduction/semantic-definition
+    {
+		Transmutation
+		Having owning MARs means you cannot replicate the iteration model in c++
+		Can a non-owning MAR bind to an owning MAR
+
+		[ | | | | ]
+		(x + 4) gives !
+		$x
+
+        type {*}si32 x
+		type &{*}mut si32
+
+		: Is the only MAR that can be iterated using the [+] and [-] operators, all of which gives !
+		: It cannot be copied, only moved and value-referenced
+		: Both MAR types cannot bind or reference each other
+		: Assignment of an owning MAR --nothing significantly special about them--
+		: Transmutation of the same type erased owning MAR to more than one owning MAR with the same lifetime range is not allowed
+		{
+			type {*}mut ? x = malloc(4)
+
+			#at::unsafe
+			unit {
+				type {*}mut si32 _(x)
+				type {*}mut si32 _(x)
+			}
+		}
+    }
+	: From Linus Trovalds said in an email, gotten from a [...] site
+	{
+		any compiler or language that likes to hide things like memory allocations behind your back just isn't a good choice for a kernel.
+	}
+    : A memory model that prioritizes safety and allocator awareness
+	: Allocator implementation in nc --return--
+	{
+		How to handle allocator failures - a global mutable log should be setup and that exits with an error as it's default action and also should be able to call a function upon exit
+		type alloc<?>
+		type arena<?>
+	}
+	: Define value-reference referencing a MAR
+	{
+		type &{*}
+		type &mut*mut si32: mut
+	}
+	: Listen to Johnthan Blows talk
+	: Expression Aliases hath cometh again and this time shath stay
+	{
+		alias one = 1
+		alias result = {give 34 + 34} + me.fcn
+		alias print = io::out.write
+		alias some = me.fcn
+		me.fcn()
+		Me::fcn(&me)
+	}
+	: LCI to add
+	{
+		#at::make_unsafe
+		#at::unsafe
+		#exp::is_unsafe
+		#exp::type_alignment<*>
+		#exp::typesize<*>
+		#exp::is_parameter_arg_result_of_function(*, *)
+		#exp::is_parameter_arg_result_of_function<*>(*)
+	}
+	: Inheritance is only possible for struct type creators
+	: Static time type introspection would be added
+	{
+		x.isMember(*)
+		x.usesMixin(*)
+		x.usesInterface(*)
+	}
+    : Priorities
+    {
+        - Learning about allocators and how to integrate them in my language
+        - Refining MARs(memory address references) semantics in relation with the introduction of an Owning MARs
+        - Understanding runtime type introspection and it's uses via type erasure, serialization and standard data-type printing
+        - Focusing more on the metadata that can be accessible via LCI like static time introspection and so much more
+        - Understanding static time evaluation and all it's niches(specific areas of expertise) and naunces
+        - Learning more about IO and how they would be implemented in my language, considering the claims that fast io makes
+        - How not to make an array of values default initializes every time due to the languages strict stance on memory safety
+		- Implementing zero size types
+    }
+	: All ideas gotten so far
+	{
+		fcn(...) --external objects i.e function parameters must be static to be considered for static evaluation
+
+		type si32 x = 34
+		#at::eval fcn(x) --no, x is not static--
+		#at::eval fcn(34) --yes, literals are static by default--
+
+		static and run time code can interact and when done, the entire code is run time
+
+		(static + run)time = (run)time
+
+		[eval] for expressions, statement and object declaration items
+		[make_static] for function definition declaration items
+
+		Oh yh! [at] for attribute
+
+		What of something like these:
+		{
+			#at::make_static fn some(){}
+		}
+	}
+	: LCI static time debugging
+	{
+		- only works when main is run at static time
+		- similar to code explaination but on steriods
+
+		#at::debug(#exp::mark(Parser))
+		#at::setDebugBreakpoint
+
+		\"compile down to what language": (Java|Javascript|C++|C|Rust|Go|Scala|C#|Webassembly)
+	}
+	: WHY?
+	{
+		type tuple<si34, si32> c()
+		
+		#at::static
+		for i: (.end= c.size)
+		c(i) + 34
+
+		: Would marking only the integer static allow it to be some accessed at runtime use in a while
+
+		: Why is tuple iteration possible while it isn't for normal structures
+
+		struct some{type [si32, si34][a, b]}
+	}
+	: typescope cannot be access restricted
+	{
+		: Define it well
+	}
+	: Function type new syntax
+	{
+		type *fn(&si32)&si32 x:mut
+	}
+	: Object of function type vs Object that overloads the call operator
+	{
+		str(1) --> gives si32 and si64 based on the overloads choosen, but since it is an object that overloads the call operator, it should behave like it only has the call operator in it's arsenal
+		to<fn(&me)si34>
+		Since it overloads the call operator, it would be the only means of overload resolution it would have. But a function type can extract the
+		call-like function in the type
+
+		Given [fcn] which has several other overloads
+		type fn(si32)! x(fcn)
+		type fn(si32)! x = fcn ``Error many overloads detected
+	}
+	: Lifetime tracking implementation
+	{
+		References must reference objects with the same lifetime range
+
+		Written mathematically
+		Given two objects m of reference type and n of non-reference type, their lifetimes lₘ and lₙ, if lₘ != lₙ then m cannot reference n
+	}
+	: [type f_array] defined semantics
+	{
+		type f_array<si34>
+		type d_array<si34>
+
+		struct f_array<type t>
+		{
+			type {*}mut t data,
+			#at::static
+			type si32 [size, capacity]
+		}
+
+		: I need to store the capacity to preallocate memory and also enabling [push]
+		: [push] -back- would not grow the capacity of a fixed array -meaing it is error prone
+		: [pop] -back- would not shrink the capacity of a fixed array
+		: To prevent against stack waste, the following measures are taken
+		{
+			- allocation of objects on first use
+			- deallocation of objects on last use
+		}
+		: So a fixed array has an owning-MAR and due to lifetime tracking rule, it must reference objects with the same lifetime range, stopping something like this:
+		{
+			type f_array<si32> x()
+			fn fcn
+			{
+				x = type f_array(1, 2, 3, 4, 5, 6) ``ERROR: x.data(type {*}si32) is referencing objects with a different lifetime range
+			}
+
+			``and this
+
+			fn my
+			{
+				type f_array<si32> x(.capacity= 32)
+				fcn(&mut x)
+
+				fn fcn(type &mut f_array x)
+				{
+					x.push(45)
+					x = type f_array(.capacity= 10) ``ERROR: x.data(type {*}si32) is referencing objects with a different lifetime range
+				}
+				type f_array<si32> global(.capacity= 40) --global
+			}
+		}
+	}
+	: Learn more about types that are expensive to copy
+	: LCIs to think about
+	{
+		#exp::filepath
+		#exp::module_location
+		#exp::package_location
+		#exp::location
+		#exp::callsite_location
+
+		location = "module: {filepath} line: {line} column: {startcolumn}"
+
+		{
+			#at::inline
+			fn assert_eq(type si32 [a, b])
+			{
+				infer [str_a, str_b] = [a, b] | #exp::\"parameter_arg->str"
+				assert(a == b, "[ASSERTION FAILURE] On location: %,  (% != %) : {% != %}", #exp::location, a, b, str_a, str_b)
+			}
+		}
+	}
+	: A new identifier item [unique] that makes an existing type distinct
+	{
+		unique handle = type si32
+		unique kilometer = type si32
+		unique str<type t> = type darray<t>
+
+		: How would these work fare during overloading, according to my implementation of not wraping the type
+	}
+	: Arbitary integers are disqualified
+	{
+		bit  8, 16, 24, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536
+		byte 1, 2,  3,  4,  8,  16,  32,  64,  128,  256,  512,  1024, 2048,  4096,  8192
+
+		ui8, ui16, ui24, ui32, ui64, ui128, ui256, ui512, ui1024, ui2048, ui4096, ui8192, ui16384, ui32768, ui65536
+	}
+	: Grouping syntax addition
+	{
+		member -> postfix -> prefix
+
+		([a, b, c].[f, g, l])()             -> [(a.f)(), (b.g)(), (c.l)()] --possible--
+
+		[a, b, c].[f, g, l]()               -> [a.(f()), b.(g()), c.(l())] ``error
+		($[a, b].[f, g])()                  -> [($a.f)(), ($b.g)()] --possible--
+		$[a, b].[f, g]() 					-> [$(a.f)(), $(b.g)()] --possible--
+		$([a, b].[f, g])() 					-> [$((a.f)()), $((b.g)())] --possible--
+
+		: Add postfix operator -call operator- when parsing for initialization for grouped object declaration
+		{
+			type [ui1, ui4] [custom_variadic_pos, past_i][(), i] --check this out--
+		}
+	}
+	: Addition of inclusive and exclusive number-range operator [~]
+	{
+		inclusive range [~=]
+		exclusive range [~]
+	}
+	: Things like recursion on function that have static parameters, how would it go
+	{
+		fn definition(#at::static type si32 f)
+		{
+			if f == 0:
+			give 34
+			else
+			definition(f-1)
+		}
+		
+		definition(45)
+
+		fn definition()
+		{
+			definition(44)
+		}
+	}
+	: The character to be used for raw string escape sequence entry is now [*]
+	{
+		"\*{\"emeka"}*" --[no more]-- "\#{\"emeka"}#"
+	}
+	: Block
+	{
+		Describes two types
+		1. Block expression
+		2. Block statement
+	}
+	: [else] effect on for loop that does not have and [end]
+	{
+		for _: (.end= void)
+		{}
+		else
+		{}
+		: Should warned against because [else] does not have a possibility of executing
+	}
+	: What and what initializers should be avialable to type_creators by default as defined in the language
+	{
+		: And also factor in access restriction
+	}
+	: Design problems of pseudo_writef
+	{
+		- pseudo_write(type slice<char>(str, old_i ~ (i-1))), how do i expect slice to work out the box with u8str?
+		- all these \"->str" functions, what will they really give and take even?
+	}
+	: There are two memomry spaces in which objects can be allocated
+	{
+		- stack space
+		- global space
+
+		Initialization of [type f_array] in an _init_ function is not feasible due to lifetime inconsintencies -study more
+		Or i can make an exception were [type f_array] fields can only use the _init_ function that takes the capacity
+	}
+	: NC regex
+	{
+		([a-z1-9_]+):(struct|union|enum|nil)
+		$[$identifier()$+] : $[struct|union|enum|nil]
+
+		*	nil:si32\n
+		*	struct:book;page_number:si16;book_colour:colour\n
+		*	union:anything;si32;si512;si2084;d32r;b64\n
+		*	enum:even_numbers;(si8);two:2;four:4;six:6;eight:8;ten:10\n
+		*	struct:novel;(book);book_edition:edition;accolades:d_array<accolades>\n
+
+		regex"\*{
+			$alias nc_identifier = \"$(unicode, min~max)$*"|$<identifier>$*
+			$alias varaint1 = $[$nc_identifier] ${: $[$nc_identifier|$(number)]}$*
+			$alias variant2 = $[($nc_identifier ,$nc_identifier$*)]
+
+			$[$[struct|union|enum|nil] : $[$nc_identifier]] ; $[$varaint1*|$variant2]
+		}*
+		"
+		$...
+
+		alias nc_identifier = ('\"' <unicode: mix, max> '"')*|<identifer>*
+		[['struct'|'union'|'enum'|'nil'] ':' [nc_identifier]] ';' ... [nc_identifier] (':' [nc_identifier|<number>])*
+	}
+	: Piping is going to be disallowed and <arg> would be looked at more
+	{
+		(1, 2, 3, 4, 5)|fcn
+		I am going to remove piping for now
+	}
+	: Since some LCI's are consider to be functions, can they be stored in an object like normal functions can
+	{
+		infer x = #exp::variadic_size
+		Two reasons to support this
+		1. In order for programmers to better understand
+		2. In order for accepting (str)s to be consider normal
+	}
+	: editor
+	{
+		Bringing out the column number for selection functions like shift + mouse-click
+	}
+	: LCI to add
+	{
+		#exp::operator_precedence
+		#exp::type_creator_metadata<*>
+		#exp::type_creator_comprehensive_metadata<*>
+		#exp::which_type_creator<*>(*)
+		#ty::\"str->item"(*)
+		#exp::\"str->exp_item"
+		#exp::\"->str"
+		#exp::\"<-str"
+
+		#exp::\"ty_item->str"
+	}
+	: Format for type_creator_metadata
+	{
+		struct book{type [si16, colour] [page_number, book_colour]}
+		union anything{type [si32, si512, si2084, d32r, b64r]}
+		enum even_numbers: type si8{two(2), four(4), six(6), eight(8), ten(10)}
+		struct novel: type book{type [edition, d_array<accolade>] [book_edition, accolades]}
+
+		/*
+		*	Remember struct type creators can inherit other struct type creators
+		*
+		*	nil:si32\n
+		*	struct:book;page_number:si16;book_colour:colour\n
+		*	union:anything;si32;si512;si2084;d32r;b64\n
+		*	enum:even_numbers;(si8);two:2;four:4;six:6;eight:8;ten:10\n
+		*	struct:novel;(book);book_edition:edition;accolades:d_array<accolades>\n
+		*/
+
+		/*
+		*	Remember struct type creators can inherit other struct type creators
+		*
+		*	nil:si32\n
+		*	struct:book;page_number;book_colour\n
+		*	union:anything;si32;si512;si2084;d32r;b64\n
+		*	enum:even_numbers;(si8);two;four;six;eight;ten\n
+		*	struct:novel;(book);book_edition;accolades\n
+		*/
+	}
+	: Output and serialize implementation focus --visit later--
+	{
+		[type str] has the printing style of this : write("Emeka") => Emeka
+		So when type slice<?> is references it, it can just use the style of [type str]
+
+		interface output
+		{
+			fn output(&me) type str
+		}
+
+		fn output(&me) type str
+		{
+			//#exp::type_creator_metadata()
+			//#exp::type_creator_metadata<#ty::\"str->code"("novel")>
+
+			``Generic default implementation of output
+			``There should be two types of metadata one that is comprehensive and the other that is not
+
+			#at::static
+			unit
+			{
+				infer type_creator_metadata = type str(#exp::type_creator_metadata<#ty::exp(me)>).slipt_on(';')
+				//type f_array<tuple<str, str>>
+
+				type str str()
+			}
+
+			infer begin_pair = type_creator_metadata(1).slipt_on(':')
+			str.fmt("% % !", begin_pair(1), begin_pair(2))
+
+			for i: (.end= void)
+			{
+				if i ∈ ':':
+				{
+					infer other_pair = type_creator_metadata(i).slipt_on(':')
+
+					if begin_pair(1) == "struct":
+					str.fmt("%: %", pair(1), me.( #exp::\"str->item"(pair(1)) ))
+					else if begin_pair(1) == "enum":
+					str.fmt("%: %", pair(1), pair(2))
+					else if begin_pair(1) == "union":
+					str.fmt("%", pair(1))
+				}
+				else
+				{
+					if begin_pair(1) == "struct":
+					{
+						infer supertypes = (&type_creator_metadata(i)).trim('(', ')').slipt_on(',')
+						str.fmt("supertype!")
+
+						for j: (.end= void)
+						{
+							alias supertype = type #ty::\"str->item"(supertypes(j))
+
+							str.fmt("%", tosuper<supertype>(me))
+
+							if j == super_types.size:
+							{str.fmt("!") break: 1}
+							else
+							str.fmt(", ")
+						}
+					}
+					else
+					{
+						str.fmt( "basetype{%}", type_creator_metadata(i).trim('(', ')') )
+					}
+				}
+
+				if i == type_creator_metadata.size:
+				{str.fmt("!") break: 1}
+				else
+				str.fmt(", ")
+			}
+			
+		}
+	}
+	: [pseudo_writef] implementation --visit later--
+	{
+		// io::out.writef("%{c.x} ;;; %{c.c.now(_)}") ``variadic one or more would not allow this
+
+		#at::inline
+		fn pseudo_writef<type t...>(#at::static type u8str u8str, type ?t... args)
+		{
+			#at::static
+			{
+				if u8str.size == 0:
+				static_write("String is empty, pls fill")
+
+				infer [str, variadic_size, variadic_pos_set] = [type str(u8str), #exp::variadic_size(args), type set<ui8>()]
+			}
+
+			#at::static
+			for type ui32 [old_i: mut, variadic_pos: mut](1); i: (.end= void)
+			{
+				#at::inline
+				fn \"just found %"() --[i] dosen't need updating--
+				{
+					pseudo_write(type slice<char>(str, old_i ~ (i-1)))
+					pseudo_write(#exp::variadic_access(args, variadic_pos))
+
+					variadic_pos += 1
+					old_i = i+1 ``forward skip %
+					variadic_pos_set.push_back(variadic_pos)
+				}
+
+				``Atleast one branch in branch statement i.e in coverage of the loop must break from either the parent loop or the both parent and child loops
+
+				if str(i, control) =>{if old_i < str.size: pseudo_write(type slice<char>(str, old_i ~= str.size)) break: 1} == '%':
+				{
+					i += 1
+
+					match str(i, control) =>{\"just found %"() break: 1}
+					{
+						br('<paren>')
+						{
+							pseudo_write(type slice(str, old_i ~= (i-2)`*backwards skip of % and <paren>*`))
+
+							[i, old_i] = [i+1, i] ``Skipping <paren> by incrementing [i]
+
+							do
+							{
+								match str(i, control): [_, i]
+								{
+									br<out_of_bounds_error> {static_write("EOS reached but <paren> was never found") continue: 1}
+									br<char>
+									{
+										if not i.isDigit(10):
+										{
+											if to<char>(i) != '<paren>':
+											{
+												static_write("Right <paren> was expected instead of this [", to<char>(i), ']') continue: 1
+											}
+											else if old_i == i: ``i.e if the no custom variadic number was found
+											{
+												static_write("No number literal was given! WHY?") continue: 1
+											}
+
+											break: 2
+										}
+									}
+								}
+
+								i += 1
+
+								//if not str(i, control)=>{static_write("EOS reached but <paren> was never found") break: 2}.isDigit(10):
+								//break: 2
+							}
+
+							infer custom_variadic_pos = type ui8(type slice(str, old_i ~ i)) =>(err){static_write("Custom varg is errorneous:", err) continue: 1}
+
+							if custom_variadic_pos > variadic_size:
+							{
+								static_write("Custom variadic pos (i.e variadic position given) is > variadic size:", custom_variadic_pos, '>', variadic_size)
+								continue: 1
+							}
+
+							variadic_pos_set.push_back(custom_variadic_pos)
+
+							//to prevent something like this: pseudo_writef("%meka %(2) %(2)", 'E', daniel)
+
+							pseudo_write(#exp::variadic_access(args, variadic_pos))
+							old_i = i+1 ``forward skip of right <paren>
+						}
+						br('<curly>')
+						{
+							pseudo_write(type slice(str, old_i ~= i-2`*backward skip of %<curly>*`))
+
+							[i, old_i] = [i+1, old_i] ``skipping <curly> by incrementing [i]
+
+							while not (str(i, control) =>{static_print("EOS reached but left <curly> was not found") continue: 1} != '<curly>'):
+							i += i
+							else
+							{
+								static_write("No expression was given! WHY? Curly brace content is zero")
+								continue: 1
+							}
+
+							pseudo_write(#exp::\"str->code"(#at::static type slice(str, old_i~i)) =>(err){static_write(err) continue: 1})
+							old_i = i+1 ``forward skip right <curly>
+						}
+						br('*') pseudo_write(type slice(str, old~i)) //write % without '*' "%*"
+						br() \"just found %"()
+					}
+				}
+			}
+
+			if variadic_pos_set != 1 ~= variadic_size:
+			static_write(variadic_size - variadic_pos, "variadic argument(s) given to pseudo_writef are not formatted:")
+
+			#at::static
+			for i: (variadic_pos, variadic_size)
+			{
+				static_write(#exp::parameter_arg_asStr(#exp::variadic_access(args, i)))
+			}
+		}
+	}
+	: [unit] is needed in block scope for objects and functions
+	: For advanced static evaluation
+    {
+        : Parsing DSLs -- since string literals are statically evaluated, it is already assured
+		{
+			c++_lang"
+				int main()
+				{
+					2 +
+				}
+			"
+		}
+        : Making .writef work
+        {
+			.write("handle")
+			.writef("% + % ÷ %(1)", 1, 2)
+			.writef("%{ #exp::tostr(1 + 2 ÷ 1) }")
+
+			{
+				type *si32 x
+				type &si32 X
+				type {*}si32 x
+				type {*}mut si32
+
+				type introspect x(#exp::\"type->str"<&si32>)
+				\"exp->str"(2 * 3)
+				\"str->exp"("2*3")
+				\"type->str"<si32>
+				\"str->type"("si32")
+				\"parameter_arg->str"(b)
+
+				if current_union_alternative<si32>(x):
+				[(try $x) + (try $x)]
+
+				: It is now called the constriant block for generic typing and the only allowed operation is type querying
+			}
+
+			#dir::inline_eval
+			#dir::exp_to_inline
+
+			
+			: Question how slice would work with u8str and many other things
+			{
+				type u8str x(type slice(34))
+				struct slice
+				{
+					type &u8str x
+					type variant<&u8str, internal> x
+				}
+				struct u8str
+				{
+					type {*}ui8 data
+					#at::static
+					type ui32 size
+				}
+			}
+        }
+        : Performing bounds checks
+        {
+			fn #op()(&me, type si32 pos)
+			{
+				if pos > me.size
+				panic(s"On line % from column %, (object %(3)(1) of type %){%(3)(1)} is greater than (%){%}"
+				.format(#exp::callsite_line(), #callsite_startcolumn(), #exp::tostr_smart(pos), #exp::tostr_smart(me.size)))
+
+				#exp::asStr()
+				#exp::is_statically_evaluated
+			}
+
+			#dir::inline
+			fn #op()(&me, type si32 pos)
+			{
+				if pos > me.size
+				exit_program()
+
+				give me.data(pos - 1)
+			}
+        }
+
+		: A static body may only contain external static values, runtime values are not allowed
+		: Language default static values
+		{
+			- literals i.e integer-number-literals, real-number-literals, boolean-literals, character-literals and string-literals
+			- immutable primitive types like integers, reals, string
+
+			: With the above, what happens with these
+			{
+				infer _ = addressof 34
+				#dir::eval type si32 x()
+				infer _ = addressof x
+
+				#dir::eval infer _ = addressof x
+
+				infer _ = #dir::eval addressof x
+				infer _ = #dir::eval fcn()
+			}
+		}
+		: Something like this is not allowed
+		{
+			#dir::eval
+			fn fcn(#dir::eval type si32 x) {}
+
+			But type does it albiet the technicalities
+
+			#dir::eval type exact x() --even though exact has functions that are opt_eval, eval and inline_eval
+		}
+		: Effects of static evaluation on function declarations and expressions
+		{
+			Function declarations can be made statically evaluated, meaning any and all calls to them would be resolved at static time. Making
+			them function exactly like the languages default static time values when called.
+
+			None static expressions can be made static using the LCI. It is redundant to make an already static expression static and would be
+			highlighted by the language when encountered.
+
+			Function declarations can also be optionally statically evaluated based on it's arguments been static or not.
+		}
+		: Effects of static evaluation on statements
+		{
+			Statements except jump_statements, can be statically evaluated, meaing the statement is statically evaluated but not it's body. Their
+			method of static evaluation is different but complies with the statements intent:
+
+			- <if_statement> : it's conditional expression and that of any else-if chain is evaluated resolving to a singular body if the body isn't static
+			- <for_statement> : it's computed and the body is duplicated the number of computed times, if the body isn't static
+			- <while_statement> : same with <for_statement>
+			- <do_statement> : same with <for_statement>
+			- <match_statement> : does pratically the same thing with <if_statement>
+		}
+		: Effects of static evaluation on objects i.e type instances
+		{
+			Objects can be made static thereby making the entire object's type item statically evaluated. This isn't only limited to objects
+			declared in block or global scope, this it true for even the ones declared at function parameters and type fields.
+
+			: What exactly happens to statically evaluated parameters ?
+			{
+				fn work(#dir::eval type si32 x, type si32 y)
+				{}
+			}
+		}
+
+		{
+			#dir::eval
+			fn factorial(type si2084 n)
+			{
+				if n == 0 give 1`si2084
+
+				type #ty::exp(n) fact(1);
+
+				for i: (2, n)
+				fact *= i
+
+				give fact;
+			}
+
+			fn call()
+			{
+				#dir::eval factorial(34`si2084) ``INFO: factorial is already statically evaluated
+				#dir::eval {infer x = factorial() give comisc(x)}
+			}
+
+			fn example_print(type si32 n)
+			{
+				type io::output x(io::stdout)
+
+				x.write("Starting here")
+
+				for type ui32 j(1); i: (n, 1)
+				{ x.writef("%{j} number[%{i}]"); j += 1 }
+			}
+
+			fn main
+			{
+				#dir::eval example_print(89)
+			}
+		}
+    }
+    : Language-Communication-Interface(LCI) definition
+    {
+		- directives(dir namespace)
+		{
+			- private(mod|pkg|type)
+			- readonly(mod|pkg|type)
+			- extend_lifetime
+			- make_error_handling_type
+			- make_optional_handling_type
+			- manages_heap_lifetime
+			- function_may_end_heap_lifetime
+			- function_ends_heap_lifetime
+			- callfirst
+			- call_last
+			- mustcall
+			- mark
+			- enforce_efficient_passing -- change to efficient for the type or would writing code for it be better?
+			- static
+			- opt_static
+
+			- explain_code
+
+			- #dir::make_threadlocal
+            - #dir::enforce_efficient_passing<*>
+			- #dir::make_optional_handling
+			#at::private(mod)
+		}
+		- statement-like-directives(statement namespace)
+		{
+			- \"enable auto $"
+			- \"disable auto $"
+			- mark
+		}
+		- expression(exp namespace)
+		{
+			- line
+			- startcolumn
+			- endcolumn
+			- columnpair
+			- callsite_line
+			- callsite_startcolumn
+			- callsite_endcolumn
+			- callsite_columnpair
+			- typename
+			- typesize
+			- typeEq
+			- isRefType
+			- isValueRefType
+			- isMemoryAddressRefType
+			- variadic_access
+			- variadic_size
+			- mark
+		}
+		- type(ty namespace)
+		{
+			- exp
+			- decay
+			- fn_givetype
+			- variadic_access
+			- integer_number_literal
+			- real_number_literal
+			- string_literal
+			- character_literal
+		}
+		- operator
+		{
+			- op <every-operator-in-nc>
+		}
+		- literal
+
+        : LCI
+        {
+			#dir::mark(daniel) 2 * 2
+			#statement::mark(daniel) 2*3
+
+			#dir::explain(#exp::mark(daniel))
+
+            {
+                #exp::typeItem<si32>(member, fn main()!)
+                #exp::typeItem<si32>(@item::function)
+                #exp::namespaceItem()
+                #exp::mixinItem()
+
+				#exp::hasItem<si32>("fn some(me: &)!")
+				#exp::hasItem<si32>(me)
+				userscope_contents(emeka)
+
+				#dir::line(#exp::mark(emeka))
+
+				item(@itemType::struct, "u8str", "member-functions")
+				itemlookup(@)
+				hasItem(@itemType::struct, "u8str", "fn #op+(type [me, me])")
+				\"inItemscope?"()
+				\"usesMixin?"
+
+				#exp::asStr(2*3)
+				#exp::asStr(me.size)
+				#exp::tostr(3 + 3 + 5)
+
+				#dir::mark(emeka) 2 * 3
+				#exp::tostr(#exp::mark(emeka))
+            }
+            : How to get callsite line number information?
+            {
+                fn somecall(){ log(#exp::callsite_line) }
+
+                A global array of all the line number location sites of the function, then a simple index to acess the info
+            }
+        }
+    }
+    : Lifetime tracking uniqueness
+	{
+		type ui8:& x
+
+		fn some{ x := &45 some2() }``x referenced value dies here
+
+		fn some2{ _= x + x }``leaving this function with a valid value of x only when called in [some()]
+
+		fn some3{ some2() }
+
+		[main]
+		{
+			use mod [cat, dog]
+
+			fn main{  }
+		}
+
+		[dog]
+		{
+			use mod cat
+
+			type cat cat()
+
+			fn _construct_(&_){ cat.bark() }
+		}
+
+		[cat]
+		{
+			use mod dog
+
+			type dog dog()
+
+			fn _construct_(&_){ dog.bark() }
+		}
+	}
+    : Variadics syntax and semantics
+    {
+        : Variadic semantics
+        {
+            Variadics also called variadic argument entry is a special feature in nc that allows the entry of an arbitrary number(>1) of arguments.
+            It is a language abstraction that makes use of the monomorphisation that type parameters apply to functions, meaning that for each
+            arbitrary number of arguments a new function is created for it, also meaning that variadics joins type parameters as an abstract
+            language feature
+
+            Usage:
+            : Variadics acting on a normal type parameter
+            {
+                fn fcn<type t>(type t... _){}
+
+                fcn<char>('2', '3', '4')
+                fcn<si34>(1, 2, 3, 4, 5)
+
+                : Of course if one wishes to have the variadics avialable for only a particaular type or set of types, a constraint can be appiled to the type parameter
+
+                #{give #exp::is_same_ty<si8, t>}
+                fn fcn<type t>(type t... _){}
+
+                fcn<char>('2', '3', '4') ``Error: type parameter [t] only accepts type si8
+                fcn<si34>(1, 2, 3, 4, 5)
+
+                struct some<type t>{ type t... x }
+                struct some<type t:?>{ type t:?... x }
+            }
+            : Variadics acting on a variadic type parameter
+            {
+                fn fcn<type t...>(type t... _){}
+
+                fcn<char, si8, b32fp, d32fp>('3', 45`si8, 45.7`b32fp, 3.)
+            }
+
+            [NOTE] due to type argument entry supporting default implicit argument entry, the following can be rewritten as this:
+            {
+                fcn('2', '3', '4') ``Error: type parameter [t] only accepts type si8
+                fcn(1, 2, 3, 4, 5)
+                fcn('3', 45`si8, 45.7`b32fp, 3.)
+            }
+
+            Due to nc-lang supporting function overloading and default implicit argument entry for type parameters, variadics can tend to get a bit
+            confusing and function identifier overload resolution
+            takes place, example:
+            {
+                [1]
+                {
+                    fn fcn(type [si8, si8, si8] _){}
+                    ``and
+                    fn fcn<type t>(type t... _){}
+
+                    fcn(2`si8, 2`si8, 2`si8)
+
+                    fcn<si8>(2`si8, 2`si8, 2`si8)
+
+                    fcn(2`si8, 2`si8, 2`si8, 2`si8)
+
+					fcn(_v_, 2,3,4,5,6, _v_)
+                }
+
+				Overload Resolution even in the case of variadics always goes for the better match
+            }
+        }
+        : Variadics do not have a mechanism to support default argument entry
+        : In a Varaidic argument entry, one or more must be entered unlike C++ where they are zero or more
+        : To avoid identifier-conflict between non-variadic argument entry where the non-varaidic overload of the function would be preferred by
+          the compiler, identifier [_v_] is used to specifiy both the start and end(if needed) entry of a variadic argument
+		: For now a variadic identifier would not be able to spread in fear of what c++ does with thier version of spreading that invovles recursion
+        : LCI variadic
+        {
+            #exp::variadic_size(*)
+            #exp::variadic_access(*, * `*has to be static*`)
+			#ty::variadic_access(*, *)
+        }
+    }
+	: Floating point number types gets renamed to real numbers
+	{
+		b32fp -> b32r
+		d32fp -> d32r
+	}
+    : [struct], [union], [tuple] and [variant] would be introduced to replace the formers
+    : <arg> does not give any value, it is just parsed as an expression
+    : The member operator is the only operator whoose rhs must be an identifer
+    : For object expression, when used in the construction of an object it's declaration, no matter if it is consists of many construction levels, it's constructor would only be called once for that object
+    {
+        [ type si32 x = type si32(34) ] same as [ type si32 x(34) ]
+        [ type si32 x = type si32(type si32(type si32())) ] same as [ type si32 x() ]
+    }
+    : Function type semantics
+    {
+		: [...............]
+		{
+			Functions are treated like objects in nc, they give data type that consists of the function's signature, they can be stored in an instance
+			of that type(i.e object of the type)
+
+			: What of thier relationship with the call operator
+		}
+
+        : Only argument taken for a direct construction is an object that overloads the #op()
+        {
+            type str x
+            x(1)
+            type (fn(str:&, si32)char:&) x(to<str>(x))
+            type (fn(str:&, si32)char:&) x = to<str>(x) ``ERROR value of type str is not of type (fn(str:&, si32)char:&)
+            type [(fn(str, si32)!), si32] x[..., 34`si32 `*ERROR expected an argument for construction*`]
+        }
+		: An object overloads the call operator while a function and function type does not
+    }
+    : How would i solve the problem of function overloading semantics example
+    {
+        - for objects, if an object can reference an overloaded function through its identifier, should objects with function type have the ability to
+        overload themselves using <function_exp> as their source?
+        - For overloaded functions and function-objects with multiple call operator overloads, when guessing the function-type, how would that go
+
+        : Big question to answer, what are functions, function-objects, call operator, objects that implement the call operator
+
+        : How will overloaded functions interface
+        - {
+            fn fcn(){}
+            fn fcn(type si32 _){}
+            infer a := fcn
+
+            infer x = fn<type t>()
+        }
+
+        type (fn()!) x = fn(){} ``same with function overloading
+        type (fn(si32)!) x = fn(si32){}
+
+        ``Add to the stuff about functions
+
+        fn <type t>(type t:& _){}
+    }
+    : Lifetime tracking for both stack and heap allocated memory
+    : Object construction and grouping syntax semantics
+    {
+        : Object expression is disqualified from participating in grouping, because of two primary reasons
+        {
+            - conflict with object declaration:
+                { type [si32, si8][(2), ()] } is distinguishable but this { type [si32, si8][a, c] } is not
+            - i want object expression to represent one singular expression like f(), 1
+        }
+
+        An object in nc is an allocated memory region that contains valid and user-defined values of the object's type
+
+        Construction/Initialization
+        ────────────────────────────
+        Is the process of giving an object valid and user-defined values of the object's type
+
+        Holds the post-condition that after construction the object contains valid and user-defined values of it's type
+        Holds the post-condition that states an object must be constructed before it's use
+
+        Types of construction
+        ──────────────────────
+        1. Direct(function call like): takes the arguments for construction/initialization of the object
+        2. Indirect(assignment like): takes an already constructed object of the same type
+
+        [Delayed construction/initialization]
+        Construction Delay
+        ───────────────────
+        Construction of an object can be delayed by not specifying an form of construction and later using the delay-construction-assignment
+        operator(:=) to construct the object(s).
+
+        Conditions of Construction Delay
+        ────────────────────────────────
+        1. It may be delayed constructed in if-else or match statements that must have a default branch
+        2. it may not be delayed constructed in loop statements
+
+        [(x, m), (y, p), (l, h)]|[fn1, fn2, fn3]
+        [x, [y, [z, [c, g]]]] + [a, [b, c]]
+
+        type [si32, si8] a = [type si32(), type si8()]
+        type [si32, si8] a()
+        type [si32, si8] a[(), (2, 3)]
+        type [si32, si8] a()
+        type [si32, si8] a = a
+        a + [a, b, n]
+        type [si32][a, b, c]
+        [(2, 3), (4, 5)]|[f, c]
+        [(3, 4), (0, 9)]|[[f, c], g]
+
+        Groupings
+        ─────────
+        Is a language feature that treats multiple items as a single unit. It's main inclusion to the language is to eliminate unnecessary
+        typing that sometimes leads to code verbosity and to add a more high-level touch to the language.
+
+        Explanation
+        ───────────
+        The entities used for enclosure are the left and right square braces '[' ']'.
+        Groupings can be acted upon, meaning it can be scaled by another grouping or single item
+
+        example:
+        type si32 [a, b, c] = { [1, 2, 3] } - good
+        fn mac() type [si32, si32] { [2, 3] } - bad
+
+        The contents of an enclosed group must be entites separated by a comma. So singletons like this [x] do not qualfiy as an enclosed-
+        group
+
+        Levels of grouping:
+        ───────────────────
+        Levels of groupings essentially means the nesting levels of a grouping, just like how blocks can be nested
+        example:
+        [a, [l, o]]
+        └───┼──┬─┼┘
+            │  1 │
+            └──┬─┘
+                2
+
+        [x, [c, [b, [k, l]]]]
+        └───┼─┬─┼───┼────┼┼┼┘
+            │ 1 │   │    │││
+            └───┼─┬─┼────┼┼┘
+                │ 2 │    ││
+                └───┼─┬──┼┘
+                    │ 3  │
+                    └──┬─┘
+                        4
+        The language syntax permits only an expression to have mutiple levels of a grouping
+
+        Grouping follows two basic rules for it's use:
+        ──────────────────────────────────────────────
+        1. When acted upon, both sides must have full coverage of each other or to be more succint, all items of one side must have a
+        corresponding item to act on the other side
+
+        example:
+
+        type si32 [a, b, c] ✔
+        type [si32, si45, si80] [d, e, f] ✔
+        type [si32, si32] [a, k, g] ⤬
+
+        [b, a, c] = v ✔
+        [b, a, c] - [v, g, n] ✔
+        {
+            🟢 b - v
+            🟢 a - g
+            🟢 c - n
+        }
+        [b, a, c] + [f, j] ⤬
+        {
+            🟢 b + f
+            🟢 a + j
+            🔴 c + ?
+        }
+        [x, [y, [z, [c, g]]]] - [a, [b, c]] ✔
+        {
+            🟢 x - a
+            🟢 [y, [z, [c, g]]] - [b, c]
+            {
+                🟢 y - b
+                🟢 [z, [c, g]] - c
+                {
+                    [z - c, [c - c, g - c]]
+                }
+            }
+        }
+        [x, [y, [z, [c, g]]]] - [a, [b, c], o] ⤬
+        {
+            🟢 x - a
+            🟢 [y, [z, [c, g]]] - [b, c]
+            {
+                🟢 y - b
+                🟢 [z, [c, g]] - c
+                {
+                    [z - c, [c - c, g - c]]
+                }
+            }
+            🔴 o - ?
+        }
+        [x, [y, [z, [c, g]]]] - [a, [b, c, m]] ⤬
+        {
+            🟢 x - a
+            🟢 [y, [z, [c, g]]] - [b, c, m]
+            {
+                🟢 y - b
+                🟢 [z, [c, g]] - c
+                {
+                    [z - c, [c - c, g - c]]
+                }
+                🔴 m - ? ``dosen't offer full coverage
+            }
+        }
+
+        2. Grouping for items is valid only in contexts where it is also valid in normal code
+
+        example:
+        - alias [myInt, bestReal] = type [si32, d32fp]
+        {
+            ``The above uses both type of groupings i.e unclosed-grouping for the alias identifiers and grouping for the type
+            ``It is valid as the expansion can already be implemented without parenthesis grouping
+
+            alias myInt = type si32
+            alias bestReal = type d32fp
+        }
+        - named_st arithmetic{ type [si32, si64, si128, b32fp, d32fp] }
+        {
+            ``The above is also valid because the expansion can already be implemented without parenthesis grouping
+            named_st arithmetic{ type si32, type si64, type si128, type b32fp, type d32fp }
+        }
+        - fn fcn() type [si32, si8]
+        {
+            ``The above is not valid because the expansion cannot be implemented without grouping
+            fn fcn() type si32 type si8 ``SYNTAX ERROR: reserved identifier 'type' found at unexpected location
+        }
+        - type si32 [a, b, c]()
+        {
+            type si32 a()
+            type si32 b()
+            type si32 c()
+        }
+        - type si32 [x, y] = [2, 3]
+        {
+            type si32 x = 2
+            type si32 x = 3
+        }
+
+        operators:
+        - It performs ordered expression wise evaluation and gives a grouping of the results of the operation
+        {
+            ``[->] denotes the equivalent operation
+            d.*fcn()
+
+            [[a, b, c].[f, g, l]]() -> something like this should not be allowed, because enclosed grouping requires multiple entity stuff
+
+            ([a, b, c].[f, g, l])()             -> [(a.f)(), (b.g)(), (c.l)()]
+			() | ([a, b, c].[f, g, l])			-> [()|a.f, ()|b.g, ()|c.l]
+
+            [a, b, c].[f(), g(), l()]           -> [a.(f()), b.(g()), c.(l())] ``error
+            $[a, b].[f, g]()                    -> [$((a.f)()), $((b.g)())]
+
+            $[a, b, c] += [n, m, c]             -> [$a += n, $b += m, $c += c]
+            -[a, b]                             -> [-a, -b]
+            b = [1, 2]                          -> [b = 1, b = 2]
+            [a, b] = [c, d]                     -> [a = c, b = d]
+            [a, b] - 1.9                        -> [a - 1.9, b - 1.9]
+            [a, b, c] + [d, e, f]               -> [a + d, b + e, c + f]
+            [a, c] * [b, x] + [e, g]            -> [a * b + e, c * x + g]
+            [[c, v], p] =/ [k, l]               -> [[c /= k, v =/ k], p =/ l] ``lhs has a two level grouping
+            [x, [y, [z, v]]] - [a, [b, c]]      -> [x - a, [y - b, [z - c, v - c]]] ``lhs has a three level grouping
+            [x, [y, [z, [c, g]]]] + [a, [b, c]] -> [x + a, [y + b, [z + c, [c + c, g + c]]]] ``lhs has a four level grouping
+            [x, y, v]|fcn                       -> [x|fcn, y|fcn, v|fcn]
+            [(a, b, c), p]|[fcn1, fcn2]         -> [(a, b, c)|fcn1, p|fcn2]
+
+            {
+                [a, b, c].[precision_mul, precision_add]()
+                [a, b, c].precision_mul()
+                [a, b, c].[precison_mul, _empty_,precison_mul]()
+            }
+
+            (x, y, b) is called an <arg>
+
+            ``example for swapping objects using an intermediate object as a store
+            ``The two objects to swap are [a, b]
+            ``The temporary object that stores an intermediate object value is [c]
+            [c, a, b] = [a, b, c]               -> [c = a, a = b, b = c]
+        }
+        others:
+        - It only expands when used as args in the call and pipe operator and it expands by the total number of entities in the resultant
+        grouping
+        {
+            fcn(x, [y, z])              -> fcn(x, y, z)
+            fcn([a, [b, [c, [e, f]]]])  -> fcn(a, b, c, e, f) ``the compiler should warn about this being irrelevant
+            fcn([m, n] + [s, c])        -> fcn(m + s, n + c)
+            (a, [c, b])|fcn             -> (a, c, b)|fcn
+        }
+
+        More Info
+		─────────
+        When used in expressions, to leave an expression unevaluated can be done just by using the [_empty_] identifer
+        [a, _empty_, b] + [x, y, c] -> [a + x, y `*unevaluated*`, b + c]
+        This is not particularly useful, only in cases where an argument entry is needed for evaluation before passing:
+        {
+            fn pass_something(type [si32, b32fp, si32] _){}
+
+            fn main()
+            {
+                infer [a, b, c] = [type si32(34), type b32fp(), type si32(56)]
+                pass_something([a, b, c] * [a, _empty_,c])
+            }
+        }
+        It can also be used to delay construction of an object
+        {
+            type si32[a, b, c][_empty_, 3, 90]
+
+            if b == 3:
+            a := b * 2
+            else
+            a := b * 3
+        }
+
+        INTIALIZATION FOR OBJECT DECLARATIONS USING ENCLOSED GROUPINGS:
+		───────────────────────────────────────────────────────────────
+        type si32[a, b, c][(), (4.5), (4.5)]
+        type si32[a, b, c] = [type si32(), type si32(), type si32()]
+        type si32[a, b, c] = {
+            ...
+            [1, 2, 4]
+        }
+        type si32[a, b, c] = a
+        type si32[a, b, c](2.4)
+        type si32[a, b, c] = [2, 4, 5] * [4, 56, 9]
+
+        - dosen't hold any significance whatsoever, just wrote it for no reason
+        fn \"give"(type [si34, si89, si7] _ [_empty_, _empty_, 5.6₃`b32fp])
+        {}
+    }
+    : Think more about what and what can have from declaration-point visibilty in module or global scope scope
+    {
+        all declarations except object
+        [typespace] must be under it's type
+    }
+    : Warn for dumb things like unnecessary enclosure like this [[[2, 3]], [2, 3], [2]] or (((3)))
+        [2, [[2, 3], [4, 5]]] | [f, c]
+    : Member operator needs to have a higher precedence than the call operator
+    : Delayed construction operator ':='
+    : Identifier, how would [\"_construct_"] be equal to [_construct_] and [\"_"] be equal to [_]
+    {
+        : It is used to disambiguate between user and language defined use of reserved identifers
+
+        fn _construct_() {}
+        fn _mConstruct_() {}
+        fn _cConstruct_() {}
+        fn _destruct_() {}
+    }
+    : [memoryof]
+    {
+        [memoryof] for reading the bits in memory of an object
+        no more 'bitcast' because the size of the type is always known statically, so it isn't something the programmer needs bothers his/her self with
+        It is even more safe because bitcasting constructs the type-to from the bits of the type-from which is the most unsafe thing that can be done in programming
+        And the main reason programmers want to bitcast anyway is to see the bits of the type as unsigned integers not as how they can construct types from bits
+        I will still need a way to construct a type from bits, for optimized swap or assignment, or should the language just handle that itself?
+
+        x = ? and y = ?
+        (memoryof a) xor_eq (memoryof b)
+        (memoryof b) xor_eq (memoryof a)
+        (memoryof a) xor_eq (memoryof b)
+    }
+    : Arbitary integer bit sizes from i2 to i65536 2^16
+    : Pre and post condition entry for compiler communication level
+    {
+        fn normalization(type str:& x)!{ #dir::\"must be a give-value of"(is_valid_base) }
+
+        #dir::\"call this function first"(open)
+		#dir::arg_must_be_a_give_value_of()
+    }
+    : Solidify the type entry that require type prefix --[type <identifier> ':' <type-reference-extension>]
+    {
+        - Everthing except type argument entry and function signature
+    }
+    : Single io interface [to be solved later]
+    {
+        : How would i implement the type of overloading interface that c++ has with [operator<<(std::ostream&, ...)] and [operator>>(std::istream&, ...)]
+        : I have solved the type of io format i would use in nc
+        {
+            io::out.writef("%0 is %1years old %(34)20", "emeka daniel", 23)
+        }
+    }
+    : Global object initialization on first use
+    : Memory model that prioritizes safety
+    : Zero sized types cannot be referenced
+    : Concurrent safe programming
+    : Greater and less than or equal to can be evaluated differently i.e !(x < y) or !(x > y)
     : Make a table class
-    : Why not call nc-objects data?
-    : code-reuse: interface, mixins and inheritance
-    : What of this total ordering operator: (3 <=> 2) == @ordering::equal
+    : Parser error reporting needs to change ???
+    : Strong and weak typing and static and dynamic typing
+	: Rust's font-family used in the web, [open-sans, sans-serif]
+	: In nc decimal floating point implementation, what happens when a really samll number is reduced significantly, does it yeild zero or not?
+    : Serialization and deserialization of nc objects look into reflection
     {
-        - what would i call a code-resue that provides both functionalities of an interface and mixin
-        - what of whether they can redefine functionalities
-        - which ones would get to reuse member state/data
+        struct foo{}
+        typescope foo{ fn foo(_){ io::out.write("Hello from foo") } }
 
-        interfaces only take other interfaces for code reuse
-        mixins are the only method of code reuse whoose functions cannot be redefined
-        interface should be soley different from a type?
-        Mixins would not have constructors
-        - what of implementing functionality similar to member data/objects ?
-        {
-            mixin c
-            {
-                fn mark(&me) type @me::item
-                {
-                    printf("{me.get}")
-                }
-            }
-            #private[module]:
-            #readonly[package]:
-
-            type mixin(c) b(/*imaginary that has member data get*/i )
-
-            b.get
-            - accessing nc-objects through mixins must have the same access-specifier throughout all mixed-in types
-
-            use mixin show
-        }
-        Would mixin function have their own scope by just being mixin functions alone?
-
-        @show
-        mixin show::fcn()
-        interface show::fcn()
-
-        data container
-
-        interface
-        typespace si32{
-            fn call(){}
-        }
-        mixin show {}
-        interface show {}
-        typespace show {}
-
-        type mixin(show, json) x
-        type interface()
-
-        include mixin show
-
-        mixin show
-        {
-            fn show(me)
-            {
-                \\no diagnostic would be gotten here
-            }
-        }
-
-        type any<?> show
-        show := 3
-        show::c
-        
-        infer x = cast<fn(pid, raw_ptr<void>)>()
-
-        mixin default_logical_operations{
-            fn #operator==(&mut me)
-            {
-                
-            }
-        }
+        type (object) x("foo")
+        x.getFnItem("foo")()
     }
-    : [infer] being superfulous
+    : For the bootstrap versions
     {
-        infer x
-        x := 'n'
-        x<si4> := 'b'
-        x<json> := 'cool'
-
-        infer [x, x, x, x]
+        - static evaluation
     }
-
-    
-    The creator of the language has root previleges
-
+    : For self-hosting versions
     {
-        ``I wrote this type of code alot in the lexer
-        while true:
-        {
-            if `{main condition}` : {}
-            else {}
-        }
-        
-        ``while i could have just done this
-        do
-        {
-            ...
-        } while `{main condition}`;
-        
-        ``else is a different concept than the above, it evaluates when a loop's condition was found to be false initial
-        ``check what python uses it for
-        ``check your code in the lexer to figure out how i would replace the redundant [while true] code
-
-        do
-        {
-
-        }
+        - unicode
+        - unicode name and abbreivation escape sequences
+        - ncregex
+        - table?
+        - package system
+        - compiler(JIT and AOT) configurations which needs serialization
     }
-    ``Define what and what gets copied, is it everything?
-
-    ``Dealing with type parameters and how it can be used
-    ``Dealing with overloading of identifiers
-    ``Dealing with function semantics that enforces only one value
-    ``Dealing with initialization semantics
-    {
-        - A good way to support dynamic entry of heterogenous types
-        - All identifiers of type associated declarations would have an optional type parameter entry
-        
-        : Looking at what to allow and overall defining it to be less complex as possible
-
-        : Overloading is the redefinition of identifer in the same name_space scope
-          - Function and object identifiers are in the same category
-          - Name_space is in it's own category
-          - Data type is in it's own category
-          - Alias is identifer dependant: (Data type Identifier, Name_space Identifier, Expression)
-        
-        : Function identifiers can be overloaded by the following -
-          + The expression parameter number, i.e it excepts that the expression parameter number be different across overloads
-          + If the expression parameter number is the same, the type of the expression parameter
-          + The type parameter, only if it maintains the same number of type parameters, makes use of a constraint and/or obeys the two rules above
-
-        fn dac(type [si1, si2, si3] _){} ✔
-        fn dac(type si1){} ✔
-        fn dac(type si2){} ✔
-        fn dac<type t1, type t2>(type [t1, t2] _){} ✔
-        fn dac<type t1, type t2>(){} ✔
-        fn dac<type t1, type t2>:
-        #
-        {
-            if #type(t2) != #arithmetic_type or #type(t1) != #arithmetic_type: #go
-            if r_l(#arithmetic_type, #operator(=))(#type(t1), #type(t2)): {}
-        }(){} ✔
-
-        r_l(2, #operator(=), $(2, 3, 4, 5, 6, 0))
-        r_l(2, #operator(=, or), $(2, 3, 4, 5, 6, 0))
-        r_l(2, #op =, #op or)
-        r_l(2, #op(and, or))(e, r, t, l, type manup(4), type twoup(), type threeup = a)
-
-        : Default expression argument entry
-          + '_' is overloaded in meaning for use as a placeholder identifier for default argument entry
-        
-        : Default type argument entry
-          + Type arguments can be deduced from expression arguments
-          + If all the default type parameters has been all deduced, the type argument entry angle braces '<' '>' maybe ommited
-          + Allows for implicit default entry
-
-        : Type parameters can be deduced from expression arguments, and when deduced, behaves like the type parameter has been give a default
-        argument, and therefore gets to utilize default type arguments rules
-        
-        fn dac<type [t, t2]>(type t a){}
-        dac<_, si4>(1`si3)
-        fn dac<type [t, t2]>(type t a = 1`si3){}
-        dac<_, si4>()
-        fn dac<type [t, t2] = $(si3,)>(type t a = 1`si3){}
-        dac<_, si4>()
-        
-        fcn(vv, 2, 3, 4, 5, 6, vv)
-
-        : Specification of default arguments for both type and expression parameters are unintuitive and should be warned against
-        fn dac<type t1 = si3>(type t1 x = 0`i3){}
-
-        : Function identifer overload call resolution
-          + Between the ones with type parameters and the ones without, choose the more concrete overload
-          + Between the ones with implict default argument entry and the ones without, choose the one without an implicit
-            default argument entry
-
-        : Function/object identifer overload resolution without type parameters
-          + Must be of a different type and for resolution, cast to the type of the identifer they want
-        
-        : Function/object identifer overload resolution with type parameters
-          + Simply make the type arguments entry explicit
-
-        : Function/object identifer overload resolution with and without type parameters
-          + Simply follow the rule for type parameters or the rule for the one without
-
-        : Overloading a function/object identifer in a parent block scope across it's child scopes, colloquially known as overshadowing
-          + Follows the same rule as Function and object identifer overload
-
-        : Overloading a function/object identifer in a parent name_space scope across it's child scopes
-          + Follows the already defined function/object overloading rules
-          + If it is overloaded across name_space scope, and it is needed to be called in a child scope, explicit identifer qualification is required
-
-        cast<fn(si3, si7, bool, bool)u8str>(cast<u8str, si3>) ``complier should error as this is redundant
-        cast<fn(si3, si7, bool, bool)u8str>(cast) ``preferring one over the other, it is not allowed to prefer one over the other
-        cast<u8str, si3>
-        type si34 a<type T, type U> = {}
-        cast<si32, si3>(a)
-
-        fn cast<type t, type t2>(){}
-        fn cast<type t, type t2>(type si32 _){}
-        fn cast<type t, type t2>(type si8 _, type si6 _){}
-        fn cast<type t, type t2>(){ #constraint(t, t2) }
-
-        cast<u8str>(1, _, _)
-        fn dac() infer{ emeka daniel }
-        fn dac() type si32{ }
-
-        fn dac();
-
-        fn dac(type (si34, si37) _ = $(, 23`si37)){}
-        fn dac(type si32 ){}
-        
-        fn dac(type si32 _ = 34){}
-        fn dac(){}
-
-        dac(_)
-        tcast<fn(si32)>(dac)()
-
-        fn dac(){}
-        fn dac(type si3 _){}
-
-        infer a = tcast<fn(si3)void>(dac)
-        infer a = tcast<fn()void>(dac)
-
-        ``overload resolution
-        tcast<fn(si3)void>(a)()
-
-        ``no need for overload resolution here, because the type is explicit
-        type fn(si3)void b = dac
-        
-        : What of identifer overload amongnst types ? during type definition(type parameters, named_pt, named_st, type aliases)
-          + For type parameters, redefinition of an already type identifer is not allowed and would be warned against
-          + For named_pt and named_st,
-        ______________________________________________________________________________________________________________________________
-        
-        : <arg> needs to permit an empty argument like so: $(, 3)
-        : <arg> does not give any value, it is just parsed as an expression
-        
-        : Initialization and type grouping is currently messy, fix it
-
-        : I should disallowed for <object_exp>s right?
-
-        : No more comma expression and parenthesis with values seperated by comma is now <arg>
-        : <arg> only works for multiple values, meaning types that take only one argument or makes use of implicit default entry are not allowed
-        
-        type si8 a(type si8())
-        type bark x(2.3)
-        type(sack, bake, bark)(a, b, c)((1, 2, 3), (1, 2, 5), (0, 9, 4))
-        
-        for infer (i, j, n)(mut (2, 3), vec.size()); i < n; {++i ++j}:
-        none
-        
-        infer(a, b, c) = $(type (si8, si8, si8)())
-        infer (a, b, c) = type(si8, si8, si8)(type si8(), type si8(), type si8())
-        infer (a, b, c) = $(type si8(), type si8(), type si8())
-        infer (a, b, c) = type(si8, si8, si8)(23, 45, 90)
-        a + ...
-        ... + a
-        a + ...(2)
-        +a...
-        a... + a...
-        fcn(a + ...)
-        
-        type (si8, si8, si8)(a, b, c) = .{}
-        type(si8, si6, si9)(a, b, c)|fcn
-        (a, b, c)|fcn
-
-        type si32 a = type(si32)()
-        type si32 a = ()
-        type math::vector a = (12, 90)
-        infer vec = type math::vector
-        
-        : How would i treat 'infer' in all this?
-
-        infer(a, b, c) = type(si8, si8, si8)(1, 2, 4)
-        infer(a, b, c) = $(type si8(), type si8(), type si8())
-
-        type(si32, si33)(a, b)(23, 89)
-        infer(a, b)(23`si32, 89`si33)
-
-        type (si34, si37) _ = $(, 23`si37)
-
-        fcn(type si32 := 3, type si37 := 45343434232323)
-        fcn(type si32 = 3, type si37 = 4565923tr8839hhn₂₉)
-        fcn(type(si32, si37)(a, b)(, type si37()))
-
-        type si32 a type si32 b type si32 c
-        type si32 (a, b, c)
-        type (si32, si32, si32)(a, b, c)
-        infer (a, b, c)(type si32(_, _, _)) -> infer (a, b, c) = type (si32, si37, si95)()
-
-        give type(si32, si37, si33)()
-        
-        : Think about this named_st P{type (c, a)}
-        : Grouping syntax for expressions too
-        
-        (a, b) = (10, 9)
-        (a, b) + (10, 9)
-        -(a, b)
-        *(a, b) =- (10, 9)
-        (a, b) = (g, h) = (k, l)
-        (a, b) + (g, h) * (l, k)
-        
-        infer r1 = a + g
-        infer r2 = b + h
-        r1 * l
-        r2 * k
-
-        b = (x.1, x.2) * (y.1, y.2) + a ``what does it return ??
-        type si32(a, b) = (x.1, x.2) * (y.1, y.2) + a
-        #treat_as_exp_unit
-        type unamed_pt _ = (x.1, x.2) * (y.1, ) + l
-        
-        : Grouping parenthesis would have a different meaning for piping
-
-        : What about discarding of give values? Because assignment operators discard values all the time and it is even used to discard values
-        _ = fcn()
-        _ = fcn()
-        #domant infer a = c;
-        infer _ = c;
-        #exp::unused fcn()
-
-        : I want type qualifiers to parse for [mut, imut and &] instead of string
-
-        type si32: mut& e
-        type si3: & h
-
-        + Expression parameters take precedence over type parameters when resolving function calls
-        + Only the ignore identifer is alllowed to be overload without restriction
-
-        named_pt string{type(heap_ptr, si32)(data, size)}
-
-        type_space string
-        {
-            alias get_size = me.size()
-            
-            #fn::inline
-            fn get_size(me){ me.size }
-
-            alias get_len = get_size
-        }
-        : Aliases would alias types with qualifiers
-        {
-            alias mutable_si32 = type si32: mut ``[SEMANTIC ERROR]
-            
-            type mutable_si32 _
-        }
-
-        : Something interesting
-        {
-            #{ #module_space_objects_types.(#mutable)? (#thread_owned : #nothing)  }:
-
-            #thread_owned:
-
-            type si3: mut xc = {
-                \"c is the best"::custom_allocator((4, 2) / #type<si3>::size())
-            }
-        }
-
-        : Can type parameter entry braces be used for distinguish when resolving overloads??
-
-        fcn<>(1, 2)
-
-        : Arithmetic, logical and relational operators must take the same type
-        
-        type time::month(2) * (type time::year(1) | tcast<type time::month, type time::year>)
-
-        : Piping cannot perform any type parameter inferrence, the example above proves it
-
-        : Does 'infer' require a type arguments when used in a function too??
-
-        : 'infer' specification is the same as type parameter entry but without the type identifier
-        
-        : What of that confusing thing that C++ does when resolving templates
-        {
-            template<typename T>
-            int fcn(T& x)
-            {
-                [T] would contain only the type,
-                [x] would be an object with the full type
-            }
-        }
-
-        {
-            ❰emeka daniel❱
-
-            encolsed grouping for expressions is valid only in contexts where it is also valid in normal unenclosed/expanded code
-            i.e
-            type gender(type [male, female]) ``is valid
-            ``but this:
-            type [male, female]|f ``is not valid
-            
-            type si32[a, b, c] = {
-                type si32[a, c, v] [type[si32, si90, si32][a, v, c]]
-            }
-
-            Construction/Initialization
-            ────────────────────────────
-            Is the process when an object is created to be valid for it's type and nothing else
-
-            Holds the post-condition that after construction - and assuming there is not alteration of control flow -, the object is valid
-            Holds the invariant that states an object must be constructed before it's use
-
-            Types of construction
-            ──────────────────────
-            1. Direct(function call like): takes the argument for construction/initialization of the object and nothing else - not even the object
-               itself
-            2. Indirect(assignment like): takes an already constructed object of the same type and nothing else
-
-            Elision of already constructed objects from using the move/copy constructors are turned on by default
-            #optimizations::elision(false) ``insightful
-
-            [Delayed construction/initialization]
-
-            [(x, m), (y, p), (l, h)]|[fn1, fn2, fn3]
-            type[si32, si4, si90]
-            type(si32, si4, si90)
-            [x, [y, [z, [c, g]]]] + [a, [b, c]]
-            (x, (y, (z, (c, g)))) + (a, (b, c))
-
-            type [si32, si8] a = [type si32(), type si8()]
-            type [si32, si8] a()
-            type [si32, si8] a[(), (2, 3)]
-            type [si32, si8] a()
-            type [si32, si8] a = a
-            a + [a, b, n]
-            type [si32][a, b, c]
-            [(2, 3), (4, 5)]|[f, c]
-            [(3, 4), (0, 9)]|[[f, c], g]
-
-            Groupings
-            ─────────
-            Is a language feature that treats certain entities as a single unit. It's main inclusion to the language is to eliminate unnecessary
-            typing that sometimes leads to code verbosity and to add a more high-level touch to the language. It embodies the write less while
-            doing so much narrative.
-            Anything that can expand to ordinary valid language syntax is not allowed.
-
-            Types of groupings
-            ──────────────────
-            1. unclosed-grouping: used for declaration identifiers other than those for objects
-            2. enclosed-grouping: used for certain part items(types and object declaration identifiers) and expression
-
-            Unclosed-grouping
-            ─────────────────
-            ...
-
-            Enclosed-grouping
-            ─────────────────
-            The entities used for enclosure are the left and right square braces '[' ']'.
-            Unlike an unclosed-grouping-group, an enclosed-grouping can be acted upon, meaning it can be scaled by another enclosed-group,
-            unenclosed-group or acceptable single-like-entity - i.e an expression or object-declaration-identifier.
-            The defined semantics for enclosed-groupings are that of expansion. The expansion follows a pre-condition that states that it's
-            application must be for entities that already can implement the expansions without enclosed-groupings.
-            The above statement would be futher explained
-            
-            example:
-            type si32 [a, b, c]
-            type [si32, d32fp]
-            a * [b, c]
-
-            The contents of an enclosed group must be entites separated by a comma. So singletons like this [x] do not qualfiy as an enclosed-
-            group
-
-            [NOTE]: an enclosed-grouping can also be callled <type>|<object-declaration-identifiers>|expression> unit
-
-            Levels of an enclosed-grouping:
-            ───────────────────────────────
-            Levels of an enclosed-groupings essentially means the nesting levels of a enclosed-grouping, just like how blocks can be nested
-            example:
-            [a, [l, o]]
-            └───┼──┬─┼┘
-                │  1 │
-                └──┬─┘
-                   2
-            
-            [x, [c, [b, [k, l]]]]
-            └───┼─┬─┼───┼────┼┼┼┘
-                │ 1 │   │    │││
-                └───┼─┬─┼────┼┼┘
-                    │ 2 │    ││
-                    └───┼─┬──┼┘
-                        │ 3  │
-                        └──┬─┘
-                           4
-            The language syntax permits only an expression to have mutiple levels of a enclosed-grouping
-
-            Enclosed-grouping follows two basic rules for it's use:
-            ────────────────────────────────────────────────────────
-            1. When acted upon, both sides must have full coverage of each other or to be more succint, all valid entities of one side must have a
-            corresponding valid entity to act on the other side
-            
-            FOR TYPE AND OBJECT-DECLARATION-IDENTIFIERS:
-            type si32 [a, b, c] ✔
-            type [si32, si45, si80] [d, e, f] ✔
-            type [si32, si32] [a, k, g] ⤬
-
-            [b, a, c] = v ✔
-            [b, a, c] - [v, g, n] ✔
-            {
-                (✔) b - v
-                (✔) a - g
-                (✔) c - n
-            }
-            [b, a, c] + [f, j] ⤬
-            {
-                (✔) b + f
-                (✔) a + j
-                [-] c + ?
-            }
-            [x, [y, [z, [c, g]]]] - [a, [b, c]] ✔
-            {
-                [*] x - a
-                [*] [y, [z, [c, g]]] - [b, c]
-                {
-                    [*] y - b
-                    [*] [z, [c, g]] - c
-                    {
-                        [z - c, [c - c, g - c]]
-                    }
-                }
-            }
-            [x, [y, [z, [c, g]]]] - [a, [b, c], o] ⤬
-            {
-                [*] x - a
-                [*] [y, [z, [c, g]]] - [b, c]
-                {
-                    [*] y - b
-                    [*] [z, [c, g]] - c
-                    {
-                        [z - c, [c - c, g - c]]
-                    }
-                }
-                [-] o - ? ``this the problem
-            }
-            [x, [y, [z, [c, g]]]] - [a, [b, c, m]] ⤬
-            {
-                [*] x - a
-                [*] [y, [z, [c, g]]] - [b, c, m]
-                {
-                    [*] y - b
-                    [*] [z, [c, g]] - c
-                    {
-                        [z - c, [c - c, g - c]]
-                    }
-                    [-] m - ? ``dosen't offer full coverage
-                }
-            }
-
-            2. It must have defined language semantics
-
-            FOR TYPE:
-            The defined semantics for it's use in types are that of expansion. The expansion is only defined for situations that can already be
-            implemented without parenthesis grouping
-
-            example:
-            - alias myInt, bestReal = type [si32, d32fp]
-            {
-                ``The above uses both type of groupings i.e unclosed-grouping for the alias identifiers and enclosed-grouping for the type
-                ``It is valid as the expansion can already be implemented without parenthesis grouping
-
-                alias myInt = type si32
-                alias bestReal = type d32fp
-            }
-            - named_st arithmetic{ type [si32, si64, si128, b32fp, d32fp] }
-            {
-                ``The above is also valid because the expansion can already be implemented without parenthesis grouping
-                named_st arithmetic{ type si32, type si64, type si128, type b32fp, type d32fp }
-            }
-            - fn fcn() type (si32, si8)
-            {
-                ``The above is not valid because the expansion cannot be implemented without parenthesis grouping
-                fn fcn() type si32 type si8 ``SYNTAX ERROR: reserved identifier 'type' found at unexpected location
-            }
-
-            FOR OBJECT-DECLARATION-IDENTIFIERS:
-            The defined semantics for it's use in object-declaration-identifiers are that of expansion too. The expansion is only defined for
-            situations that can already be implemented without parenthesis grouping, but this pre-condition is always true for enclosed-grouping
-            on object-declaration-identifiers
-
-            example:
-            - type si32 (a, b, c)
-            {
-                type si32 a
-                type si32 b
-                type si32 c
-            }
-            
-            FOR EXPRESSIONS:
-            The defined semantics for it's use in expressions is more complicated than the others.
-            [NOTE] Expressions allow for multiple levels
-
-            operators:
-            - It performs ordered expression wise evaluation and gives a enclosed-grouping of the results of the operation
-            {
-                rl(3, ##op(=, and))
-                1~2~3
-
-                ``[->] denotes the equivalent operation
-                d.*fcn()
-
-                [[a, b, c].[f, g, l]]() -> something like this should not be allowed, because enclosed grouping requires multiple entity stuff
-
-                ([a, b, c].[f, g, l])()             -> [(a.f)(), (b.g)(), (c.l)()]
-                [a, b, c].[f(), g(), l()]           -> [a.(f()), b.(g()), c.(l())]
-                *[a, b].[f, g]()                    -> [[*a].[f()], [*b].[g()]]
-                *[a, b, c] += [n, m, c]             -> [*a += n, *b += m, *c += c]
-                -[a, b]                             -> [-a, -b]
-                b = [1, 2]                          -> [b = 1, b = 2]
-                [a, b] = [c, d]                     -> [a = c, b = d]
-                [a, b] - 1.9                        -> [a - 1.9, b - 1.9]
-                [a, b, c] + [d, e, f]               -> [a + d, b + e, c + f]
-                [a, c] * [b, x] + [e, g]            -> [a * b + e, c * x + g]
-                [[c, v], p] =/ [k, l]               -> [[c /= k, v =/ k], p =/ l] ``lhs has a two level enclosed-grouping
-                [x, [y, [z, v]]] - [a, [b, c]]      -> [x - a, [y - b, [z - c, v - c]]] ``lhs has a three level enclosed-grouping
-                [x, [y, [z, [c, g]]]] + [a, [b, c]] -> [x + a, [y + b, [z + c, [c + c, g + c]]]] ``lhs has a four level enclosed-grouping
-                [x, y, v]|fcn                       -> [x|fcn, y|fcn, v|fcn]
-                [(a, b, c), p]|[fcn1, fcn2]         -> [(a, b, c)|fcn1, p|fcn2]
-                
-                (x, y, b) is called an multiple-pipe-exp-output
-
-                ``example for swapping objects using an intermediate object as a store
-                ``The two objects to swap are [a, b]
-                ``The temporary object that stores an intermediate object value is [c]
-                [c, a, b] = [a, b, c]               -> [c = a, a = b, b = c]
-            }
-            others:
-            - It only expands when used as args in the call and pipe operator and it expands by the total number of entities in the resultant
-            enclosed-grouping
-            {
-                fcn(x, [y, z])              -> fcn(x, y, z)
-                fcn([a, [b, [c, [e, f]]]])  -> fcn(a, b, c, e, f) ``the compiler should warn about this being irrelevant
-                fcn([m, n] + [s, c])        -> fcn(m + s, n + c)
-                (a, [c, b])|fcn             -> (a, c, b)|fcn
-            }
-            - For object exps, the semantics are undefined by the language, and therefore not to be used with it
-
-            MORE INFO:
-            when used in evaluation expressions, to leave an expression unevaluated can be done just by not specifying anything after the comma
-            [a, , b] + [x, y, c] -> [a + x, y `{unevaluated}`, b + c]
-            This is not particularly useful, only in cases where a argument entry is need for an evaluation before passing:
-            {
-                fn pass_something(type si32 a, type b32fp c, type si32 b){ _ = a _ = c _ = b `{would error because '_' cannot be used}` }
-
-                fn main()
-                {
-                    infer [a, b, c] = [type si32(34), type b32fp(), type si32(56)]
-                    pass_something([].[precison_mul, , precison_mul]())
-                    pass_something([a, b, c] * [a, ,c])
-                    pass_something(([a, b, c].[precison_mul, ,precison_mul])())
-                }
-            }
-
-            INTIALIZATION FOR OBJECT DECLARATIONS USING ENCLOSED GROUPINGS:
-            type si32[a, b, c][(), (4.5), (4.5)]
-            type si32[a, b, c] = [type si32(), type si32(), type si32()]
-            type si32[a, b, c] = {
-                ...
-                [1, 2, 4]
-            }
-            type si32[a, b, c] = a
-            type si32[a, b, c](2.4)
-            type si32[a, b, c] = [2, 4, 5] * [4, 56, 9]
-
-            ``To delay the construction of an object in a group:
-            type [si32, si34]a [ ,3.4]
-            ``later on:
-            tcast<si32>(a) := type si32(2.3)
-
-            * passsing parenthesis groupings of expressions ?
-            fn \"give"(type [si34, si89, si7] _ [, , tcast<b32fp>(5.6₃)])
-            {
-
-            }
-
-            infer (a, b) = fcn()
-            infer [a, b] = fcn()
-        }
-        match s{
-            case<si32, b32fp> 3
-            case(2, 3, 4) 3
-            case('3') p.precision_mul(s)
-        }
-        
-        "⟦{3, 4}⟧"
-        "❴{3, 4, 5}❵"
-        "❰{2 + 4}❱"
-       한
-       한
-       🙅
-       Ĝ Ĝ
-       ✝️
-
-       "{emeka daniel}"
-        "emeka daniel is a goat of all things good"
-
-        "
-        The easier it is the better eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee\
-        also badder than ever
-        "
-        : Should leading and trailing new line characters in a mutline string be part of the string?
-
-        : Should enums be give type parameters? and what are enums all about anyways?
-        : enums should be inheritable - efficient code reuse, extending a classes item
-        : Greater and less than or equal to can be evaluated differently i.e !(x < y) or !(x > y)
-        : The part of it expand to ordinary code should be obeyed, soo...
-        {
-            🛺_isPoor
-
-            if type si32 a = 3, type si34 c = b; e == b: {} ``so is this is an unclosed-grouping? yes it is
-            equals :
-            if type [si32, si34][a, c] = [3, b]; e == b: {}
-        }
-        : Concrete definitions for operator overloads
-        {
-            For binary operations, it the operands must be the same type
-            For all operations, it must give the same type as it's operand
-        }
-        : I would think more about error handling
-        {
-          - what would io functions do if an io operation fails?
-          - what of arithmetic overflow checking?
-          - what of opening a file?
-          - look at learningcpp.com section on error handling
-        }
-        : Think more about what and what can have a wide range visibilty in module scope
-        {
-            all declarations except object
-        }
-        : Change 'named_st' and 'named_pt' to be 'named_s' and 'named_p'
-        {
-            named_s a{}
-            named_p c{type si32 a, type [b32fp, d32fp] a}
-            type unamed_p a(1, 2, 3, 4)
-        }
-        : Should 'type any' replace 'void*' ability to point to any type? yes
-        {
-            type any x(34)
-            x = 45.6
-            x = type fraction(1, 2)
-
-            type any x(b)
-            int three = 34;
-            void* ptr = &three;
-            *(float*)ptr + 2.3
-
-            infer begin_address = cast<ui32>(type raw_ptr(a))
-            infer begin_address = cast<ui32>(address_of a)
-            begin_address += [1, 3, 4]
-            infer some_address = cast<raw_ptr<>>()
-            ``raw_ptrs and unchecked heap access violate the invariant
-        }
-        : Contructed-from and casted-to are similar
-        {
-            string and string_view
-            string: overloaded type casting to cast it's self to string_view
-            string: can be constructed from a string_view
-            [alternatively]
-            string_view: can be casted to a string
-            string_view: can be constructed from a string
-
-            Construction is to be used when the construction process is not errorneous
-            When a construction is errorneous, it should be casted to instead
-        }
-        : Warn for dumb things like unnecessary enclosure like this [[[2, 3]], [2, 3], [2]] or (((3)))
-            [2, [[2, 3], [4, 5]]] | [f, c]
-        : Replace the 'mem' to 'address_of'
-        : How would infer be treated in all this? treat like a defined behaviour
-        {
-            infer a = [type si32(), type si32(), type b32fp()]
-            infer a[] ``direct enclosed-grouping initialization is not allowed for 'infer'
-            infer [a, b, c] = [...]
-            infer [a, b, c] = [a, P, d]
-        }
-        : Should type parameters be allowed on inferred objects?
-        {
-            infer a
-            is equivalent to :
-            type unknown a<type unknown> = 7
-            
-            a := 3.4
-            a<b32fp>
-            a<si32>
-            
-            what of resolving overload conflict strategies?
-            cast<b32fp>(a)
-            or?
-            a<b32fp>
-        }
-        : No more implict expression argument entry for functions, only for type arguments
-        : 'cast' should be reserved for things like tcast<si32>(a) overload-distinction
-        {
-            type [si32, si8] a
-            cast<si32>(a)
-            cast<si8>(a)
-        }
-        : The semantic that describes object construction enforces me to reason more about primitive data-types
-        {
-            so [ type si32(3) ] is not allowed, only [type si32(3.4)]
-            Just use cast for it anyways
-        }
-        : '_ = x' if you are not using an expression while 'type si34 _ = 9' when you are not using an object declaration
-        {
-            '_' cannot be used in an expression, so..
-            infer _ = x
-        }
-        : Member operator needs to have a higher precedence than the call operator
-        : Delayed construction operator ':='
-        : Piping is very different from function entry as it is a stricter form of function calling
-        {
-          - no default argument entry
-          - no default type argument entry
-        }
-        : What is the high-level-indirection operator even for?
-        {
-            It is used of identifying ranges, along with the size(len) function
-            
-            c[1] - It should a requirement for ranges - c(1)
-
-            c[2, 4]
-            c[2~4, rng::no_bounds_checking]
-            - Is it a function call though? No it isn't, it is an operator
-        }
-
-        : Identifier, how would [\"_construct_"] be equal to [_construct_] and [\"_"] be equal to [_]
-        {
-            fn _construct_(...) {}
-            fn _destruct_(me) {}
-            fn _move_construct_() {}
-            fn _copy_construct_() {}
-
-            what of _v?
-            fcn(_v, 1, 2, _v)
-        }
-        
-        : '$' for getting the bits in memory of an object
-          no more 'bitcast' because the size of the type is always known at compileTime so, it isn't something the programmer needs bothers his/her self with
-          It is even more safe because bitcasting constructs the type-to from the bits of the type-from which is the most unsafe thing that can be done in programming
-          And the main reason programmers want to bitcast anyway is to see the bits of the type as unsigned integers not as how they can construct types from bits
-          I will still need a way to construct a type from bits, for optimized swap or assignment, or should the language just handle that itself?
-        
-        : My language gives the invariant that states that every object of a type is always valid from its construction to its destruction
-        
-        : 'cast' is now free for use 😁
-
-        : Memory wise copying should be implemented only by the compiler
-          x = ? and y = ?
-          ($a) xor_eq ($b)
-          ($b) xor_eq ($a)
-          ($a) xor_eq ($b)
-        : Object expressions are mutable by default
-
-        : Arbitary integer bit sizes from i2 to i65536 2^16
-
-        : Parser error reporting needs to change ???
-        ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-        fn dac<type t1, type t2>(type t2 _){}
-
-        fn dac<type t1, type t2>(type si32 _){}
-        dac<s, si3>(23)
-        dac<s>(23)
-        dac<s>(23)
-        
-        fn dac<type t>(type t _){}
-        dac<si33>(34)
-        dac<si32>(34)
-        dac<>(34)
-
-        fn dac(type si32){}
-        dac(34)
-
-        fn dac<type t1, type t2, type t3>(){}
-        fn dac<type(t1, t2, t3)>(){}
-        fn dac(){}
-
-        fn dac<type(t1, t2)>(){}
-
-        fn dac<type t1, type t2>(){}
-        fn dac<type t1, type t2>(type t1 _){}
-        fn dac<type t1, type t2>(type t2 _){}
-        fn dac<type t1, type t2>(type (t1, t2) _){}
-        fn dac(){}
-        fn dac(type (t1, t2) _){}
-        
-        dac<si2, si3>() -> []
-        dac<si3, si4>(34) -> [ dac<si3, si4>(34) ]
-        dac<si2>(34) -> [ dac<si3, si4>(34) ]
-        dac<>(34, 45) -> [ dac<si3, si4>(34, 45) ]
-        dac() -> []
-        dac(34, 45) -> []
-
-        ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
-
-        : Concerning error handling
-
-        name_space error
-        {
-            named_pt code{type si32 code}
-            type_space code
-            {
-                fn get_msg(me) type u8str
-            }
-        }
-
-        : How can inheritance model sumType capabilities like my ast Expression
-    }
-    
-
-    #async type user dum_client()
-    
-    [I don't want [nc] to be in no way confusing as C++, i want everthing to make sense as much as possible to the average programmer]
-
-    [LCI - language communication interface]
-
-    iter i : (1, 2, #operator(=)) {}
-    r_l(23, #operator(=, and))(23, ...+)
-    r_l(23, #operator and)(...)
-    
-    printf("emeka daniel").printf("{23}+{23} .{:0} + .{:0}", 23)
-    
-    type error::code e;
-    e.::message()
-    e.message()
-    type error::string e;
-
-    Passing types as values in common for generic programming, therefore it is avialable in user code, while returning of types isn't
-    Being able to treat types as data is valuable in programming
-
-    type list<si32> x(_v, 1, 2, [+1]...)
-    type #exp::getType(2+3) h
-    type #type::remove_qualifiers(si32, #type::mutability) c;
-
-    alias no_mutabilty<type t> = type #type::remove_qualifiers(type t, #type::mutability)
-
-    fn geo(){}
-    fn geo<type t>(){}
-    fn geo<type t = si32>(){}
-
-    ``solved C++'s like templating for all declarations that deal with types, but i still don't know what to call it
-    {
-        type si32 a<type _> = a
-        
-        type si32:"&"<>|<>()
-        
-        fn<type t>(){} ``syntax permits <func_exp> to have generic parameters but nut types
-
-        type si32 a<type t> = #compileTime {
-            infer (a, b)
-            a = 100, b = 10'000
-            
-            iter i : (a, b, ...)
-                #run_at_compileTime io::out.write(i)
-
-            type t _;
-        }
-
-        ``Won't that mean i can overload an identifer using generic types: { pi<b32fp> pi<si34> }
-        ``This shit is sooo fucking hard
-
-        number::pi<float>
-        std::numbers::e_v<float>;
-
-        type bfpT nums::pi<type bfpT> = {
-            if #{type(bfpT) == #type(b32fp)}:
-            3.23454
-            else
-            3.234545
-
-            if #type::is_eq(type bfpT, type b32fp): 3.23454
-
-            #force_compileTime error::panic("Emeka Daniel")
-        }
-
-        nums::pi<b32fp>
-        nums::pi<b512fp>
-
-        fn dirt<#apply::constraint(si32) type t>()
-        {
-
-        }
-        fn dirt<#apply::constraint(si33) type t>()
-        {
-
-        }
-        
-        fn dirt<type t>(type si32)
-        {
-
-        }
-    }
-    
-    `{
-        infer line_number = #file::line_contents::line
-        infer column_pair = #file::line_contents::column_pair()
-        
-        #give::value()
-        #give::type()
-        #statement::loop::extra::break()
-        #concurrency::async
-    }`
-
-    ``Reason about generic specialization
-    {
-        named_pt byte {type ui8 byte}
-
-        named_pt d_array<type dT>
-        {
-            #{
-                if #type(dT) == #type(byte):
-                {
-                    type bytes data()
-                }
-                else
-                {
-                    type heap_ptr<dT> data
-                }
-            }
-            ``or
-            type #{ if #type(dT) == #type(byte): give type data else give type dT }
-            type si32 (size, capacity) = $() ``this is confusing to me
-        }
-
-        named_pt d_array<type dT>
-        {
-            #_expand_on_evaluation_:
-            {
-                if #type(dT) == #type(byte):
-                {
-                    type bytes data()
-                }
-                else
-                {
-                    type heap_ptr<dT> data
-                }
-            }
-        }
-
-        type_space cartier<type t>
-        {
-            #_expand_:
-            {
-                if #type::is_eq(t, b32fp):
-                {}
-                else
-                {}
-            }
-        }
-
-        named_pt cartier<type t>{ #type::hide_if(t, b32fp) type t (t<>, p<>)() }
-
-        ``how would i implement <string casting> which requires entry of multiple parameters ?
-        tcast<bool>(23)
-        tcast<u8str>(23, .base=3, .\"normalize?"=true .\"show pos sign?"=true, .\"show seperator"=true)
-        tcast<u8str>(23, true...);
-
-        #constraint<t> = #{
-            if #type(t) != #type(u8str): #error::disqualify
-        }
-
-        fn tcast<#constraint type new_t, type old_t>
-        (type old_t x, type ui6 base(10), type bool \"show pos sign?"(false), type bool \"show sep?"(false))
-        {
-
-        }
-
-        named_pt Danny<type t>
-        {
-            #enable_if(#type::\"!eq?"(si32, t)) type t data
-            #
-            {
-                if #type::\"
-            }
-        }
-
-        template<typename t>
-        fn data<type t>()
-        {
-            if constexpr (std::is_same<t, std::string>)
-            {
-
-            }
-            else
-            {
-
-            }
-
-            #compileTime
-            if #type::\"eq?"(t, astr):
-            {
-
-            }
-            else
-            {
-
-            }
-            #
-            {
-                if #type::\"eq?"(t, astr):
-                {
-
-                }
-                else
-                {
-
-                }
-            }
-        }
-
-        type_space data<type t>()
-        {
-            #
-            {
-                if #type::is_eq(t, u8str):
-                #give::entity::declaration( alias fp_sex = namespace floating::sexx )
-            }
-        }
-
-        ``I do not want code to be runnable directly in the LCI
-        tcast<u8str>(2, ...)
-    }
-
-    `{
-        ``A type has properties
-
-        [type_space]
-        - allows for extension of the type properties
-        - allows for type_space sharing with unrelated/related types when defining properties for a type(all type centric declarations have this)
-    }`
-
-    fcn(1, 2, 3, ...), fcn(1.2, ...) ``disallow un-sepcification of default arguments
-
-    iter i : |1~2|{}
-
-    type rid_of_mutability<#exp::getType(a)> n;
-
-    #info::unhandled_exception
-    type heap_ptr<si32> f(@heap_ptr::non_arena)
-    type raw_ptr<si32> g()
-    tcast<raw_ptr<b32fp>>(type raw_ptr(g))
-
-    #info::handles_exception (type u8str = $()).insert()
-
-    iter i : (1,2)
-    #print(i), #output("Emeka Daniel")
-
-    type #[type::T must_be(hashable)] c()
-
-    type #literal::number::integer("si32") b = 0454340092323
-    type #literal::char_wise::unicode_char("basic-latin") = 'ß'
-    
-    #operator(=, and)
-    
-    ``conflict
-    infer a(type si32())
-    infer a(type si32(), 3) ``converting constructors won't take the type itself
-
-    * How would i be able to return types? - abstract answer: through the LCI
-     - typeof()
-     - { type unamed_st<si32, si4> e; if e.get_current_type(): {}? }
-    * Think about how comparison of types with mutability should go
-    * How to design meta-programming
-     - like get line number?
-     - get identifier names
-     - get function-give-type
-     - get name_space contents
-     - use literal as types
-    * Pre and post condition entry for compiler communication level
-    * Really think about what and what compiler communication interface can do
-     - should it be used in an expression
-     - should it deduce function return types #[fn::getGiveType(dama)]
-     - they should embody meta programming and nothing else right?
-     - they shouldn't be used to affect async and await right?
-    * Think about how attributes should be used in my language(they should have namespace like syntax though: function_body::forLoop::eval_once)
-    * CompileTime code runablity
-    * Compiler ability to force things like: [must be a return value of a function] or [must call a particular function after object initialization]
-    
-    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-    TokenTypes:
-    - identifier: rIdentifier and nIdentifier
-    - literal: character_wise, number and boolean
-    - symbol
-
-    Expressions:
-    are items associated with a data type and define their existence as operands that may or may not return/give a value
-
-    Statements:
-    are rudimentary lines of code that can only be found in blocks
-    
-    Declarations: are language abstractions used for the convientent manipulation of data, which the compiler requires explicit information
-    on to setup for the programmer to use
-     - Definitions: also called declaration definitions are the concrete bodies of declarations
-     - Disclosures: also called declaration disclosures are declarations without a concrete body, so they are abstract declarations such that the
-       compiler dosen't posses enough information to setup and therefore allow the programmer to use
-
-    Definitions
-    ───────────
-    🦜 👁 🌲
-
-    [Type]:
-    a data-type is simply a classification that dictates how a value is to be interpreted and what operations can be performed on that value
-
-    Example:
-    A 32bit wide memory can contain this: [11110000 10011111 10001100 10111001]
-    When interpreted as a signed integer, the value becomes -257'979'207₁₀
-    When interpreted as an unsigned intger, the value becomes 4'036'988'089₁₀
-    When interpreted as a utf8 character, the value becomes the unicode character rose 🌹
-    When interpreted as a d32fp real, the value becomes nan
-    When interpreted as a b32fp real, the value becomes -3.950259@+29
-    And so on...
-    
-    b'3'; u8'÷'
-    type bchar a()
-    type si21 c()
-    type bchar n = cast<bchar>(c)
-
-    [Object]: an object in nc is an allocated region of memory(either physical or virtual) that stores a value that is associated with a type.
-    
-    So the requirement of some memory to be called an object in nc are:
-    1. The memory must be explicitly allocated, .i.e it must belong to the process
-    2. The memory must be contian a value associated with a type
-    
-    The term used to refer to memory regions that do not fufill the above two conditons are non-objects
-
-    There are two types of object entities in nc:
-    1. <object_decl>
-    2. <object_exp>
-    
-    The above two are futher more classified into a general category:
-    1. named objects: objects which posses an identifier
-    2. unnamed objetcs: objects which do not posses an identifier
-
-    A named object is basically an <object_decl> entity, which requires an <identifier> as part of its declaration.
-    An unnamed object is much more broad, it ranges from elements of data structures to <object_exp> entities.
-    Here's a full list of them:
-    - elements of data structures
-    - return values in an expression
-    - <object_exp> i.e type int32(2) + (type int32 ::= 78)
-
-    For clarification purposes:
-    To be pedantic all expressions in nc return/give an object as its value
-    
-    |Object Lifetime|: the lifetime of an object is tied to the scope in which it was defined
-    Objects defined in expressions have expression scope
-    Objects defined else-where have either block or global scope
-    
-    [Functions]: a function is simply just a block of code, that can be called arbitary in expressions
-    Functions in nc aren't objects, but they can be treated like objects to some degree.
-    Because function can be treated as objects, they do not support all the features that functions provide
-    Like overloading, example:
-    In a block scope, an object identifier must be unique to a type i.e
-    {
-        type int32 a
-        type int64 b
-
-        ``a and b can only be redefined as identifiers in objects with differing types than the original
-        ``i.e
-        type int64 a
-        type int32 b
-
-        ``but functions do not share this limitation, they can be redefined using the same identifiers with a condition that either the number
-        ``of parameters are different or the types of the parameters are
-        ``example:
-        fn gang(type int32 _){}
-        fn gang(type int64 _){}
-        fn gang(type int32 (a, b)){}
-
-        ``for identifers
-        type fn(int32)void gang := fn(int32){}
-        ``it works because of the redefination of type stuff
-    }
-
-    Example:
-    {
-       ``Reason about what happens when an overloaded function gets assigned to an object of a concerte type or worse an object of an un-guessed type??
-        fn fcn(){}
-        fn fcn(type i32 _){}
-        fn fcn(type i32:"imut" _)
-        fn fcn(i1024 _)
-
-        type fn(type i32)type void a;
-        a ::= fcn
-
-        guess a ::= fcn
-        ```
-        compile error: cannot guess the type because the fcn identifier has too many overloadeds
-        ```
-    }
-    
-    !a
-    not a
-
-    Understanding value categories and referencing
-    ──────────────────────────────────────────────
-    Values also known pedantically as objects are divided into two categories:
-    - abstract-values
-    - concrete-values
-    
-    [Memory reference] references the memory of concrete-values
-    [Value reference] references the value of concrete-values but those concrete-values can be results of concrete-value promotion
-
-    A reference is in nc is an object that simply refers to another object in memory. There
-
-    For a function to be treated as a member function, the first parameter must have the function parameter only type
-    The function parameter only type works like this:
-    {
-        fn example(type any: "[]" me)
-        {
-            if r_l(type ncType(arg.1), ==, or)()
-        }
-
-        - Attribute: "[]" -> is a function parameter only type that performs cvalue promotion only if the type is not trivially movable.
-         That is, it is a pseudo-value-reference type that favours the promotion of avalues to cvaules within a function call context, only if it
-         is not trivially movable.
-
-        - Attribute: "[&]" -> is a function parameter only type that also performs cvalue promotion but with no pre-condition of it being trivially
-         movable. That is, it is a reference type(not pseudo-reference) that promotes rvalues to lvaules within a function call context
-
-        - Attribute: "imut []" -> the same with {attribute:"[]"}, but immutable
-        
-        - Attribute: "imut [&]" -> the same with {attribute:"[&]"}, but immutable
-    }
-        {
-            lvaules always get match to &me
-            rvalues always get matched to imut &me
-
-            I need a way of manipulating 
-        }
-    'imut', 'mv' and 'cp' are lower-marker-prefix-operators parsed as expressions
-    '&' is the only higher-marker-prefix-operator that is parsed along with expressions
-    
-    cp a = b
-    imut a * b
-    (imut &a) + b
-
-    imut: is a lower-marker-prefix-operator that can be used in type-guessing and immutable-reference inference
-
-    [<object_exp> are not allowed to have type qualifiers]->[they are now allowed]
-    (guess ::= &a).fcn() -> has something to do with value-referencing
-    type i32(&a).fcn()
-
-    also how can literals have call member functions when they are rvalues: 2.set(2), "33".insert(0) and so on
-
-    [A special root compiler attribute that relaxes some of the rules of the language, example: instead of write(imut &"emeka", imut &3)]
-    
-    fn dance(&me, i32 (a, b, c)){}
-    type_space(Emeka)
-    {
-        fn dance(me, i32, i8){}
-        fn dance(me, i32, i8){ #[copy_function_body_from(dance, fn(&me, i32))] }
-
-        fn normalize(type: "[]" back){}
-        fn dance(type: "[&]" me){}
-    }
-    
-    Solidify the entities that require the type prefix
-    {
-        - Everthing except type argument list and function signature
-    }
-    Solidify default contruction/initialization
-    {
-        ``a combination of rust's and c++'s model
-        type i32:"imut&" a := imut &23
-        type i32 b()
-
-        guess a := &23
-        guess b
-
-        if b == 3: fan()
-        if b = 3: fan()
-        b := 3
-        guess a := 2
-        :(2, 3)
-    }
-
-    name_space E {}
-    type_space E {}
+	: Blog to write [C++'s Illusion of Immutability]
+	{
+		int const a{}
+
+		int* _{&a} ``cannot not bind
+		int* const y{&a}
+		int* _{&*y}
+	}
 }`
 
 `{
@@ -2487,207 +3359,72 @@ named_pt color{type red x, type ui16 curr_i}
 
     * Reason about why raw identifers should escape reserved identifers?? what is the purpose = interoperability with other languages
      - escaped identifers and escaped raw identifers
-    * Remove 'mem', type raw_ptr<?> would suffice
+
     * Change reserved and identifier to rIdentifier and nIdentifier
-    * Changing of signed integers i[n] to si[n]
-    * Can literal types take raw-identifiers? example: \"emeka"'👀' or 12343`\"daniel"
      - if not, fix it
-    * Make a unicode class that prefectly encompasses all it's encodings
-     - Structure utf8 more accurately to support all unicode encodings: utf16, utf32, ucs-2 and so on
-    * Remember to add a condition in character function for getting the size when unicode name(\{}) and entity(\()) are introduced
-    * Block should be able to transform seemingly normal statements into end expressions when used as an expression
-     - i.e{
-        type si32 a = {
-            if true: 3
-            else 90
-        }
-    }
-     - ability to transform end expressions to give values
-    * Think about why 'none' needs to be reserved
-     - hindsight, current me dosen't want it that way
-    * 'panic', 'output', 'tcast', 'bcast' and input shouldn't be a reserved word no more
-    * Think strongly about initialization
-     - type si32 a() ==? type si32 a = $()
-     - How would treat <arg>?
+
+    * Remember to add a condition in character function for getting the size when unicode name(\{}), alias(\()) and abbreivation(\<>) are introduced
+
     * Error recovery in the syntxer to be thought of
      - find a fix for something like: (+) or r_l(+)
      - try to outline what the production-rule expands to when logging like in <r_l>, when <r_l_arg_list> is not found or <relational_op>
-    * Remove 'defer'
-    * Addition of mem operator to replace & which is now a reference operator
-    * Should i remove the colon in the match block?
-    * Really defined semantics around <arg>
-    * Change 'break' arg to accept an integer-number-literal type instead of an identifier
-    * A semicolon can be appended to a block that is an expression statement 👀
-    * Alias should take an <expression> and the multiple special_ident that the others have
-    * Remove <jump_statement>s from conditional-expression
-    * Think more about which things can be parsed as expressions, for example an <if_statement>
-    * Remove 'default'
-    * Provide both the 'mut' and 'imut'
+    * Remove 'defer' and 'default'
     * Remove this @::si32 from [fromType]
     * Change 'guess' to 'infer'
-    * [3,,4] for pair expression and [3~4] for inclusive range
-     - how would i parse them, as operators? or sole expressions?
-    * Why is odd an operator? remove it in favour of member function: 2.isOdd()
-    * Check how you did the syntax for the C for loop
-    * Should a <block> accept <type_space> and <name_space>? Yes it should
-    * Add an alternate parameter entry: [me, imut me, &me, imut &me] -> ['imut']['&']'me'
-    * Why do i really need ':=', why can't i use '=' instead
-    * Change cp to copy, mv to move and imut to mut. And think about how i should parse them
-     - like this: copy(a) + b or this: copy(a + b)
-     - Liken them to how rust parses their own
-    * Should a <raw-ident> equal a <normal-ident>. Example: \"emeka" == emeka
-     - yes they should
-    * _v Should be used to opionally start a varg- homogenous or heterogenous
-        - fcn(_v, 1, 2, 5, _v)
-    * Identifiers with starting with [_] should not be allowed
-    * The semantic class should warn about something like this: type si32 a := type si32(3), stating that it is redundant
-    * Integer-number-literal with arbitrary sizes up to 10000
-     - To be checked in the semantic class
-     - Optimize maximum number literal checking
-    * identifier shadowing how will i allow it? and rust's style of redefinition
-     - This question is deeper than it ought to be, it is similar to how function can be overloaded
-    * How would i solve the problem of function overloading semantics example:
-     - for objects, if an object can reference an overloaded function through its identifier, should objects with function type have the ability to
-       overload themselves using <function_exp> as their source?
-     - For overloaded functions and function-objects with multiple call operator overloads, when guessing the function-type, how would that go
-    * How will overloaded functions interface
-    - {
-        fn fcn(){}
-        fn fcn(type si32 _){}
-        infer a := fcn
-    }
-    * For nc-happy-size types, copying is the default
-    * Something like this '\_' is parsable 👀
-    * What would not be the discard identifier? '_'
+    * [3~4] for inclusive range
+    * Remove 'odd' in favour of member function: 2.isOdd()
+    * Should a <block> accept <typespace> and <namespace>? Yes it should
+
+    * Identifiers with starting and ending with [_] should not be allowed
     * '_' would be both the discard and default identifer
-    * Should i support any order function parameter entry like in mojo and python? yes i would, just need to define the semantics around it
-     - {
-            fn e(type si32 a, type b32fp l, type d32fp k){}
-            e(.k := 2, _, _)
-       }
-    * I need a refined semantic for <objetc_exp>
-     - Lifetime
-     - Being used as function calls to supply multiple arguments to named objects, redefine things like move and copy constructor
-     - Being used as standalone expressions
-    * Cement semantics around function declarations and how they can be treated like objects
-    * Should i create syntactic suger for working with sumTypes?
     * Conditional expression should have a compulsory else expression
-    * The enforcement of using [mut &<expression>] should have a clear semantic definition, that allows override when it becomes inconvinient
+    * The enforcement of using [&mut <expression>] should have a clear semantic definition, that allows override when it becomes inconvinient
      - {
             ``instead of:
-            io::out(mut &2, mut &3, mut &4, mut &5, mut &6)
+            io::out(&mut 2, &mut 3, &mut 4, &mut 5, &mut 6)
             ``do this instead:
-            io::cout(2, 3, 4, 5, 6)
+            io::out(2, 3, 4, 5, 6)
        }
-    * Create a concrete semantic definition around initialization, should they be allowed to be initialized after the fact?
-     - {
-            type si32 s
-            if i == 3: s = 2 else s = 4
-            b = i == 3?(2:4)
-            b = { if i==3: give 2 else give 4 }
-       }
-    * Reason more about the sumTypes in my language, becuase initialization of them are horrendous compared to rust's way
-    * nc should be immutable first because a programmer should have a clear reason while coding of what object needs to be mutable, it essentially forces the programmer to reason more about his/her code
+
+    * Nc-lang should be immutable first because a programmer should have a clear reason while coding of what object needs to be mutable, it essentially forces the programmer to reason more about his/her code
      - Due to that, standardize how the new [mut] keyword is going to be used
-    * Make looping dynamic using compiler attributes like:
-     - in for and iter loop, the modifier should not always be at the end
-     {
-        iter i:(mut 5, 1)
-        {
-            #[loop::after_modification_do_this]
-            {
-
-            }
-            ``or
-            #[loop::modify_instead];
-        }
-        
-        for infer a:= 5; a < 1; --a:
-        {
-            #[loop::after_modification_do_this]
-            {
-
-            }
-            ``or
-            #[loop::modify_instead];
-        }
-     }
-    - in while to help when [continue] is used and it skips the modification expression there causing an infinite loop
+    * Enforce safe while-looping safe using compiler attributes like:
+    - in while to help when [continue] is used because it skips the modification expression thereby causing an infinite loop
     {
         while a < 7:
         {
             if a == 5: continue
-            #[loop::modification_exp_mark] ++i;
+            //change the name though
+            #dir::loop_modifier ++i;
         }
+        : Even for loop will need it when the loop itself is not doing the iterating
     }
     * Add the file name of the current file it is compiling, like: current file is main.nc
-    * Think more about how expressions at the end of a block would qualify as return values?
-    {
-        if e * 2 = 3:{
-            2
-        }
-    }
-    
-    * I want io devices to have a common infertace, like type-casting
-    * I want a similar technology of reloading the nc's ast while running as the DOM in javascript or lisp
+
     * My language needs to be exception safe - read that rust's article about it
-    
-    * Since assembly languages compute the result of a division as it's quot and remainder, find out if llvm provides a similar function
+
     * Check if rust does that annoyning stuff of this std::uint32_t(std::int8_t{-3})
 
-    * Can i write something like this: [for (auto i = operand_digit_count - desired_digits; ; ){}] in nc
-    * Swapping should use that xor way
-
-    * <block> is going to be parsable in the global space for things like match os::which_os {case(os::windows): case(os::linux): case(os::mac): }
-    
-    * Add support for nc decimal floating point 8 and 16
-    
-    * Unicode name and entity entry would be left for another time
-    * Unicode name check and replacement with the code-point entry be addressed - would be done in the semantic
-
-    * Support for range loops; possible syntax: 'rng' <identifier_list> ':' <expression_list> <statement>
-     - A range operator for number literals -> [1~3]
-    * Add catch block; syntax: 'catch' ['(' [<parameter_list>] ')'] <block>
-     - until i study exception implementation
-
-    * Add generics, varadic generics and specialization of said generics support
-     - Constraints should be added to enrich generics
-    * Think about how multiple files would interact with one another[nc_impl, nc_inf, nc and (the import system)]
-     - i.e think more about the import system of nc
-    * arena_ptr and non_arena_ptr are the two heap allocation objects we have in nc
-    * think more about slices
+    * Add support for nc decimal floating point 8 and 16 - in a later version of the language
+    * Think more about slices
      - A general concept is needed to classify range data structures and that concept would be iterators
      - And the common interface for using data-structures
+
     * Reflect more on the part of the static analyzer that enforces memory safety
      - How safe are pointers going to be
+
     * What of this [simd] type?
-    * Think about error handling for my language .i.e things like: error::code, error::msg, error::panic, exceptions and so on
 
     : A compiler tool that explains the nc code, would be avialable in the LCI directly too
-
-    * What happens when a <rng> references a range mutably and one tries to modify the range(collection)?
-    {
-        guess int32_darr := type d_array(_v, 1, 2, 3, 8, 9, 0)
-        rng i : i32_darr
-        {
-            io::out(i)
-            i.erase(2, 3, 5)
-        }
-        iter i : |i32_dar| io::out(i), i.erase(2, 3, 5)
-
-        infer si32_dArray := type dArray(_v, 1, 2, 3, 4, 5, 6)
-        iter i : mut si32_dArray
-        io::out.wrt(i), i.act()
-    }
-    _______________________________________________________________________________________________________________________________________________    
+    _______________________________________________________________________________________________________________________________________________
 
     something like this is very dangerous:
     {
-        type astr a() type ui count()
+        type darray a(1, 2, 3, 4, 5) type ui32 count()
 
         a.assign(a.begin() + count, a.end())
 
-        ``because function @astring::assign(type astring:"immut l-ref", type @astring::iterator, type @astring::iterator) dealloctes itself
+        ``because function @astring::assign(type darray<si32>:&mut, type @darray<si32>::iterator, type @darray<si32>::iterator) dealloctes itself
     }
     _______________________________________________________________________________________________________________________________________________
 
@@ -2755,12 +3492,13 @@ named_pt color{type red x, type ui16 curr_i}
         Find and replace
         "emeka@cyril.com"
         "<unicode:all_lang_alphabets> '@' ['gmail'|'hotmail'|'outlook'|'yahoo'] ['.'] 'com'|'n_com'"
-        
+
         match_str[1] = "nc_mail"
         match_str[2] = "nc"
      }
     * my own list implementation that provides random access without that need of an internal array
-    * editor features
+	* document editor like microsoft word
+    * text/code editor features --study what makes vim and emacs so good then copy it, even it vscode--
     {
         - arbitrary selection of highlighted text starting from a start to end line: turns out vscode already has, depending on where the cursor is, hold shift down and click on an location you want
         - movement of highlighted or focused text to arbitary locations: can be able to apply whitespace inducing keys on it
@@ -2768,7 +3506,11 @@ named_pt color{type red x, type ui16 curr_i}
         - keybindings for spwaning and despwaning the sugggestion window: truns out vscode uses the escape key for it
         - highlight lines with only whitespace and lines ith trailing whitespace
         - backspace and delete would be set to remove a grapheme-cluster by default while shift+backspace gives the option of deleting par code-point
-    }
+		- move forward and backward between "words", similar to ctrl+d but performs a move action instead
+		- select a word, similar to ctrl+d
+		- combining nc regular expressions with selection --> i think vim does it
+	}
+	* Your opinon Your Identity - article to write
     _______________________________________________________________________________________________________________________________________________
 
     *11110000 10011111 10001100 10111001
@@ -2778,46 +3520,10 @@ named_pt color{type red x, type ui16 curr_i}
     *
     *[11110]000 [10]011111 [10]001100 [10]111001
 
-    match e {
-        case(1, 2, 3, 4) {
-            
-        }
-        case(1~4) {
-
-        }
-    }
-
-    match type unamed_st(1, 2.333`b32fp) : i{
-        case<si32, b32fp>{
-
-        }
-        case<>
-        case<si45> e + 4
-    }
-
-    for i, j, k : (!{default, 0, 0}, <, 32, !{1, 1, 1})
-    io::stdout.write(i)
-
-    for i, j, k : (!(23, 0, 0), 32, !(1, 3, 5))
-
-    iter i, j, k : ($(23, _, 9), .end := 32, )
-
     true or false and true or false
     (true or (false and true)) or false :[ C/C++ parse]
     true or (false and (true or false)) :[ nc parse ]
 
-    u8"
-    Emeka Daniel at 2003
-    \"Emeka\"
-    \n
-    "
-    a"
-    ${3, 3}
-    \u{
-        Emeka Daniel
-     }
-    \u[2222'222]
-    "
     «Emeka, Daniel»
 
     d(i, f(e, 9))
@@ -2838,11 +3544,11 @@ ________________________________________________________________________________
     - [Division]:
         - [lhs < rhs]: leading zeros are accounted for, we can prove it by using two methods
         Only the lhs need the integer of such size
-        
+
         prove(1): (9{max_real_part-1} ÷ 9{max_real_part}).digit_count() + {implementation_precision+1}.digit_count()
         lhs = 9{max_real_part-1}
         lhs.digit_count() + {implementation_precision+1}.digit_count()
-        
+
         prove(2):
         lhs = 1 ÷ 9{max_real_part}
         1 + {number_of_leading} + {implementation_precision+1}
@@ -2852,7 +3558,7 @@ ________________________________________________________________________________
         b128fp(35+36 = 71 digits) -> si236
         b256fp(73+74 = 147 digits) -> si489
         b512fp(149+150 = 299 digits) -> si994
-    
+
     - [Addition]:
         {implementation_precision+1} + 1
 

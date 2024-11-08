@@ -3064,6 +3064,10 @@ int main()//test d32fp with that conversion of base(10) real_part to base(n)
         * test approximate_ui64(999'999, 5);
         */
 
+        /*
+        * New format of nc decimal real number implementation [signed mantissa][exponent] reason how inf and nan would be stored?
+        */
+
         // io::cout.setFmtf(std::ios_base::fixed);
         io::cout.setPrecision(6);//try rounding this 9'999'999
         //Now it's time for definig operations on special values

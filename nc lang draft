@@ -51,3 +51,89 @@ scope. [ This is why are member types not defined like this (type @a::color) ins
 
 TYPE SYNTAX AND SEMANTICS:
 A type in nc, also called a data type, is the only part-item in nc, it has features like qualifiers.
+
+{
+    Expressions:
+    are items associated with a data type and define their existence as operands that may or may not return/give a value
+
+    Statements:
+    are rudimentary lines of code that can only be found in blocks
+    
+    Declarations: are language abstractions used for the convientent manipulation of data, which the compiler requires explicit information
+    on to setup for the programmer to use
+     - Definitions: also called declaration definitions are the concrete bodies of declarations
+     - Disclosures: also called declaration disclosures are declarations without a concrete body, so they are abstract declarations such that the
+       compiler dosen't posses enough information to setup and therefore allow the programmer to use
+
+    Definitions
+    ───────────
+
+    [Type]:
+    a data-type is simply a classification that dictates how a value is to be interpreted and what operations can be performed on that value
+
+    Example:
+    A 32bit wide memory can contain this: [11110000 10011111 10001100 10111001]
+    When interpreted as a signed integer, the value becomes -257'979'207₁₀
+    When interpreted as an unsigned intger, the value becomes 4'036'988'089₁₀
+    When interpreted as a utf8 character, the value becomes the unicode character rose 🌹
+    When interpreted as a d32fp real, the value becomes nan
+    When interpreted as a b32fp real, the value becomes -3.950259@+29
+    And so on...
+}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+TokenTypes:
+- identifier: rIdentifier and nIdentifier
+- literal: character_wise, number and boolean
+- symbol
+
+Understanding value categories and referencing
+──────────────────────────────────────────────
+Values also known as expression results are divided into two categories:
+- abstract-values
+- concrete-values
+
+A reference is in nc is an object that simply refers to another object in memory
+[Memory and value reference]
+{
+    fn main
+    {
+        use mod std::io
+
+        io::out("Enter your name")
+        infer user_name = try io::in(_)
+
+        io::out("Hello %{0}, how are you doing today\n....", user_name)
+
+        infer _ = try io::in()
+    }
+
+    use pkg console
+    use pkg networking
+
+    fn download_effect
+    {
+        infer _ = await try network(@protocol::http).fetch("www.nclang.com/main_dir/language_index.html")
+        async
+        {
+            console::draw_rectangle(console.cursor.pos, .width= 100, .height= 500)
+        }
+    }
+
+	=================================================================================================================================
+
+	use [pkg, mod] [graphics, std::io]
+
+	fn main
+	{
+		infer io_context = \"2d".opendevice(device::keyboard)
+
+		infer window = io::opendevice(@window)
+
+		window.title("nc is awesome".toTitleCase())
+		infer ml = type html(window)
+
+		ml.tag(@htmlTag::p, "successful as doing this")
+	}
+}

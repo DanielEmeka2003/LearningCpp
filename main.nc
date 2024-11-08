@@ -98,7 +98,7 @@ fn language() ``fixing accidental C-style syntax and expression-list error
 
 //👩🏿 = 👩+ 🏿
 
-fn main() int32
+fn main() si32
 {
 `{
     !((int32, achar)int32) a := 9
