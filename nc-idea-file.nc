@@ -1973,24 +1973,10 @@ fn main()
 		alias some = me.fcn
 		me.fcn()
 		Me::fcn(&me)
-	}
-	: LCI to add
-	{
-		#at::make_unsafe
-		#at::unsafe
-		#exp::is_unsafe
-		#exp::type_alignment<*>
-		#exp::typesize<*>
-		#exp::is_parameter_arg_result_of_function(*, *)
-		#exp::is_parameter_arg_result_of_function<*>(*)
+
+		: Would only alias literal and identifier expressions
 	}
 	: Inheritance is only possible for struct type creators
-	: Static time type introspection would be added
-	{
-		x.isMember(*)
-		x.usesMixin(*)
-		x.usesInterface(*)
-	}
     : Priorities
     {
         - Learning about allocators and how to integrate them in my language
@@ -2022,9 +2008,16 @@ fn main()
 		What of something like these:
 		{
 			#at::make_static fn some(){}
+
+			infer x = some
+
+			struct some_type
+
+			#at::eval type *some_type x() ``would still work
 		}
 	}
-	: LCI static time debugging
+	: Only type creator allowed for FTCI -foriegn type creator interface- is struct
+	: LCI static time debugging and testing --to be investigated after [beta-version-0] comes out--
 	{
 		- only works when main is run at static time
 		- similar to code explaination but on steriods
@@ -2048,6 +2041,22 @@ fn main()
 
 		struct some{type [si32, si34][a, b]}
 	}
+	: [prop] and [try]
+	{
+		Can i expressions somehow specify different actions that [prop] and [try] can take?
+
+		prop fcn() --instead of only propagating, i can log then propagate--
+		How does the [?] operator work in rust and how can i overload it
+
+		fn #op prop(type result<\"2d physics engine", error_2d_physics_engine> result)
+		{
+			match result: alt
+			{
+				br<error_2d_physics_engine> log.write(alt)
+				br<\"2d physics engine"> give alt
+			}
+		}
+	}
 	: typescope cannot be access restricted
 	{
 		: Define it well
@@ -2067,14 +2076,76 @@ fn main()
 		type fn(si32)! x(fcn)
 		type fn(si32)! x = fcn ``Error many overloads detected
 	}
+	: Number literal type indicator is now [_] instead of [`]
+	{
+		333_si64
+	}
+	: Doc comment types
+	{
+		[`]		- for single line doc comment
+		[``]	- for dobule line doc comment
+	}
+	: Using [_] for the identifier expected in function disclosure declaration --define well
+	{
+		fn malloc(type si32 [memorysize, amount]) type {*}?
+	}
 	: Lifetime tracking implementation
 	{
 		References must reference objects with the same lifetime range
 
-		Written mathematically
-		Given two objects m of reference type and n of non-reference type, their lifetimes lₘ and lₙ, if lₘ != lₙ then m cannot reference n
+		Written mathematically:
+		Given two objects [m] of reference type and [n] of non-reference type, their lifetimes [lₘ] and [lₙ], if [lₘ] != [lₙ] then [m] cannot reference [n]
+
+		The above is true even for objects allocated on the heap
+		{
+			type *si32 x
+			{
+				#at::unsafe
+				type {*}si32 y(malloc(#exp::size<si32>, .amount= 2))
+
+				x = addressof try $y `ERROR: lifetime range of [x] and [addressof try $y] doesn't match
+			}
+			type {*}si32 y(malloc(#exp::size<si32>, .amount= 2))
+			{
+				...
+				y = type {*}si32(malloc(#exp::size<si32>, .amount= 35))
+				y + 8
+				x = addressof try $y `ERROR: lifetime range of [x] and [addressof try $y] doesn't match
+			}
+		}
+
+		- Lifetime range of stack allocated objects are defined by the language
+		- Lifetime range of heap allocated objects are defined by the user i.e programmer
+		- Lifetime range of (global memory location) allocated objects are defined by the language
+
+		If a foreign function takes as a parameter a struct that contains an owning MAR, the foreign function must specify
+		to the language whether or not an owning MAR is moved in the foreign function's body which is hidden from the
+		language: [ #at::moves_owning_MAR(a, b) ]
 	}
-	: [type f_array] defined semantics
+	: LCI to add
+	{
+		#at::fn_moves_owning_MAR(?, ...)
+		#exp::ty_isEq
+		#exp::ty_size
+		#exp::ty_memsize
+	}
+	: editor
+	{
+		- A way to toggle between [full-matches] and [contianed-matches]
+		Difference being
+		tysize- CM[(ty)pe(size)]
+		foriegn- CM[(for)|e||i|(gn)]
+
+		Chaining commands together(think also of chaining along with regex)
+
+		Simplified entry of symbols in nc- using the :<character name>
+	}
+	: [_] for ignoring values
+	{
+		_ = 34 ``used only in expressions
+		type si32 _ = 34 ``should be used only in parameters? because they have the above to be used in blocks
+	}
+	: [type f_array] defined implementation
 	{
 		type f_array<si34>
 		type d_array<si34>
@@ -2117,27 +2188,163 @@ fn main()
 				type f_array<si32> global(.capacity= 40) --global
 			}
 		}
-	}
-	: Learn more about types that are expensive to copy
-	: LCIs to think about
-	{
-		#exp::filepath
-		#exp::module_location
-		#exp::package_location
-		#exp::location
-		#exp::callsite_location
-
-		location = "module: {filepath} line: {line} column: {startcolumn}"
-
+		: Allocates storage in the fixed address space it finds itself in
 		{
-			#at::inline
-			fn assert_eq(type si32 [a, b])
+			fn main
 			{
-				infer [str_a, str_b] = [a, b] | #exp::\"parameter_arg->str"
-				assert(a == b, "[ASSERTION FAILURE] On location: %,  (% != %) : {% != %}", #exp::location, a, b, str_a, str_b)
+				type f_array<ui32> _(.capacity= 34) ``allocated on the stack
 			}
+
+			type f_array<ui32> _(.capacity= 34) ``allocated on the BSS
+
+			struct some
+			{
+				type f_array<ui32> _(.capacity= 34) ``allocated in the structure -- does not allow reallocation
+			}
+			type f_array.\"= elements"
+		}
+		: Problems
+		{
+			- The possibility of struct and enums been undeterminate due to [type f_array] and it's dynamic capacity change via [init] functions
+			- How would they work when allocated in the heap
 		}
 	}
+	: [type u8str] defined implementation
+	{
+		struct u8str
+		{
+			type {*}ui8 data,
+			#at::[static, readonly("mod")]
+			type ui32 size,
+			#at::static
+			type bool address_space_flag
+		}
+
+		I would act as if there is even 1024
+		: Manages lifetime from two address spaces
+
+		- applies to [u8str] because it uses the stack memory on a condition
+		- applies to [str] because it uses f_array
+
+		(&"12345678")(2) = '3'
+
+		How string literal are handle in various languages:
+
+		const char* greeting = "hello"			``C/C++
+		let greeting: &'static str = "hello"	``Rust
+		const greeting: []const u8 = "hello"	``Zig
+		String greeting = "hello"				``Java
+		b: str = "hello"						``Zig
+		-------------------------------------------all immutable-------------------------------------------------------
+		type u8str greeting = "hello"			``NC
+
+		type f_array<si32> x:mut()
+		fn fcn
+		{
+			x = type f_array(1, 2, 3, 4, 5, 6) ``ERROR: x.data(type {*}si32) is referencing objects with a different lifetime range
+		}
+
+		``and this
+
+		fn my
+		{
+			type f_array<si32> x(.capacity= 32)
+			fcn(&mut x)
+
+			fn fcn(type &mut f_array x)
+			{
+				x.push(45)
+				x = type f_array(.capacity= 10) ``ERROR: x.data(type {*}si32) is referencing objects with a different lifetime range
+			}
+			type f_array<si32> global(.capacity= 40) --global
+		}
+	}
+	: [type str] defined implementation
+	{
+		alias char_array = type variant<d_array<char>, f_array<char>>;
+
+		struct str
+		{ type char_array str }
+
+		f_array's character limit is 64, same as u8str
+	}
+	: [alias] is back
+	{
+		[alias] is to be modelled after it's colloquial definition, meaning an [alias] must be declared in the same
+		scope as the identifier-item it is aliasing.
+		The only identifier-items that can be aliased are type_creator identifier items or types and userscope identifier-
+		items
+	}
+	: Can i do something like this
+	{
+		To avoid the risk of identifier conflict of library functions with others
+
+		#at::private("mod")
+		fn InitWindow(type ui8* title)! ``so it would not be mangled
+
+		fn init_window(type str x){ give InitWindow(str.to_cstr()) }
+
+		fn same_function(){ give InitWindow("Daniel") }
+	}
+	: Fix for something like this
+	{
+		#at::must_use_parameter_name_call
+
+		type f_array x(2.0) ``would call the variadic init
+		type f_array x(2, 4) ``would call the variadic init
+		type f_array x(2) ``would call the capacity init, but i want to call the variadic init
+	}
+	: Learn lisp
+	: Nc regex
+	{
+		there should be a contains and match to prevent things like that normalization regex and
+
+		ncregex" 'p' ".match("casper perl polygon p") ``[p]
+		ncregex" 'p' ".imatch("casper perl polygon p") ``[perl] [polygon] [p]
+		ncregex" 'p' ".search("casper perl polygon p") ``[casper] [perl] [polygon] [p]
+		'p'.
+		'p' <identifier>.
+	}
+	: The default literal type for integer number literals are [ui32], for now
+	: Optimization for function parameters that are non reference immutable objects
+	{
+		When a function is made [inline] and the one of it's parameters askes for a non reference immutable object,
+		the language specifies the use of the argument.
+
+		#at::inline
+		fn fcn(type ui32768 x) { give x + 34 }
+
+		fn main
+		{
+			_ = fcn(233333333333333334444444444445555555000000012221_ui32768)
+		}
+		``after semantic analysis
+		fn main
+		{
+			``inlined function fcn of type fn(ui32768)ui32768 in location module_path: /home/emeka/test.nc line(34)
+			_ = 233333333333333334444444444445555555000000012221_ui32768 + 34
+		}
+	}
+	: Mutable stack allocated objects must be used in an expression, and an assignment doesn't count
+	{
+		b = 34 ``ERROR: b was assigned to but not used
+	}
+	: This problem
+	{
+		x.emeka() 	`-> @ #ty::exp(x)::emeka(x)
+		&x.emeka()	`-> @ #ty::exp(x)::emeka(&x)
+
+		Due to dual identity
+	}
+	: Suggested spaces to broadcast my language
+	{
+		- Quora
+		- Reddit
+		- HackerNews
+		- Handmade
+		- [search for other programming spaces]
+	}
+	: Learn more about types that are expensive to copy
 	: A new identifier item [unique] that makes an existing type distinct
 	{
 		unique handle = type si32
@@ -2146,7 +2353,7 @@ fn main()
 
 		: How would these work fare during overloading, according to my implementation of not wraping the type
 	}
-	: Arbitary integers are disqualified
+	: No more arbitary bit sized integers
 	{
 		bit  8, 16, 24, 32, 64, 128, 256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536
 		byte 1, 2,  3,  4,  8,  16,  32,  64,  128,  256,  512,  1024, 2048,  4096,  8192
@@ -2225,6 +2432,8 @@ fn main()
 
 		Initialization of [type f_array] in an _init_ function is not feasible due to lifetime inconsintencies -study more
 		Or i can make an exception were [type f_array] fields can only use the _init_ function that takes the capacity
+
+		Remember [_init_] are inlined !!
 	}
 	: NC regex
 	{
@@ -2250,11 +2459,8 @@ fn main()
 		alias nc_identifier = ('\"' <unicode: mix, max> '"')*|<identifer>*
 		[['struct'|'union'|'enum'|'nil'] ':' [nc_identifier]] ';' ... [nc_identifier] (':' [nc_identifier|<number>])*
 	}
-	: Piping is going to be disallowed and <arg> would be looked at more
-	{
-		(1, 2, 3, 4, 5)|fcn
-		I am going to remove piping for now
-	}
+	: Piping as concept is no more
+	: <arg> would be no more too
 	: Since some LCI's are consider to be functions, can they be stored in an object like normal functions can
 	{
 		infer x = #exp::variadic_size
@@ -2265,20 +2471,146 @@ fn main()
 	: editor
 	{
 		Bringing out the column number for selection functions like shift + mouse-click
+		Moving line via keybindings like how test is moved via column shifting
+		Go to the top and end of a file
 	}
-	: LCI to add
+	: How to assign to VRs without stiring up semantics for VR binding to another VR
 	{
-		#exp::operator_precedence
-		#exp::type_creator_metadata<*>
-		#exp::type_creator_comprehensive_metadata<*>
-		#exp::which_type_creator<*>(*)
-		#ty::\"str->item"(*)
-		#exp::\"str->exp_item"
-		#exp::\"->str"
-		#exp::\"<-str"
+		b = &3
+		&b = 3
+		#exp::to<&si32>(b) = &34
+		
+		since VRs hide thier type identity, only [#exp::to<?>(?)] can expose them
 
-		#exp::\"ty_item->str"
+		VRs when exposed after it's initialization only offer an assignment to itself and nothing more
+
+		That means [(to)] is akin to [&[mut]]
+		No because that would mean [&[mut]] can transform ordinary values to references
+
+		[&[mut]] is for VR initialization not assignment ??
+
+		No more VR omission special treatment for operators
+
+		Meaning [=] is an operator with special semantics because something like this :  b = &type si32 : is not in [nc]. I want rust's style of
+		copy and move semantics : b = copy type str
+
+		: What i want
+		{
+			type si32 x() 		-> direct initialization
+			type si32 x = 32 	-> indirect initialization
+
+			type &si32 b:mut()
+			&b = &34
+			``if it is overloaded
+			& #exp::to<&si32>(b) = & #exp::to<&si32>(34)
+
+			copy 32 + copy 34 -> not allowed as the copy initialization is the default here
+
+			Only owning MARs are allowed to be moved for now
+
+			fn _copy_(&mut me, &src){}
+			fn _move_(&mut me, &mut src){}
+
+			VRs do not have
+			type str [x, y]["daniel", "emeka"]
+			&x + &y
+			&d.fcn()
+			(&d).fcn() --> meant to go to the VR typescope
+			VRs don't have the concept of typescope
+
+			(addressof d).fcn()
+		}
 	}
+	: Problem
+	{
+		infer _ = [2, 3]
+		type si32 x [2, 3] ``one can't do this because of they are of the same type
+		type si32 _ = [2, 3] ``but it can be done usign the ignore identifer
+	}
+	: SFU(simplified function use)
+	{
+		SFU: states that a function used in an expression can be expressed only as an identifer with no type argument entry
+
+		Essentially it means since something like this [fn fcn<type t>(type t _)!] produces an overload like this [fn fcn(type si32 _)!] or this
+		[fn fcn(type d32r _)!], there is no need to specify the type argument like this [fcn<si32>] or this [fcn<d32r>] when the function is used in
+		an expression, that the provided overload resolution tools is more than enough.
+
+		Without SFU the following would be possible:
+		1. Identifier ambiguity
+		{
+			fn fcn<type t>(type t _)!
+			fn fcn<type t>(type [si32, t] _)!
+
+			infer _ = fcn<si32> ``ambiguous
+		}
+		2. Type parameter based overloading via type argument resolution
+		{
+			fn fcn<type t>(type [si32, d32r, t]_)! 	``[1]
+			fn fcn<type [t, u]>(type [si32, t, u])! 	``[2]
+
+			fcn<si64> ``[3] resolves to [1]
+			fcn<d32r, si64> ``[4] resolves to [2]
+
+			``[3] and [4] creates the same overload of type fn(si32, d32r, si64)!
+		}
+		3. Non participating type parameter - meaning a type parameter that is not present in the signature of it's function
+		{
+			fn fcn<type [t, _]>(type t _)!
+
+			: This is a subset of Type parameter based overloading
+		}
+
+		Semantics due to SFU
+		1. Language functions are now defined in the LCI
+		{
+			to<?>(?) 		-> #exp::to<?>(?)
+			tosuper<?>(?)	-> #exp::tosuper<?>(?)
+		}
+		2. Use of functions with type parameters
+		{
+			fn dac<type t>(type t _)!
+
+			type fn(si32)! _ = dac ``ERROR: dac has a type parameter which is subject to spwan multiple overloads, so it has to ues the overload resolution method even if those overloads have not been spwaned
+			type fn(si32)! _ = #exp::to<fn(si32)!>(dac) ``correct
+		}
+	}
+	: Monomorphisation of function with type parameter via constraints
+	{
+		One can overload via constraint application like so
+
+		fn fcn<type t>(type t x)
+		{
+			if #exp::isEq<t, si32>:
+			dothis()
+			else
+			this()
+		}
+
+		fn fcn(type si32 _){ dothis() }
+
+		fn fcn<type t>(type t _) -> {give #exp::isEq<t, si32> or #exp::isEq<t, d32r>} { dothis() }
+	}
+	: Removal of this [_v_]
+	: Nc identifier definition
+	{
+		\<reserved_identifier>
+		\"<non_valid_nc_identifier>" -> including use of this [_] as the first character in an identifer
+	}
+	: Remove that foolish constraint on error and optional handling types
+	: Really think about type u8str, because it has two spaces within the address space to store memory
+	{
+		fn some()
+		{ give "emeka daniel" }
+
+		A boolean that stores whether or not it is in the stack address space or not
+	}
+	: No more alias for type, userscope, identifier, or literals
+	: No more qualified identifier for function and type identifiers
+	{
+		fn  some_scope::sch()!
+	}
+	: What happens when an [_init_] function is made static ?
+	: For nc identifiers, character [_] is not allowed to start or end an identifer
 	: Format for type_creator_metadata
 	{
 		struct book{type [si16, colour] [page_number, book_colour]}
@@ -2287,8 +2619,6 @@ fn main()
 		struct novel: type book{type [edition, d_array<accolade>] [book_edition, accolades]}
 
 		/*
-		*	Remember struct type creators can inherit other struct type creators
-		*
 		*	nil:si32\n
 		*	struct:book;page_number:si16;book_colour:colour\n
 		*	union:anything;si32;si512;si2084;d32r;b64\n
@@ -2297,8 +2627,6 @@ fn main()
 		*/
 
 		/*
-		*	Remember struct type creators can inherit other struct type creators
-		*
 		*	nil:si32\n
 		*	struct:book;page_number;book_colour\n
 		*	union:anything;si32;si512;si2084;d32r;b64\n
@@ -2419,24 +2747,24 @@ fn main()
 
 					match str(i, control) =>{\"just found %"() break: 1}
 					{
-						br('<paren>')
+						br('<square>')
 						{
-							pseudo_write(type slice(str, old_i ~= (i-2)`*backwards skip of % and <paren>*`))
+							pseudo_write(type slice(str, old_i ~= (i-2)`*backwards skip of % and <square>*`))
 
-							[i, old_i] = [i+1, i] ``Skipping <paren> by incrementing [i]
+							[i, old_i] = [i+1, i] ``Skipping <square> by incrementing [i]
 
 							do
 							{
 								match str(i, control): [_, i]
 								{
-									br<out_of_bounds_error> {static_write("EOS reached but <paren> was never found") continue: 1}
+									br<out_of_bounds_error> {static_write("EOS reached but <square> was never found") continue: 1}
 									br<char>
 									{
 										if not i.isDigit(10):
 										{
-											if to<char>(i) != '<paren>':
+											if to<char>(i) != '<square>':
 											{
-												static_write("Right <paren> was expected instead of this [", to<char>(i), ']') continue: 1
+												static_write("Right <square> was expected instead of this [", to<char>(i), ']') continue: 1
 											}
 											else if old_i == i: ``i.e if the no custom variadic number was found
 											{
@@ -2450,7 +2778,7 @@ fn main()
 
 								i += 1
 
-								//if not str(i, control)=>{static_write("EOS reached but <paren> was never found") break: 2}.isDigit(10):
+								//if not str(i, control)=>{static_write("EOS reached but <square> was never found") break: 2}.isDigit(10):
 								//break: 2
 							}
 
@@ -2467,7 +2795,7 @@ fn main()
 							//to prevent something like this: pseudo_writef("%meka %(2) %(2)", 'E', daniel)
 
 							pseudo_write(#exp::variadic_access(args, variadic_pos))
-							old_i = i+1 ``forward skip of right <paren>
+							old_i = i+1 ``forward skip of right <square>
 						}
 						br('<curly>')
 						{
@@ -2516,33 +2844,9 @@ fn main()
 		}
         : Making .writef work
         {
-			.write("handle")
-			.writef("% + % ÷ %(1)", 1, 2)
-			.writef("%{ #exp::tostr(1 + 2 ÷ 1) }")
-
-			{
-				type *si32 x
-				type &si32 X
-				type {*}si32 x
-				type {*}mut si32
-
-				type introspect x(#exp::\"type->str"<&si32>)
-				\"exp->str"(2 * 3)
-				\"str->exp"("2*3")
-				\"type->str"<si32>
-				\"str->type"("si32")
-				\"parameter_arg->str"(b)
-
-				if current_union_alternative<si32>(x):
-				[(try $x) + (try $x)]
-
-				: It is now called the constriant block for generic typing and the only allowed operation is type querying
-			}
-
 			#dir::inline_eval
 			#dir::exp_to_inline
 
-			
 			: Question how slice would work with u8str and many other things
 			{
 				type u8str x(type slice(34))
@@ -2564,14 +2868,12 @@ fn main()
 			fn #op()(&me, type si32 pos)
 			{
 				if pos > me.size
-				panic(s"On line % from column %, (object %(3)(1) of type %){%(3)(1)} is greater than (%){%}"
-				.format(#exp::callsite_line(), #callsite_startcolumn(), #exp::tostr_smart(pos), #exp::tostr_smart(me.size)))
+				panic(s"On line %: %, {% > %} %{pos > me.size}".fmt(#exp::callsite_line(), #exp::callsite_startcolumn(), "pos", "me.size"))
 
-				#exp::asStr()
 				#exp::is_statically_evaluated
 			}
 
-			#dir::inline
+			#at::no_inline
 			fn #op()(&me, type si32 pos)
 			{
 				if pos > me.size
@@ -2642,10 +2944,10 @@ fn main()
 		}
 
 		{
-			#dir::eval
+			#at::eval
 			fn factorial(type si2084 n)
 			{
-				if n == 0 give 1`si2084
+				if n == 0: give 1`si2084
 
 				type #ty::exp(n) fact(1);
 
@@ -2657,8 +2959,8 @@ fn main()
 
 			fn call()
 			{
-				#dir::eval factorial(34`si2084) ``INFO: factorial is already statically evaluated
-				#dir::eval {infer x = factorial() give comisc(x)}
+				#at::eval factorial(34`si2084) ``INFO: factorial is already statically evaluated
+				#at::eval {infer x = factorial() give comisc(x)}
 			}
 
 			fn example_print(type si32 n)
@@ -2673,119 +2975,104 @@ fn main()
 
 			fn main
 			{
-				#dir::eval example_print(89)
+				#at::eval example_print(89)
 			}
 		}
     }
-    : Language-Communication-Interface(LCI) definition
+	: Variadic
+	{
+		must be the last function parameter
+
+		same type variadics must be placed before or after other types
+		But any type variadics must be placed as the last function parameter
+	}
+	: How would the [explain_code] LCI work?
+	{
+		#at::explain_code
+	}
+    : LCI(Language Communication Interface)
     {
-		- directives(dir namespace)
+		enum type_creator{nil, \struct, \union, \enum, \unique}
+
+		[keep operator and thier precedence, BNF, along with the various LCIs and thier explanation in a file to be shipped along with the compiler]
+
 		{
-			- private(mod|pkg|type)
-			- readonly(mod|pkg|type)
-			- extend_lifetime
+			For LCI functions that take a string, the string that is expected is based on a concept where the type must have overloaded the
+			call operator to have as parameters an unsigned 32bit integer and give type a character
+		}
+
+		- attribute(at userscope)
+		{
+			- private(?)						: private("mod") | private("type") | private("pkg")
+			- readonly(?)						: readonly("mod") | readonly("type") | readonly("pkg")
 			- make_error_handling_type
 			- make_optional_handling_type
-			- manages_heap_lifetime
-			- function_may_end_heap_lifetime
-			- function_ends_heap_lifetime
-			- callfirst
-			- call_last
-			- mustcall
-			- mark
-			- enforce_efficient_passing -- change to efficient for the type or would writing code for it be better?
-			- static
-			- opt_static
+			- make_threadlocal
+			- make_unsafe
+			- unsafe
+			- make_static
+			- eval
+			- increase_lifetime_range
 
 			- explain_code
-
-			- #dir::make_threadlocal
-            - #dir::enforce_efficient_passing<*>
-			- #dir::make_optional_handling
-			#at::private(mod)
 		}
-		- statement-like-directives(statement namespace)
+		- expression(exp userscope)
 		{
-			- \"enable auto $"
-			- \"disable auto $"
-			- mark
-		}
-		- expression(exp namespace)
-		{
+			- module_path
+			- location
+			- callsite_location
 			- line
-			- startcolumn
-			- endcolumn
-			- columnpair
 			- callsite_line
 			- callsite_startcolumn
 			- callsite_endcolumn
-			- callsite_columnpair
-			- typename
-			- typesize
-			- typeEq
-			- isRefType
-			- isValueRefType
-			- isMemoryAddressRefType
-			- variadic_access
-			- variadic_size
-			- mark
+			- is_VR_type<?>
+			- is_MAR_type<?>
+			- variadic_access(?, ?)
+			- variadic_size(?)
+			- variadic_size<?>
+			- is_unsafe
+			- isEq<?, ?>
+			- type_creator<?>							: gives an type type_creator which is an enum
+			- type_creator_metadata<?>
+			- type_creator_elementary_metadata<?>
+			- memsize<?>
+			- typesize<?>
+			- is_fn_parameter_arg_result_of_fn(?, ?)
+			- strTocode(?)
+			- codeTostr(?)
+			- codeTostr<?>
+			- avialable_error_handling_types
+			- avialable_optional_handling_types
+			- to<?>(?)
+			- tosuper<?>(?)
+			- fn_parameter_arg_to_str(?)
+			- uses_mixin<?>(?)
+			- uses_interface<?>(?)
 		}
-		- type(ty namespace)
+		- type(ty userscope)
 		{
-			- exp
-			- decay
-			- fn_givetype
-			- variadic_access
-			- integer_number_literal
-			- real_number_literal
+			- exp(?)
+			- decay<?>
+			- fn_givetype<?>				: fn_givetype<fn() --come back--
+			- variadic_access(?, ?)			: variadic_access(args, 12)
+			- integer_number_literal<?>		: integer_number_literal<si32>
+			- real_number_literal			: real_number_literal<d32r>
 			- string_literal
 			- character_literal
+			- strTocode(?)
 		}
-		- operator
+		- others
 		{
-			- op <every-operator-in-nc>
+			- op <nc_operators>
+			- literal
 		}
-		- literal
 
-        : LCI
-        {
-			#dir::mark(daniel) 2 * 2
-			#statement::mark(daniel) 2*3
+		: How to get callsite line number information?
+		{
+			fn somecall(){ log(#exp::callsite_line) }
 
-			#dir::explain(#exp::mark(daniel))
-
-            {
-                #exp::typeItem<si32>(member, fn main()!)
-                #exp::typeItem<si32>(@item::function)
-                #exp::namespaceItem()
-                #exp::mixinItem()
-
-				#exp::hasItem<si32>("fn some(me: &)!")
-				#exp::hasItem<si32>(me)
-				userscope_contents(emeka)
-
-				#dir::line(#exp::mark(emeka))
-
-				item(@itemType::struct, "u8str", "member-functions")
-				itemlookup(@)
-				hasItem(@itemType::struct, "u8str", "fn #op+(type [me, me])")
-				\"inItemscope?"()
-				\"usesMixin?"
-
-				#exp::asStr(2*3)
-				#exp::asStr(me.size)
-				#exp::tostr(3 + 3 + 5)
-
-				#dir::mark(emeka) 2 * 3
-				#exp::tostr(#exp::mark(emeka))
-            }
-            : How to get callsite line number information?
-            {
-                fn somecall(){ log(#exp::callsite_line) }
-
-                A global array of all the line number location sites of the function, then a simple index to acess the info
-            }
-        }
+			A global array of all the line number location sites of the function, then a simple index to acess the info
+		}
     }
     : Lifetime tracking uniqueness
 	{
@@ -2900,12 +3187,13 @@ fn main()
     }
 	: Floating point number types gets renamed to real numbers
 	{
-		b32fp -> b32r
-		d32fp -> d32r
+		b32[fp] -> b32[r]
+		d32[fp] -> d32[r]
+
+		b16r, b32r, b64r, b128r
+		d32r, d64r, d128r, d512r
 	}
     : [struct], [union], [tuple] and [variant] would be introduced to replace the formers
-    : <arg> does not give any value, it is just parsed as an expression
-    : The member operator is the only operator whoose rhs must be an identifer
     : For object expression, when used in the construction of an object it's declaration, no matter if it is consists of many construction levels, it's constructor would only be called once for that object
     {
         [ type si32 x = type si32(34) ] same as [ type si32 x(34) ]
@@ -2935,6 +3223,13 @@ fn main()
     {
         - for objects, if an object can reference an overloaded function through its identifier, should objects with function type have the ability to
         overload themselves using <function_exp> as their source?
+		{
+			type [fn(si32)!, fn()!] x = [fn(type si32 _){}, fn(){}]
+			#exp::to<fn(si32)!>(x)
+			#exp::to<fn()!>(x)
+
+			In scenarios such as the above, it is impossible to differentiate between
+		}
         - For overloaded functions and function-objects with multiple call operator overloads, when guessing the function-type, how would that go
 
         : Big question to answer, what are functions, function-objects, call operator, objects that implement the call operator
@@ -2947,13 +3242,6 @@ fn main()
 
             infer x = fn<type t>()
         }
-
-        type (fn()!) x = fn(){} ``same with function overloading
-        type (fn(si32)!) x = fn(si32){}
-
-        ``Add to the stuff about functions
-
-        fn <type t>(type t:& _){}
     }
     : Lifetime tracking for both stack and heap allocated memory
     : Object construction and grouping syntax semantics
@@ -3227,15 +3515,10 @@ fn main()
         fn \"give"(type [si34, si89, si7] _ [_empty_, _empty_, 5.6₃`b32fp])
         {}
     }
-    : Think more about what and what can have from declaration-point visibilty in module or global scope scope
-    {
-        all declarations except object
-        [typespace] must be under it's type
-    }
     : Warn for dumb things like unnecessary enclosure like this [[[2, 3]], [2, 3], [2]] or (((3)))
         [2, [[2, 3], [4, 5]]] | [f, c]
     : Member operator needs to have a higher precedence than the call operator
-    : Delayed construction operator ':='
+    : Delayed initialization operator ':='
     : Identifier, how would [\"_construct_"] be equal to [_construct_] and [\"_"] be equal to [_]
     {
         : It is used to disambiguate between user and language defined use of reserved identifers
@@ -3245,6 +3528,48 @@ fn main()
         fn _cConstruct_() {}
         fn _destruct_() {}
     }
+	: All reserved identifiers
+	{
+		- userscope
+		- typescope
+		- mixin
+		- interface
+		- struct
+		- union
+		- enum
+		- unique
+		- infer
+		- type
+		- fn
+		- give
+		- break
+		- continue
+		- true
+		- false
+		- addressof
+		- memoryof
+		- and
+		- or
+		- xor
+		- not
+		- if
+		- else
+		- while
+		- do
+		- for
+		- rl
+		- match
+		- br
+		- use
+	}
+	: Context identifiers
+	{
+		- mut
+		- init
+		- move
+		- copy
+		- cleanup
+	}
     : [memoryof]
     {
         [memoryof] for reading the bits in memory of an object
@@ -3257,14 +3582,6 @@ fn main()
         (memoryof a) xor_eq (memoryof b)
         (memoryof b) xor_eq (memoryof a)
         (memoryof a) xor_eq (memoryof b)
-    }
-    : Arbitary integer bit sizes from i2 to i65536 2^16
-    : Pre and post condition entry for compiler communication level
-    {
-        fn normalization(type str:& x)!{ #dir::\"must be a give-value of"(is_valid_base) }
-
-        #dir::\"call this function first"(open)
-		#dir::arg_must_be_a_give_value_of()
     }
     : Solidify the type entry that require type prefix --[type <identifier> ':' <type-reference-extension>]
     {
@@ -3309,7 +3626,7 @@ fn main()
         - package system
         - compiler(JIT and AOT) configurations which needs serialization
     }
-	: Blog to write [C++'s Illusion of Immutability]
+	: Blog to write [C++'s and Java's Illusion of Immutability]
 	{
 		int const a{}
 
