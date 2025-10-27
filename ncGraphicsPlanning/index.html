@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Calculator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .calculator {
+            max-width: 400px;
+            width: 100%;
+            background-color: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+
+        .display {
+            width: 100%;
+            height: 4rem;
+            background-color: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 2.5rem;
+            text-align: right;
+            color: #1f2937;
+            font-weight: 600;
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .calc-button {
+            height: 4rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            color: #1f2937;
+            background-color: #e5e7eb;
+        }
+
+        .calc-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .calc-button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .operator {
+            background-color: #d1d5db;
+        }
+
+        .equals {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+
+        .clear {
+            background-color: #fca5a5;
+            color: #b91c1c;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="calculator">
+        <input type="text" id="display" class="display" value="0" disabled>
+        <div class="buttons-grid">
+            <button class="calc-button clear" data-action="clear">C</button>
+            <button class="calc-button operator" data-action="operator" data-value="/">&divide;</button>
+            <button class="calc-button operator" data-action="operator" data-value="*">&times;</button>
+            <button class="calc-button operator" data-action="operator" data-value="-">-</button>
+
+            <button class="calc-button" data-value="7">7</button>
+            <button class="calc-button" data-value="8">8</button>
+            <button class="calc-button" data-value="9">9</button>
+            <button class="calc-button operator" data-action="operator" data-value="+">+</button>
+
+            <button class="calc-button" data-value="4">4</button>
+            <button class="calc-button" data-value="5">5</button>
+            <button class="calc-button" data-value="6">6</button>
+            <button class="calc-button" data-value=".">.</button>
+
+            <button class="calc-button" data-value="1">1</button>
+            <button class="calc-button" data-value="2">2</button>
+            <button class="calc-button" data-value="3">3</button>
+            <button class="calc-button equals" data-action="equals">=</button>
+
+            <button class="calc-button" data-value="0">0</button>
+        </div>
+    </div>
+
+    <script>
+        // Get references to all the elements
+        const display = document.getElementById('display');
+        const buttonsGrid = document.querySelector('.buttons-grid');
+
+        // State variables for the calculator's logic
+        let firstOperand = null;
+        let secondOperand = null;
+        let currentOperator = null;
+        let displayValue = '0';
+        let waitingForSecondOperand = false;
+
+        // Function to update the display
+        function updateDisplay() {
+            display.value = displayValue;
+        }
+
+        // Function to handle number and decimal button clicks
+        function inputDigit(digit) {
+            // If we're waiting for the second operand, replace the display value
+            if (waitingForSecondOperand) {
+                displayValue = digit;
+                waitingForSecondOperand = false;
+            } else {
+                // Otherwise, append the digit, ensuring no leading zeros
+                displayValue = displayValue === '0' ? digit : displayValue + digit;
+            }
+            updateDisplay();
+        }
+
+        // Function to handle operator button clicks
+        function inputOperator(operator) {
+            // Parse the current display value as a float
+            const inputValue = parseFloat(displayValue);
+
+            // If an operator is already selected and we're not waiting for a second operand, calculate the result
+            if (currentOperator && !waitingForSecondOperand) {
+                const result = calculate(currentOperator, firstOperand, inputValue);
+                displayValue = String(result);
+                firstOperand = result; // The result becomes the first operand for the next calculation
+            } else {
+                // If it's the first operator, store the current display value as the first operand
+                firstOperand = inputValue;
+            }
+
+            // Store the new operator and set the flag to wait for the next number
+            currentOperator = operator;
+            waitingForSecondOperand = true;
+            updateDisplay();
+        }
+
+        // Function to perform the calculation
+        function calculate(operator, op1, op2) {
+            if (operator === '+') return op1 + op2;
+            if (operator === '-') return op1 - op2;
+            if (operator === '*') return op1 * op2;
+            if (operator === '/') return op1 / op2;
+            return op2; // Fallback for invalid operator
+        }
+
+        // Function to reset the calculator
+        function resetCalculator() {
+            displayValue = '0';
+            firstOperand = null;
+            currentOperator = null;
+            waitingForSecondOperand = false;
+            updateDisplay();
+        }
+
+        // Event listener for the entire button grid
+        buttonsGrid.addEventListener('click', (event) => {
+            const { target } = event;
+
+            // Check if the clicked element is a button
+            if (!target.matches('.calc-button')) {
+                return;
+            }
+
+            // Handle actions based on the button's data attributes
+            const action = target.dataset.action;
+            const value = target.dataset.value || target.textContent.trim();
+
+            if (action === 'clear') {
+                resetCalculator();
+                return;
+            }
+
+            if (action === 'operator') {
+                inputOperator(value);
+                return;
+            }
+
+            if (action === 'equals') {
+                if (currentOperator && firstOperand !== null && !waitingForSecondOperand) {
+                    const result = calculate(currentOperator, firstOperand, parseFloat(displayValue));
+                    displayValue = String(result);
+                    firstOperand = result; // The result becomes the first operand
+                    currentOperator = null; // Reset the operator for a new calculation
+                    waitingForSecondOperand = true;
+                    updateDisplay();
+                }
+                return;
+            }
+
+            // Handle number and decimal point
+            inputDigit(value);
+        });
+
+        // Initial display update
+        updateDisplay();
+    </script>
+
+</body>
+</html>

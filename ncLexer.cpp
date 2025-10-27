@@ -474,7 +474,7 @@ namespace Nc
             m_tokenString.assign(m_fileBuffer, formerFilePos, count);
         }
         
-        auto found_first_sequential = [&]()
+        /*auto found_first_sequential = [&]()
         {
             if (auto first_digit_seperator_index = m_tokenString.find('\''_u8); first_digit_seperator_index != U8string::npos)
             {
@@ -484,7 +484,7 @@ namespace Nc
                     break;
                 }
             }
-        };
+        };*/
 
 
         U8string baseAndLiteralType{};

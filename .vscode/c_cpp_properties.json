@@ -4,14 +4,15 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "/usr/local/boost_1_85_0"
+                "/usr/include/boost",
+                "/usr/include/c++/15.1.1/**"
             ],
             "defines": [
                 "_DEBUG",
                 "UNICODE",
                 "_UNICODE"
             ],
-            "compilerPath": "/usr/local/bin/g++",
+            "compilerPath": "/usr/sbin/g++",
             "cStandard": "c23",
             "cppStandard": "c++23",
             "intelliSenseMode": "linux-gcc-x64"

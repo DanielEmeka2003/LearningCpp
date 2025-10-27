@@ -11,15 +11,15 @@
             "problemMatcher": [],
             "group": {
                 "kind": "build",
-                "isDefault": true
+                "isDefault": false
             },
             "detail": "Debug Configuration"
         },
         {
             "type": "cppbuild",
-            "label": "build-config",
+            "label": "single-build-config",
             "command": "g++",
-            "args": [ "-std=c++23", "-g", "-ggdb", "-pedantic-errors", "-Wall", "-Werror", "-Wenum-compare", "-Iheader", "-I/usr/local/boost_1_85_0", "${file}", "-o", "${fileBasenameNoExtension}" ],
+            "args": [ "-std=c++23", "-g", "-ggdb", "-pedantic-errors", "-Wall", "-Werror", "-Wenum-compare", "-Iheader", "${file}", "-o", "${fileBasenameNoExtension}" ],
             "options": {
                 "cwd": "${fileDirname}"
             },

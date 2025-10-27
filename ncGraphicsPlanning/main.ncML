@@ -1,0 +1,221 @@
+@body {
+	@div class="calculator" {
+		@input type.text, (id, class)="display", value="0" {}
+		@button class="calc-button clear" {C} @button class="calc-button clear" {}
+	}
+}
+
+
+
+<body>
+	<div class="calculator">
+		<input type="text" id="display" class="display" value="0" disabled>
+		<div class="buttons-grid">
+			<button class="calc-button clear" data-action="clear">C</button>
+			<button class="calc-button operator" data-action="operator" data-value="/">&divide;</button>
+			<button class="calc-button operator" data-action="operator" data-value="*">&times;</button>
+			<button class="calc-button operator" data-action="operator" data-value="-">-</button>
+
+			<button class="calc-button" data-value="7">7</button>
+			<button class="calc-button" data-value="8">8</button>
+			<button class="calc-button" data-value="9">9</button>
+			<button class="calc-button operator" data-action="operator" data-value="+">+</button>
+
+			<button class="calc-button" data-value="4">4</button>
+			<button class="calc-button" data-value="5">5</button>
+			<button class="calc-button" data-value="6">6</button>
+			<button class="calc-button" data-value=".">.</button>
+
+			<button class="calc-button" data-value="1">1</button>
+			<button class="calc-button" data-value="2">2</button>
+			<button class="calc-button" data-value="3">3</button>
+			<button class="calc-button equals" data-action="equals">=</button>
+
+			<button class="calc-button" data-value="0">0</button>
+		</div>
+	</div>
+</body>
+
+
+>: Svelte
+
+<script>
+    // State variables for the calculator's logic
+    let displayValue = '0';
+    let firstOperand = null;
+    let operator = null;
+    let waitingForSecondOperand = false;
+
+    // Function to handle number and decimal button clicks
+    function handleNumber(digit) {
+        if (waitingForSecondOperand) {
+            displayValue = digit;
+            waitingForSecondOperand = false;
+        } else {
+            displayValue = displayValue === '0' ? digit : displayValue + digit;
+        }
+    }
+
+    // Function to handle operator button clicks
+    function handleOperator(op) {
+        const inputValue = parseFloat(displayValue);
+
+        if (operator && !waitingForSecondOperand) {
+            const result = calculate(operator, firstOperand, inputValue);
+            displayValue = String(result);
+            firstOperand = result;
+        } else {
+            firstOperand = inputValue;
+        }
+
+        operator = op;
+        waitingForSecondOperand = true;
+    }
+
+    // Function to perform the calculation
+    function calculate(op, op1, op2) {
+        if (op === '+') return op1 + op2;
+        if (op === '-') return op1 - op2;
+        if (op === '*') return op1 * op2;
+        if (op === '/') return op1 / op2;
+        return op2;
+    }
+
+    // Function to handle the equals button
+    function handleEquals() {
+        if (operator && firstOperand !== null && !waitingForSecondOperand) {
+            const result = calculate(operator, firstOperand, parseFloat(displayValue));
+            displayValue = String(result);
+            firstOperand = result;
+            operator = null;
+            waitingForSecondOperand = true;
+        }
+    }
+
+    // Function to reset the calculator
+    function handleClear() {
+        displayValue = '0';
+        firstOperand = null;
+        operator = null;
+        waitingForSecondOperand = false;
+    }
+</script>
+
+<div class="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8 font-sans">
+    <div class="max-w-md w-full bg-white rounded-3xl shadow-xl p-6 md:p-8">
+        <input
+            type="text"
+            class="w-full text-5xl md:text-6xl text-right bg-gray-50 rounded-2xl border-2 border-gray-200 p-4 mb-6 text-gray-800 font-bold tracking-tight focus:outline-none"
+            bind:value={displayValue}
+            readonly
+        />
+        <div class="grid grid-cols-4 gap-3 md:gap-4">
+            <button
+                class="col-span-1 p-5 md:p-6 text-2xl font-semibold bg-red-100 hover:bg-red-200 text-red-600 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={handleClear}
+            >
+                C
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-200 hover:bg-gray-300 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleOperator('/')}
+            >
+                &divide;
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-200 hover:bg-gray-300 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleOperator('*')}
+            >
+                &times;
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-200 hover:bg-gray-300 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleOperator('-')}
+            >
+                -
+            </button>
+
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('7')}
+            >
+                7
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('8')}
+            >
+                8
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('9')}
+            >
+                9
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-200 hover:bg-gray-300 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleOperator('+')}
+            >
+                +
+            </button>
+
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('4')}
+            >
+                4
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('5')}
+            >
+                5
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('6')}
+            >
+                6
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('.')}
+            >
+                .
+            </button>
+
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('1')}
+            >
+                1
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('2')}
+            >
+                2
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('3')}
+            >
+                3
+            </button>
+            <button
+                class="p-5 md:p-6 text-2xl font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={handleEquals}
+            >
+                =
+            </button>
+
+            <button
+                class="col-span-2 p-5 md:p-6 text-2xl font-semibold bg-gray-100 hover:bg-gray-200 rounded-2xl transition-all duration-200 transform hover:scale-105"
+                on:click={() => handleNumber('0')}
+            >
+                0
+            </button>
+        </div>
+    </div>
+</div>

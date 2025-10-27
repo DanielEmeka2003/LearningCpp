@@ -19,7 +19,7 @@ subsystem = sfml
 program_name = ncc
 
 ifeq ($(system), linux)
-includes = -Iheader -I/usr/local/boost_1_85_0
+includes = -Iheader
 rm = -rm
 endif
 
@@ -31,7 +31,7 @@ endif
 
 
 ifeq ($(program_name), fiftheenpuzzle)
-obj_files += point2d.o board.o fiftheenpuzzle.o u8char.o
+obj_files += board.o  point2d.o fiftheenpuzzle.o 
 target_dependacies += header/board.h header/point2d.h header/random.h header/fiftheenpuzzle.h header/u8char.h
 endif
 
@@ -58,7 +58,7 @@ nccTest: #target is no longer used
 	main main.nc && gcc -m32 assembly.s -o asm && asm
 
 intro:
-	@echo "\033[33;1;52mmake running\nCompiling package: { $(program_name) }\n───────────────────────────────────\033[0m"
+	@echo "\e[33;1;52mmake running\nCompiling package: { $(program_name) }\n───────────────────────────────────\e[0m"
 
 #Base Targets───────────────────────────────────────────────────────────────────────
 $(target): $(obj_files)

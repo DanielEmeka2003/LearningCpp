@@ -1,0 +1,440 @@
+: Nc decimal real numbers
+{
+	: Add support for nc decimal floating point 8 and 16 - in a later version of the language
+	: In nc decimal floating point implementation, what happens when a really small number is reduced significantly, does it yeild zero or not?
+	: Ask chat-gpt why underflow for IEEE binary floating-point literal constants are tolerated and rounded to zero in programming languages while overflow isn't?
+
+	```(txt)
+	Intermediate arithmetic base(10) digits requirements
+
+	- [Multiplication]:
+		lhs and rhs should be converted to the result's integer type when computing
+		prove: (9{max_real_part}²).digit_count()
+
+		b32fp(7+7 == 14 digits) -> si49
+		b64fp(16+16 == 32 digits) -> si109
+		b128fp(35+35 == 70 digits) -> si235
+		b256fp(73+73 == 146 digits) -> si488
+		b512fp(149+149 == 298 digits) -> si993
+
+	- [Division]:
+		- [lhs < rhs]: leading zeros are accounted for, we can prove it by using two methods
+		Only the lhs need the integer of such size
+
+		prove(1): (9{max_real_part-1} ÷ 9{max_real_part}).digit_count() + {implementation_precision+1}.digit_count()
+		lhs = 9{max_real_part-1}
+		lhs.digit_count() + {implementation_precision+1}.digit_count()
+
+		prove(2):
+		lhs = 1 ÷ 9{max_real_part}
+		1 + {number_of_leading} + {implementation_precision+1}
+
+		b32fp(7+8 = 15 digits) -> si50
+		b64fp(16+17 = 33 digits) -> si110
+		b128fp(35+36 = 71 digits) -> si236
+		b256fp(73+74 = 147 digits) -> si489
+		b512fp(149+150 = 299 digits) -> si994
+
+	- [Addition]:
+		{implementation_precision+1} + 1
+
+		b32fp(7+1+1 = 9 digits) -> si30
+		b64fp(16+1+1 = 18 digits) -> si60
+		b128fp(35+1+1 = 37 digits) -> si123
+		b256fp(73+1+1 = 75 digits) -> si250
+		b512fp(149+1+1 = 151 digits) -> si502
+
+	- [Subtraction]:
+		b32fp(7+1 = 8 digits) -> si27
+		b64fp(16+1 = 17 digits) -> si57
+		b128fp(35+1 = 36 digits) -> si120
+		b256fp(73+1 = 74 digits) -> si246
+		b512fp(149+1 = 150 digits) -> si499
+	```
+}
+: When it is time to write the backend, learn more about this alignment requirement for pointers that Zig has
+: When time comes, native syntax highlighting for nc-lang code when displaying compile errors -- Highlevel stuff
+: Imprecise compiler knowledge
+{
+	: Examples of precise and imprecise compiler knowledge
+	{
+		```(nc-lang)
+		fn push(type (&mut arrayList, &T) (self, elem)) {
+			if self.try_delay_init!(elem) {
+				give
+			} else {
+				infer capacity = (self*.capacity as r4 × 1.5'r4) as ui
+				infer temp = @arrayList<T>:with_capacity(capacity)
+				(&mut temp).copy((&self).iter())
+				(&mut temp).push(elem)
+				self = temp
+			}
+		}
+		```
+	}
+	: The language assumes the worst to information not available to it when checking language constraints (Under comptime)
+	{
+		- A runtime if conditional
+		- External functions
+
+		Example would be possible moves
+	}
+	- Declaration for external modules
+	{
+		- How would the compiler know if the following is deallocated or not
+		```
+		fn might_move(type &mut{*}ui32 x) {}
+		```
+	}
+}
+: Introduction of unit testing blocks [IMPORTANT]
+{
+	- When writing the compiler determine the best structure of unit testing needed
+}
+: Miscellaneous ideas
+{
+	- A touchscreen gamePad that rids the mess of button gamePads
+		Think of how dreadful it is to play all the PSP games, most especially ghost recon, and how amazing it is to play PUBG and COD
+	- SoftwareAds(more than github)
+		A platform that shows advertisement of software in different categories
+	- An app to put into pespertive how far distances are? Like the depth of an ocean, 1km, 1m, 1mile
+	- A program that lets me pick shapes, text and images by hand, using something like python's open cv
+	- Create a visual representation of IEEE binary floating-point using the SFML library
+}
+: Non-null types union data type creator optimization
+{
+	Because a Box is just a pointer to some location on the heap, it can be better to use Option<Box<T>> instead of Box<Option<T>>.
+	This is because the second one will allocate an Option<T> on the heap, while the first one will not. Additionally, Option<Box<T>>
+	and Box<T> are equally big (both are 8 bytes). This is because Rust knows that Box<T> can never be all zeros (i.e can never be the
+	null pointer), so it can use the all-0's state to represent the None case of Option<Box<T>>.
+
+	`type maybe[box[ui4]]`
+	```
+}
+: Warn for recursive functions that dosen't have a termination condition
+: Build system in my language
+{
+	: Look at the problem with building and running c++ code files with visual studio, it's a mess
+	{
+		: Find a solution that works for all languages and use this problem to figure out how to design your own make/cargo/cmake
+		: A way i can seemlessly make use of multiple [main] modules in the same [main] package
+	}
+}
+: Data structure userscope decision
+{
+	type (array, arrayList, singlyLinkedList, doublyLinkedList, queque, stack, heap, deque, bitset, hashSet, hashMap)
+}
+: I want the compiler to only accept the program to execute or an immediate program, the rest would set through it's config file
+: Formula that relates the dividend, divisor, quotient and remainder [divisor × quotient + remainder = dividend]
+: What I want when [\"nc-lang exit"] is called for something like a failed allocation
+{
+	For example a game that uses a singlyLinkedList to represent enemies and the player has reached a level where he/she is meant
+	to fight off 1 million enemies but they appear in a batch, so after every 100,000 enemies, but upon reaching the last batch, the
+	game tries to allocate the 900,100 enemy but allocation fails, instead of going to crashing in a violent mode, I would like the
+	game to go to crash gracefully mode, where whatever game state that needs to be saved is saved and the game shows the player a
+	message of calm detailing the reason for the crash and assure that game state is perseved regardless in either one of the following
+	ways:
+	1. The game tries to secure a nofitication/message window displaying the message
+	2. The game tries to store the message in a file to shown upon the next start of the game
+	3. The game sends the message to the user via a media such as social media message platforms or emails
+	4. The game performs all of the above for insurance
+
+	This is my plan for my language
+	But I believe operating systems automatically shutdowns processes with a failed allocation request, research that
+	I have had this experience first hand though with the linux kernel shutting down VScode, Brave and webapps because of no ram memory 
+}
+: Build system model?
+{
+	- Incremental parsing
+	- Because the parser's ast would be stored (i think 🫣)
+	Look at ncLog.h when modifying the file, it's dependencies have to be recompiled because they 'include' instead of 'importing'
+	it
+	But modification of serious things like an object name would warrant a recompile
+}
+: Priorities
+{
+	- Learning about allocators and how to integrate them in my language ✔
+	- Refining MARs(memory address references) semantics in relation with the introduction of owning MARs ✔
+	- Understanding runtime type introspection and it's uses via type erasure, serialization and standard data-type printing ✔
+	- Focusing more on the metadata that can be accessible via LCI like compileTime introspection and so much more ✔
+	- Understanding compileTime evaluation and all it's niches(specific areas of expertise) and naunces ✔
+	- Learning more about IO and how they would be implemented in my language, considering the claims that fast io makes
+	- How not to make an array of values default initializes every time due to the languages strict stance on memory safety ✔
+	- Implementing zero size types ✔
+	- Cleanup on abrupt end of the program ✔
+}
+: Check if rust does that annoyning stuff of this std::uint32_t(std::int8_t{-3}) [YES THEY DO]
+: Next features
+{
+	- Native Web-programming integration
+	- LCI compile time debugging and testing --to be investigated after [beta-version-0] comes out--
+	{
+		- only works when main is run at compile time
+		- similar to code explaination but on steriods
+	}
+	- Hot code reloading similar to VLang
+	- Concurrency model ?
+	- For self-hosting versions
+	{
+		- unicode
+		- unicode name and abbreivation escape sequences
+		- ncRegex
+		- table?
+		- package system
+		- JIT and AOT compiler version
+	}
+	- Async non-blocking IO
+	- Safe Concurrency (For concurrency model check Elixir and Erlang)
+	- Simd and Simd optimization
+	{
+		- What of this [simd] type?
+		- Simd operators
+		{
+			Instead of creating a new type to represent simd or applying them as part of niche optimizations which I would still do, why not
+			just incorprorate them as operators instead, that way their use makes it easily accessible, inituitive and ergonomic.
+
+			```(nc-lang)
+			[2, 3, 4] simd+ [3, 4, 5]
+			(2, 3, 4) simd+ (3, 4, 5) /# Can work with groupings apparently
+
+			/# They can be overloaded but only for types that are simd appropriate
+			```
+		}
+	}
+}
+: Rust's font-family used in the web, [open-sans, sans-serif]
+: Implement vscode's word search algorithm
+{
+	- A partial match search operation is performed leaving an array of possible matches
+	- The possible matches would be filtered based on it's identifier-item type
+	- The possible matches will also be filtered based on the full set of characters in the <word>
+	- The possible matches would them be sorted based on the L-R order the full set of characters appear in the <word>, the one
+	with the most L-R characters in order gets sorted first
+	
+	takerepthemlaallce
+	taKerepthemlaallce
+	takeepthemlaallce
+	relpa
+	repalce
+	max_real_part
+	containrpeoppliiace
+	containreoppliiace
+	containreplpliiacerrrrr
+	containreplacliiacerrrrr
+	[replace] or [eplace] or [an]
+
+	Math
+	Mhta
+	Mtah
+	mtha math mtah replcae rpelcae
+	- It checks this disparity between adjacent characters |charₙ| ↔️ |char
+}
+: Suggested spaces to broadcast my language
+{
+	- Reddit
+	- HackerNews
+	- Handmade
+	- YouTube
+	- [search for other programming spaces]
+}
+: TODOs --have nothing to do with code
+{
+	- Listen to Johnthan Blows talk
+	- Learn lisp
+	- Brillant site for learning mathematics and physics
+	: Read that pseudo-book on alignment you downloaded to the laptop
+	: Learn more about signal handling direct from Brain Wills vidoes
+}
+: Current regex cannot match the below
+{
+	"type [t:&, t:?, t:&*] x"
+	"t:*, t:&*, t:{*}"
+
+	: "t:..," or "t:.+,"  - all dosen't work
+	: " 't:' .+ ',' "	  - nc regex should be able to match
+}
+: Nc-documentEditor
+: Nc-codeEditor possible features
+{
+	- Snippets addition
+	- A feature that can perform actions like delete, copy, cut part of a line using the cursor as the start offset. It should be able
+	  to apply this feature to the left or right of the text
+	{
+		Example
+		You must be stupid to think that nc-lang is comparable to the likes of C/C++[cursor-pos], it is not your dumb bimbo
+	}
+	- A feature that allows pasting of text in folded sections without unfolding, it should provide like a view that it user can then
+	  locate where to paste the text
+	- Autocorrection in my editor for things like these [Language specific] ?
+	{
+		fn new(type &self me) { me.doctor ``-> me*.doctor }
+	}
+	- Subscripting numbers for base number entry [Language specific]
+	- A mode for writing text around selected text, like
+	- A way to refresh modified opened files
+	- The ability to transform certain characters or a group of characters
+	{
+		* -> ×
+	}
+	- Searching for a word across single and multiple lines like in helix
+	{
+		If a possible match for a searched word happens to be in a folded section, a sort of like preview would be use to display
+		the word instead of unwraping the entire thing like vscode does
+	}
+	- Keybinding for entering unicode characters by name and code
+	- Keybinding for a language server to allow the entry of language specific unicode characters
+	- Move a highlighted text by using the cursor to set the new position of the highlighted text
+	- Move a highlighted text in any direction by using the keys on the board
+	- Text commands
+	{
+		A way to add selection with text edit commands such jumping to the begin and end brace
+		select+find(end brace) | delete
+		delete(select + find(end brace))
+		An action history feature that stores previous actions on files along with thier text and state of the editor
+	}
+	- Implementation of autocompletion of my editor
+	{
+		- Let's say the user types a word and the sugggestions there are of different case, change the particular character that is of different case and suggest that word to the user
+		{
+			Cov - [but there is only coverage, so suggest it as Coverage] - Coverage
+		}
+		- [some different case] should not suggest [another different case]
+		{
+			t - [X] - T
+		}
+		- How would choosing symbols for end-to-end completion work
+		{
+			Example: entering '(' then ')' auto completes itself, same for ["]
+
+			In normal text mode, only brace symbols(expect '<' '>') should be used
+			In source code mode, it is choosen by the language
+
+			It also covers the symbols that performs end-to-end completion on selected text
+		}
+		- Replace the quotation marks with square braces and watch what happens '(' ')'
+		- Indentation of the file and moving between indentation like ctrl+home but selective
+		- Selecting words but with a different command than ctrl+d
+
+		- Vscode word search problem
+		{
+			(comptime) can match (compileTime) too ?
+			- I guess it's substring matching right, leaving me to wonder if i should support substring matching ?
+			(mathin) can match (matching) and (make_optional_handling_type)
+		}
+	}
+	- Performing actions on braces i.e matched braces set, like going to both ends and so on
+	{
+		- A way to toggle between [full-matches] and [contianed-matches]
+		Difference being
+		tysize- CM[(ty)pe(size)]
+		foriegn- CM[(for)|e||i|(gn)]
+
+		Chaining commands together(think also of chaining along with regex)
+
+		Simplified entry of symbols in nc- using the :<character name>
+	}
+	- A way to record actions and playback those actions either step by step or at once extacly like vim marcos
+	- A way to combine visual selection with common actions like going to the end of a brace thereby selecting it along the way
+	- Learn helix really well and incorprorate the features it has along with vscode's editing and UI features
+	- Pasting text with the added leading whitespace of the initial line
+	- Teleporting selected text to a particular line and/or column
+	- Bringing out the column number for selection functions like shift + mouse-click
+	- Moving line via keybindings like how test is moved via column shifting
+	- Go to the top and end of a file
+	- text/code editor features --study what makes vim and emacs so good then copy it, even it vscode--
+	- arbitrary selection of highlighted text starting from a start to end line: turns out vscode already has, depending on where the cursor is, hold shift down and click on an location you want
+	- movement of highlighted or focused text to arbitary locations: can be able to apply whitespace inducing keys on it
+	- bookmarking for highlighted or focused text and lines
+	- keybindings for spwaning and despwaning the sugggestion window: truns out vscode uses the escape key for it
+	- highlight lines with only whitespace and lines ith trailing whitespace
+	- backspace and delete would be set to remove a grapheme-cluster by default while shift+backspace gives the option of deleting par code-point
+	- move forward and backward between "words", similar to ctrl+d but performs a move action instead
+	- select a word, similar to ctrl+d
+	- combining nc regular expressions with selection --> i think vim does it
+}
+: Nc-BNF
+: Algorithmns for data-structures -- Would probably be implemented in the iterator contract anyway
+{
+	- shift_element_Left
+	- shift_element_Right
+	- count_sequential
+	- find_from : takes an index to start finding from, then returns the result plus the offset to get an accurate index
+	{
+		- drawbox_around_text::spacing needs it for handling of newline inputs
+		- in file ncLog.h slipt needs it to locate the delimeter(m)
+	}
+	- slipt_on
+	- during comparsion, a pair should be taken indicating the start position for comparsion for the two operands, similar to find_from
+	- find_first_sequential
+	- count_sequential_until_c_is_greater_than_n: \"count sequential until c > n"
+}
+
+
+
+
+
+[Notes]
+* Positional base agnostic precision arithmetic for integers
+* The convention of defining relational operators is to encourage defining only equality and lessthan
+* Imbedding of markup languages like html and styling languages like css in my language to be used in the web
+* Warn about function identifiers not being called
+* Moving should be the default instead of coying
+* When implementing unsigned addition, make it like this: max(lhs, rhs) - min(lhs, rhs); to prevent reckless overflow
+* When converting from a lesser signed to a greater unsigned integer, disregard the sign and perform a clean conversion
+{
+	(type int8 -> type uint32) != (type int8 -> type int32 -> type uint32)
+	but this:
+	(type int8 -> type uint32) != (type int8 -> type uint32)
+}
+* functions for integers
+{
+	- zero
+	- isPos
+	- mem_layout
+}
+* my own regex implementation that embodies clarity and brevity - inspired by EBNF
+{
+	- it's syntax won't be conventional
+	- it will support extraction without checking
+	- it give clear error messages if the syntax is wrong
+	- it will support error recording for the parts of strings that don't match ??
+	Find and replace
+	"emeka@cyril.com"
+	"<unicode:all_lang_alphabets> '@' ['gmail'|'hotmail'|'outlook'|'yahoo'] ['.'] 'com'|'n_com'"
+
+	match_str[1] = "nc_mail"
+	match_str[2] = "nc"
+}
+* my own list implementation that provides random access without that need of an internal array
+* document editor like microsoft word
+* Your opinon Your Identity - article to write
+* algorithm for reversing a string by swaping it
+{
+	fn swap_reverse(type slice<char> text) {
+		infer [begin, end] = [1`ui4, text.len]
+		while true: {
+			if end - begin == 0: ``condition to gaurd against odd text lengths, thereby preventing them from participating in the operation
+				break: 1
+
+			algorithm::swap(text.nth(begin), text.nth(end))
+
+			if end - begin == 1: ``condition to gaurd against even text lengths, thereby exiting the loop after the operation has be carried out
+				break: 1
+
+			begin += 1
+			end -= 1
+		}
+	}
+}
+_______________________________________________________________________________________________________________________________________________
+
+*11110000 10011111 10001100 10111001
+*            11111   001100   111001 -> correct
+*            11111     1100 00111001 -> wrong
+*
+*
+*[11110]000 [10]011111 [10]001100 [10]111001
+
+true or false and true or false
+(true or (false and true)) or false :[ C/C++ parse]
+true or (false and (true or false)) :[ nc parse ]

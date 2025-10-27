@@ -1,0 +1,457 @@
+<'
+	Format specification
+	{
+		@format = '$' (@indexEntry|@expEntry) '='?
+		@indexEntry = '{' @integerNumberLiteralToken+ '}'
+		@expEntry = '(' @expressionItem ')'
+	}
+'>
+
+>! Fix error reporting because it is shit
+>! Slipt into other marcos bro
+marco mainFormatter[type (FormatString, ..Params, RFormatString)]
+	(
+		'at:comptime
+		obj (
+			lineInfo: ui = 'exp:line(),
+			columnInfo: integerEndInclusiveRange[ui1] = 'exp:column(),
+			modInfo: &str = 'exp:mod(),
+			pkgInfo: &str = 'exp:pkg(),
+			format: FormatString,
+		)
+		obj ..params: ..Params
+	) RFormatString
+apply
+	FormatString impls unicode_string and
+	RFormatString impls dyn_unicode_string and
+	'exp:isArgumentResultOfExp(~> lineInfo, ~> 'exp:line()) and
+	'exp:isArgumentResultOfExp(~> columnInfo,  ~> 'exp:column()) and
+	'exp:isArgumentResultOfExp(~> modInfo, ~> 'exp:module_name()) and
+	'exp:isArgumentResultOfExp(~> pkgInfo, ~> 'exp:package_name()) and
+	not format.isEmpty()
+{
+	obj mut result: RFormatString()
+	'at:comptime unit {
+		obj mut beginCharPosition = 1'ui1
+		obj callerLineContent = 'exp:modLineContent(pkgInfo, modInfo, lineInfo, columnInfo)
+		obj mut (varaidic_index_default, varaidic_index) = 0'ui
+		obj mut consumed_varaidic_indexes: hashSet[ui]()
+		obj mut unconsumed_varaidic_indexes: arrayList[ui1]()
+	}
+
+	'at:run
+	while obj charIterator = &format.iter().into_slient_count_iterator(); {.a
+		charIterator.next() => some {
+			if some not eq '$' {
+				-> .a continue
+			}
+
+			charIterator.next() => some {
+				match some with '\{Left Curly Bracket}' {
+					>! When a string like the following is given `"${}${}"`, `charIterator.charPosition()-1` now points to
+					>! the second `$` which would make `beginCharPosition` and `charIterator.charPosition()-1` have the same
+					>! values and when both the `start` and `end` have the same values in an
+					>! `integerEndExclusiveRange`, the resulting distance is zero, so a null slice would be
+					>! created and push, which in effect does nothing, which is the desired result.
+					result.push_unicode_string(format.slice(beginCharPosition~.charIterator.charPosition()-1))
+
+					charIterator.next() => some {
+						if some eq '\{Right Curly Bracket}' {
+							varaidic_index_default += 1
+							varaidic_index = varaidic_index_default
+						}else {
+							@ui2:from_characterIterator(&charIterator) => ok {
+								varaidic_index = ok
+
+								charIterator.next() => some {
+									if not some eq '\{Right Curly Bracket}' {
+										>! Error reporting
+										comptime_panic("Expected the `\{Right Curly Bracket}` character, but instead found this character `", some, '`')
+									}
+								}else {
+									>! Error reporting
+									comptime_panic("After a successful integer was parsed, I expected the terminating `\{Righ Curly Bracket}` charater not the end of the string")
+								}
+							}|err {
+								>! Error reporting
+								comptime_panic("The following error was encountered while parsing for an integer number literal token in the format integer number literal token entry [", err.message(), ']')
+								err.suggestPossibleFix() => some {
+									comptime_print(some, '\n')
+								}
+							}
+						}
+
+						consumed_varaidic_indexes.insert(var)
+					}else {
+						>! Error reporting
+						comptime_panic("End of string was reached before the terminating character `\{Right Curly Brace}` for format integer number literal token entry was found")
+					}
+
+					if varaidic_index eq 0 {
+						>! Error reporting
+						comptime_panic("In integer format entry, the integer given is zero which is invalid")
+					}|varaidic_index gt params.size {
+						>! Error reporting
+						comptime_panic("In integer format entry, the integer given is greater than the varaidic size")
+					}
+
+					>! This is the only optional `charIterator` advance that is an optimistic search for
+					>! additional format entry and has the sole purpose of updating the `beginCharPosition`
+					>! if found or not. As such, `beginCharPosition` is updated in a way that prevents capturing
+					>! when the end of the string is reached.
+					charIterator.next() => some {
+						if some eq '=' {
+							>! Advance the `beginCharPosition` to the character after the end of the format
+							>! entry, this operation is not checked to see if `charIterator.charPosition()` points to the last
+							>! character in the string because it is desired behaviour that if the end of string
+							>! is reached, `beginCharPosition` should be greater than `charIterator.charPosition()` by one.
+							beginCharPosition = charIterator.charPosition() + 1
+							obj argument_column = 'exp:argument_column(~> params.[varaidic_index])
+							obj argument_string = callerLineContent$.slice(argument_column)
+
+							result.push_unicode_string(argument_string)
+							result.push_unicode_string(" = ")
+						}else {
+							beginCharPosition = charIterator.charPosition()
+							obj _ = charIterator.prev()
+						}
+					}else {
+						>! This is needed because it is desired behaviour for `beginCharPosition` to be greater
+						>! than `charIterator.charPosition()` by one when end of string is reached.
+						beginCharPosition = charIterator.charPosition() + 1
+					}
+
+					if @'ty:type_of(~> params.[varaidic_index]) impls display {
+						result.push_unicode_string(params.[varaidic_index].contract(display):display())
+					}else {
+						>! Error reporting
+						comptime_panic("The type of this argument does not implement the display contract")
+					}
+				}|'\{Left Parenthesis}' {
+					>! When a string like the following is given `"${}${}"`, `charIterator.charPosition()-1` now points to
+					>! the second `$` which would make `beginCharPosition` and `charIterator.charPosition()-1` have the same
+					>! values and when both the `start` and `end` have the same values in an
+					>! `integerEndExclusiveRange`, the resulting distance is zero, so a null slice would be
+					>! created and push, which in effect does nothing, which is the desired result.
+					result.push_unicode_string(format.slice(beginCharPosition~.charIterator.charPosition()-1))
+
+					charIterator.next() => some {
+						obj previous_charPosition = charIterator.charPosition()
+
+						'exp:parseForExp(&charIterator) => ok {
+							charIterator.next() => some {
+								if some not eq '\{Right Parenthesis}' {
+									>! Error reporting
+									comptime_panic("Expected the `\{Right Parenthesis}` character, but instead found this character `", some, '`')
+								}
+
+								obj expression_string = format.slice(previous_charPosition~.charIterator.charPosition())
+
+								>! This is the only optional `charIterator` advance that is an optimistic search
+								>! for additional format entry and has the sole purpose of updating the
+								>! `beginCharPosition` if found or not. As such, `beginCharPosition` is updated
+								>! in a way that prevents capturing when the end of the string is reached.
+								charIterator.next() => some {
+									if some eq '=' {
+										>! Advance the `beginCharPosition` to the character after the end of the
+										>! format entry, this operation is not checked to see if `charIterator.charPosition()`
+										>! points to the last character in the string because it is desired
+										>! behaviour that if the end of string is reached, `beginCharPosition`
+										>! should be greater than `charIterator.charPosition()` by one.
+										beginCharPosition = charIterator.charPosition() + 1
+										result.push_unicode_string(expression_string)
+										result.push_unicode_string(" = ")
+									}else {
+										beginCharPosition = charIterator
+										obj _ = charIterator.prev()
+									}
+								}else {
+									>! This is needed because it is desired behaviour for `beginCharPosition`
+									>! to be greater than `charIterator.charPosition()` by one when end of string is reached.
+									beginCharPosition = charIterator.charPosition() + 1
+								}
+
+								obj expression = 'exp:from_string(expression_string)
+								if @'ty:type_of(~> expression) impls display {
+									result.push_unicode_string(expression.contract(display):display())
+								}else {
+									>! Error reporting
+									comptime_panic("The type of this argument does not implement the display contract")
+								}
+							}else {
+								>! Error reporting
+								comptime_panic("After a successful expression was parsed, I expected the terminating `\{Righ Parenthesis}` charater not the end of the string")
+							}
+						}err {
+							>! Error message
+							comptime_panic("The following error was found when parsing for an expression", err.message())
+						}
+					}else {
+						>! Change Error Reporting
+						comptime_panic("End of string was reached before the terminating character `\{Right Parenthesis}` for format expression entry was found")
+					}
+				}else {
+					if some not eq '$' {
+						charIterator.prev()
+					}
+				}
+			}else {}
+		}else {
+			>! This is done because `beginCharPosition` is expected to be one greater than `charIterator.charPosition()` by
+			>! one when end of string is reached. When `beginCharPosition` updates itself after a format entry
+			>! is found, it points to the fictional character after the terminating format character i.e
+			>! '\{Right Curly Bracket}' or '{Right Parenthesis}' and '=' if any is found, this is used as a
+			>! signal to not attempt to push.
+			if beginCharPosition lt or eq charIterator.charPosition() {
+				result.push_unicode_string(format.slice(beginCharPosition~charIterator.charPosition()))
+			}
+			-> .a break
+		}
+	}
+
+	>! Populate `unconsumed_varaidic_indexes` and error report if there are any unconsumed varaidic indexes
+	'at:run
+	{
+		obj consumed_varaidic_indexes_iter = &consumed_varaidic_indexes.iter()
+		obj mut previous_varaidic_consumed_index = consumed_varaidic_indexes_iter.next()
+
+		for consumed_varaidic_index in consumed_varaidic_indexes_iter {
+			if consumed_varaidic_index - previous_varaidic_consumed_index gt 1 {
+				for unconsumed_varaidic_index in previous_varaidic_consumed_index+1 ~. consumed_varaidic_index {
+					unconsumed_varaidic_indexes.push(unconsumed_varaidic_index)
+				}
+			}
+			previous_varaidic_consumed_index = consumed_varaidic_index
+		}
+
+		if unconsumed_varaidic_indexes.isEmpty() {
+			obj unconsumedVaraidicParameterArgumentColumns = @array[integerEndExclusiveRange[ui]]:with_capacity(unconsumed_varaidic_indexes.size)
+			obj argument_column: integerEndExclusiveRange[ui]()
+
+			for unconsumed_varaidic_index in unconsumed_varaidic_indexes {
+				argument_column = 'exp:argument_column(~> param.[unconsumed_varaidic_index])
+				unconsumedVaraidicParameterArgumentColumns.capacity_push(argument_column)
+			}
+
+			>! Error reporting
+			comptime_panic("Ahem, some varaidic arguments were not consumed! I would show them which I do have the info for `unconsumedVaraidicParameterArgumentColumns`, but I am too freaking lazy right now 👀 ☠️")
+		}
+	}
+
+	-> result
+}
+
+>! the contiguous data in unicode strings.
+>! Unicode string must be a contiguous iterator
+>! Remember that variadics can be iterated through and the give the actual parameter
+>! Static arrays are indeed category-2 specials
+
+>! -------------------------------------------------------------------------------------------------------
+<'
+	[Check this out]
+
+	struct baseType[type T]
+
+	scope[type T] @baseType[T] =
+	marco r:type() 'ty:unavailable {
+		if isValueDefTypeCreator[T]() {
+			-> obj: T:BaseType()
+		}
+		-> obj: T()
+	}
+	end @baseType scope
+
+	unique bits[type T] apply isUnsignedInteger[T]() or 'exp:whichTypeCreator[T](@type_creator.r:valueDef) =
+	'ty:type_of(~> obj: baseType[T]().r:type())
+'>
+
+'at:comptime
+marco mainType[type T]() type {
+	if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
+		-> _ @T:BaseType
+	}
+	-> @T
+}
+
+'at:comptime
+marco bits_type_constraint[type T]() bool {
+	-> (
+		'exp:whichTypeCreator[T](@type_creator.r:valueDef)
+		and
+		(
+			>: If the type is of valueDef type creator origin, it checks for two things, first, if the
+			>: bit-width is within the maximum allowed bit-width for the bits type which is 256-bits or
+			>: 32-bytes, second, if the value count of the valueDef type-creator is within the base-type's
+			>: bit-width, because the number of values cannot surpass the bit-width
+			@T:BaseType:bit_width not gt 256 and not gt @T:value_count
+		)
+	)
+	or (
+		>: If it is an unsigned integer, it checks if the bit-width is within the maximum allowed bit-width for
+		>: the bits type which is 256-bits or 32-bytes
+		@T eq @ui1 or eq @ui2 or eq @ui4 or eq @ui8 or eq @ui16 or eq @ui32
+	)
+}
+
+'at:comptime
+marco bits_position_type_constraint[type (BitType, Position)]() bool {
+	-> if 'exp:whichTypeCreator[Position](@type_creator.r:valueDef) {
+		@Position eq @BitType
+	}else {
+		>! @Position eq @ui1 or eq @ui2 or eq @ui4 or eq @ui8 or eq @ui16 or eq @ui32
+		match @BitType with @ui1 {
+			@Position eq ui1_shift_integer
+		}|@ui2 {
+			@Position eq ui2_shift_integer
+		}|@ui4 {
+			@Position eq ui4_shift_integer
+		}|@ui8 {
+			@Position eq ui8_shift_integer
+		}|@ui16 {
+			@Position eq ui16_shift_integer
+		}|@ui32 {
+			@Position eq ui32_shift_integer
+		}else
+	}
+}
+
+'at:restrict_primary_object_constructor
+unique bits[type T] apply bits_type_constraint[T] = [mainType[T]()]
+
+>! [both valueDef and unsigned integers start from 0]
+scope[type T] @bits[T] =
+marco 'default() bits[T] {
+	-> obj: bits[T](obj: [mainType[T]()]())
+}
+
+marco set[type Position](obj mut self: bits[T], 'at:pseudo_comptime obj ..positions: Position) !
+apply bits_position_type_constraint[T, Position]() {
+	'at:comptime
+	obj primary_bits: [mainType[T]()] = 0000_0001₂
+
+	'at:run if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
+		'at:pseudo_run
+		for position in positions {
+			'exp:de_unique(self) = 'exp:de_unique(self) or (primary_bits << position.toInternalRepresentation())
+		}
+	}else {
+		'at:pseudo_run
+		for position in positions {
+			'exp:de_unique(self) = 'exp:de_unique(self) or (primary_bits << position)
+		}
+	}
+
+	<'
+		Due to the `positions` being pseudo_run, the following expressions are ran at comptime if `positions`
+		turns out to be comptime:
+		[1] `(primary_bits << position.toInternalRepresentation())`
+		[2] `(primary_bits << position)`
+	'>
+}
+
+marco set_all[type Position](obj mut self: bits[T]) !
+apply bits_position_type_constraint[T, Position]() {
+	'exp:de_unique(self) = 'exp:de_unique(self) or @[mainType[T]]():max
+}
+
+marco unset[type Position](obj mut self: bits[T]) !
+apply bits_position_type_constraint[T, Position]() {
+	'todo
+}
+
+marco unset_all[type Position](obj mut self: bits[T]) !
+apply bits_position_type_constraint[T, Position]() {
+	'todo
+}
+
+marco test[type Position](obj self: bits[T], 'at:pseudo_comptime obj position: Position) bool
+apply bits_position_type_constraint[T, Position]() {
+	'at:comptime
+	obj primary_bits: [mainType[T]()] = 0000_0001₂
+
+	-> 'at:run if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
+		'exp:de_unique(self) and (primary_bits << position.toInternalRepresentation())
+	}else {
+		'at:pseudo_run
+		if position+1 gt @T:bit_width {
+			panicf("The position($(position)) is greater than the available bits which is 32, but remember bit count starts from 0, so it's 0~31 which is still 32 bits")
+		}
+		'exp:de_unique(self) and (primary_bits << position)
+	}#bool
+}
+
+marco flip[type Position](obj self: bits[T], 'at:pseudo_comptime obj ..positions: Position) !
+apply bits_position_type_constraint[T, Position] {
+	'at:comptime
+	obj primary_bits: [mainType[T]()] = 0000_0001₂
+
+	'at:run if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
+		'at:pseudo_run
+		for position in positions {
+			'exp:de_unique(self) = 'exp:de_unique(self) xor (primary_bits << position.toInternalRepresentation())
+		}
+	}else {
+		'at:pseudo_run
+		for position in positions {
+			'at:pseudo_run
+			if position+1 gt @T:bit_width {
+				panicf("The position($(position)) is greater than the available bits which is 32, but remember bit count starts from 0, so it's 0~31 which is still 32 bits")
+			}
+			'exp:de_unique(self) = 'exp:de_unique(self) xor (primary_bits << position)
+		}
+	}
+}
+
+marco flip_all[type Position](obj mut self: bits[T]) !
+apply bits_position_type_constraint[T, Position]() {
+	'exp:de_unique(self) = 'exp:de_unique(self) xor @[mainType[T]()]:max
+}
+
+struct bitsIterator = obj (data: bits[T], position: ui1)
+
+scope @bitsIterator =
+impl iterator[bool] =
+fn next(obj self: mut&bitsIterator) maybe[bool] {
+	-> if (self$.position + 1) not gt @[mainType[T]()]:bit_width {
+		obj old_position = self$.position
+		self$.position += 1
+		obj: maybe(self$.data.test(old_position))
+	}else
+}
+end impl
+end @bitsIterator scope
+
+marco iter(obj self: bits[T]) bitsIterator {
+	obj: bitsIterator(self, 0)
+}
+end @bits scope
+
+>! -------------------------------------------------------------------------------------------------------
+contract[type Self] iterator[type Item] =
+fn next(obj self: mut&Self) maybe[Item]
+
+marco filter[type Fn](obj (self: Self, fcn: Fn)) filter[Self, Fn] apply @Fn impls fn(Item)bool {
+	-> obj: filter(&self, fcn)
+}
+marco map[type (Fn, Output)](obj (self: Self, fcn: Fn)) map[Self, Fn] apply @Fn impls fn(Item)Output {
+	-> obj: map(&self, fcn)
+}
+end contract
+
+>! -------------------------------------------------------------------------------------------------------
+>: Change the implementation to the updated one
+>! Check out the new type creator API
+>! The new should be in the part about ncDRL
+contract[type Self] display =
+fn display[type UnicodeString](obj self: &Self) UnicodeString apply @UnicodeString impls dyn_unicode_string {
+	'todo
+}
+end contract
+
+contract[type Self] to_NcDRL
+end contract
+
+<"
+	ncDRL is different from display
+	Example: ncDRL of character `a` would be `'a'` while display of character `a` would just be `a`
+">

@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(gdb) Launch",
+            "name": "Nc-lang (gdb)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/main",
@@ -28,7 +28,7 @@
             "preLaunchTask": "make-build-config"
         },
         {
-            "name": "(gdb) for single",
+            "name": "Normal (gdb)",
             "type": "cppdbg",
             "request": "launch",
             "program": "${fileDirname}/${fileBasenameNoExtension}",
@@ -51,7 +51,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "build-config"
+            "preLaunchTask": "single-build-config"
         }
     ]
 }

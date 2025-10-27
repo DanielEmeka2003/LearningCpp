@@ -1,0 +1,96 @@
+NcBNF is whitespace independent
+Instead of ncBNF, why not just use ncRegex, since they are essentially the same thing
+So, I am going to move ncRegex here
+
+: @? = '?'
+{
+	- @?	: represents a named-subsitution-tag
+	- `=` 	: is the euqal symbol character
+	- '?'	: single-quotes used for writing any number of unicode character(s) used when matching
+}
+: Operators are parsed from left to right
+{
+	- Postfix operators
+	{
+		- '?'+ 			: expects one or more of the operand
+		- '?'* 			: expects zero or more of the operand
+		- '?'?			: expects zero or one of the operand
+		- '?'{?}		: expects exactly ? of the operand, replaced with n,n₀,n₁,... expects the same number of another curly brace operator that has an identical n,n₀,n₁,...
+		- '?'{?,}		: expects exactly ? or more of the operand, replaced with n,n₀,n₁,... expects the same number of another curly brace operator that has an identical n,n₀,n₁,...
+		- '?'{?₁, ?₂}	: expects ?₁ to ?₂ of the operand, replaced with n,n₀,n₁,... expects the same number of another curly brace operator that has an identical n,n₀,n₁,...
+	}
+	- Binary operators
+	{
+		- '?₁' | '?₂'	: either ?₁ or ?₂ is expected
+		- '?₁' ~ '?₂'	: creates a range from the unicode character code point which would match any character that is within that range
+	}
+	- Special independent symbols
+	{
+		- `.`	:  matches unicode character
+	}
+	- Encolusre operators
+	{
+		- (?₁, ?₂, ?ₙ)	:	Predence operator
+	}
+	- Idea of how `|` works and any other binary operator
+	{
+		- 'emeka' 'daniel'|'Johnthan' 	=> 'emeka' ('daniel' | 'Johnthan')
+		- ('emeka' 'daniel')|'Johnthan' => ('emeka' 'daniel') | 'Johnthan'
+	}
+}
+
+: Nc-regex
+{
+	- An expression that considers anything inside a match and another that does the exact opposite
+	([a-z1-9_]+):(struct|union|enum|nil)
+	$[$identifier()$+] : $[struct|union|enum|nil]
+
+	*	nil:si32\n
+	*	struct:book;page_number:si16;book_colour:colour\n
+	*	union:anything;si32;si512;si2084;d32r;b64\n
+	*	enum:even_numbers;(si8);two:2;four:4;six:6;eight:8;ten:10\n
+	*	struct:novel;(book);book_edition:edition;accolades:d_array<accolades>\n
+
+	regex"\#(
+		@nc_identifier = \"$(unicode, min~max)$*"|$<identifier>$*
+		@varaint1 = $[$nc_identifier] ${: $[$nc_identifier|$(number)]}$*
+		@variant2 = $[($nc_identifier ,$nc_identifier$*)]
+
+		$[$[struct|union|enum|nil] : $[$nc_identifier]] ; $[$varaint1*|$variant2]
+	)#
+	"
+	$...
+
+	@nc_identifier = ('\"' <unicode: mix, max> '"')*|<identifer>*
+	[['struct'|'union'|'enum'|'nil'] ':' [nc_identifier]] ';' ... [nc_identifier] (':' [nc_identifier|<number>])*
+
+	: Nc regex
+	{
+		there should be a contains and match to prevent things like that normalization regex and
+
+		ncregex" 'p' ".match("casper perl polygon p") ``[p]
+		ncregex" 'p' ".imatch("casper perl polygon p") ``[perl] [polygon] [p]
+		ncregex" 'p' ".search("casper perl polygon p") ``[casper] [perl] [polygon] [p]
+		'p'.
+		'p' <identifier>.
+	}
+	- Nc regular expressions compromises of two languages
+	{
+		- match language
+		- replace language
+
+		"
+		if $[1] & $[2] eq 'marco function'{
+			-> $[2] $[1]
+		}or $[3] & $[4] eq 'Marco function' {
+			-> toUpperCase($[4]) toLowerCase($[3])
+		}
+		"
+	}
+	- Addtion of
+	{
+		'#'emeka'#'
+		`'`
+		`'emeka' 'daniel'`
+	}
+}

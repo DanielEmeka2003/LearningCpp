@@ -158,7 +158,7 @@
     "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.default.cppStandard": "c++23",
     "C_Cpp.default.cStandard": "c23",
-    "C_Cpp.default.compilerPath": "C:\\Program Files\\mingw64\\bin\\g++.exe",
+    "C_Cpp.default.compilerPath": "/usr/sbin/g++",
     "C_Cpp.intelliSenseMemoryLimit": 4296,
     "C_Cpp.autocompleteAddParentheses": true,
     "C_Cpp.autocomplete": "default",
@@ -172,7 +172,8 @@
     "editor.fontWeight": "520",
     "editor.fontSize": 15,
     "python.analysis.typeCheckingMode": "basic",
-    "editor.fontFamily": "'Noto Mono Regular', 'cascadia code', monospace, consolas",
+    "editor.fontFamily": "Source Code Pro, Monospace, Consolas, Fira Mono, JetBrains Code",
     "makefile.configureOnOpen": false,
+    "editor.fontLigatures": true,
 }
 
