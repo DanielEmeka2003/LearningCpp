@@ -39,123 +39,12 @@
 	for bit in x.iter() {
 		printf("{x#ui1}")
 	}
+	(x as obj)()
+	(x as fn)()
+	x#fn
 	bit.count_if(fn(obj x: bool){-> x}) >! Count if the bits are set
 	bit.count_if(fn(obj x: bool){-> not x}) >! Count if the bits are not set
 "/
-
-
-fn marco format<type T..>(#at:comptime type str u8str, type T.. args) {
-	#at:comptime_eval
-	if u8str.size == 0:
-	static_write("String is empty, pls fill")
-
-	#at::comptime
-	infer [str, variadic_size, variadic_pos_set] = [type str(u8str), #exp::variadic_size(args), type set<ui8>()]
-
-	#at::eval
-	for type ui32 [old_i: mut, variadic_pos: mut](1); i: (.end= void)
-	{
-		#at::inline:eval
-		fn \"just found %"() --[i] dosen't need updating--
-		{
-			pseudo_write(type slice<char>(str, old_i ~ (i-1)))
-			pseudo_write(#exp::variadic_access(args, variadic_pos))
-
-			variadic_pos += 1
-			old_i = i+1 ``forward skip %
-			variadic_pos_set.push_back(variadic_pos)
-		}
-
-		``Atleast one branch in branch statement i.e in coverage of the loop must break from either the parent loop or the both parent and child loops
-
-		if str(i, control) =>{if old_i < str.size: pseudo_write(type slice<char>(str, old_i ~= str.size)) break: 1} == '%':
-		{
-			i += 1
-
-			match str(i, control) =>{\"just found %"() break: 1}
-			{
-				br('<square>')
-				{
-					pseudo_write(type slice(str, old_i ~= (i-2)`*backwards skip of % and <square>*`))
-
-					[i, old_i] = [i+1, i] ``Skipping <square> by incrementing [i]
-
-					do
-					{
-						match str(i, control): [_, i]
-						{
-							br<out_of_bounds_error> {static_write("EOS reached but <square> was never found") continue: 1}
-							br<char>
-							{
-								if not i.isDigit(10):
-								{
-									if to<char>(i) != '<square>':
-									{
-										static_write("Right <square> was expected instead of this [", to<char>(i), ']') continue: 1
-									}
-									else if old_i == i: ``i.e if the no custom variadic number was found
-									{
-										static_write("No number literal was given! WHY?") continue: 1
-									}
-
-									break: 2
-								}
-							}
-						}
-
-						i += 1
-
-						//if not str(i, control)=>{static_write("EOS reached but <square> was never found") break: 2}.isDigit(10):
-						//break: 2
-					}
-
-					infer custom_variadic_pos = type ui8(type slice(str, old_i ~ i)) =>(err){static_write("Custom varg is errorneous:", err) continue: 1}
-
-					if custom_variadic_pos > variadic_size:
-					{
-						static_write("Custom variadic pos (i.e variadic position given) is > variadic size:", custom_variadic_pos, '>', variadic_size)
-						continue: 1
-					}
-
-					variadic_pos_set.push_back(custom_variadic_pos)
-
-					//to prevent something like this: pseudo_writef("%meka %(2) %(2)", 'E', daniel)
-
-					pseudo_write(#exp::variadic_access(args, variadic_pos))
-					old_i = i+1 ``forward skip of right <square>
-				}
-				br('<curly>')
-				{
-					pseudo_write(type slice(str, old_i ~= i-2`*backward skip of %<curly>*`))
-
-					[i, old_i] = [i+1, old_i] ``skipping <curly> by incrementing [i]
-
-					while not (str(i, control) =>{static_print("EOS reached but left <curly> was not found") continue: 1} != '<curly>'):
-					i += i
-					else
-					{
-						static_write("No expression was given! WHY? Curly brace content is zero")
-						continue: 1
-					}
-
-					pseudo_write(#exp::\"str->code"(#at::comptime type slice(str, old_i~i)) =>(err){static_write(err) continue: 1})
-					old_i = i+1 ``forward skip right <curly>
-				}
-				br('*') pseudo_write(type slice(str, old~i)) //write % without '*' "%*"
-				br() \"just found %"()
-			}
-		}
-	}
-
-	if variadic_pos_set != 1 ~= variadic_size:
-	static_write(variadic_size - variadic_pos, "variadic argument(s) given to pseudo_writef are not formatted:")
-
-	#at::comptime
-	for i: (variadic_pos, variadic_size)
-	{
-		static_write(#exp::parameter_arg_asStr(#exp::variadic_access(args, i)))
-	}
-}
 
 fn r"[[Ideas]]" {
 

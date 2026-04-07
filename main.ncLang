@@ -1,14 +1,15 @@
 <'
 	Format specification
 	{
-		@format = '$' (@indexEntry|@expEntry) '='?
-		@indexEntry = '{' @integerNumberLiteralToken+ '}'
-		@expEntry = '(' @expressionItem ')'
+		format = '$' indexEntry|expEntry '='?
+		indexEntry = '{' integerNumberLiteralToken+ '}'
+		expEntry = '(' expressionItem ')'
 	}
 '>
 
 >! Fix error reporting because it is shit
 >! Slipt into other marcos bro
+>! Rewrite this entire thing
 marco mainFormatter[type (FormatString, ..Params, RFormatString)]
 	(
 		'at:comptime
@@ -246,187 +247,10 @@ apply
 >! Remember that variadics can be iterated through and the give the actual parameter
 >! Static arrays are indeed category-2 specials
 
->! -------------------------------------------------------------------------------------------------------
-<'
-	[Check this out]
-
-	struct baseType[type T]
-
-	scope[type T] @baseType[T] =
-	marco r:type() 'ty:unavailable {
-		if isValueDefTypeCreator[T]() {
-			-> obj: T:BaseType()
-		}
-		-> obj: T()
-	}
-	end @baseType scope
-
-	unique bits[type T] apply isUnsignedInteger[T]() or 'exp:whichTypeCreator[T](@type_creator.r:valueDef) =
-	'ty:type_of(~> obj: baseType[T]().r:type())
-'>
-
-'at:comptime
-marco mainType[type T]() type {
-	if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
-		-> _ @T:BaseType
-	}
-	-> @T
-}
-
-'at:comptime
-marco bits_type_constraint[type T]() bool {
-	-> (
-		'exp:whichTypeCreator[T](@type_creator.r:valueDef)
-		and
-		(
-			>: If the type is of valueDef type creator origin, it checks for two things, first, if the
-			>: bit-width is within the maximum allowed bit-width for the bits type which is 256-bits or
-			>: 32-bytes, second, if the value count of the valueDef type-creator is within the base-type's
-			>: bit-width, because the number of values cannot surpass the bit-width
-			@T:BaseType:bit_width not gt 256 and not gt @T:value_count
-		)
-	)
-	or (
-		>: If it is an unsigned integer, it checks if the bit-width is within the maximum allowed bit-width for
-		>: the bits type which is 256-bits or 32-bytes
-		@T eq @ui1 or eq @ui2 or eq @ui4 or eq @ui8 or eq @ui16 or eq @ui32
-	)
-}
-
-'at:comptime
-marco bits_position_type_constraint[type (BitType, Position)]() bool {
-	-> if 'exp:whichTypeCreator[Position](@type_creator.r:valueDef) {
-		@Position eq @BitType
-	}else {
-		>! @Position eq @ui1 or eq @ui2 or eq @ui4 or eq @ui8 or eq @ui16 or eq @ui32
-		match @BitType with @ui1 {
-			@Position eq ui1_shift_integer
-		}|@ui2 {
-			@Position eq ui2_shift_integer
-		}|@ui4 {
-			@Position eq ui4_shift_integer
-		}|@ui8 {
-			@Position eq ui8_shift_integer
-		}|@ui16 {
-			@Position eq ui16_shift_integer
-		}|@ui32 {
-			@Position eq ui32_shift_integer
-		}else
-	}
-}
-
-'at:restrict_primary_object_constructor
-unique bits[type T] apply bits_type_constraint[T] = [mainType[T]()]
-
->! [both valueDef and unsigned integers start from 0]
-scope[type T] @bits[T] =
-marco 'default() bits[T] {
-	-> obj: bits[T](obj: [mainType[T]()]())
-}
-
-marco set[type Position](obj mut self: bits[T], 'at:pseudo_comptime obj ..positions: Position) !
-apply bits_position_type_constraint[T, Position]() {
-	'at:comptime
-	obj primary_bits: [mainType[T]()] = 0000_0001₂
-
-	'at:run if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
-		'at:pseudo_run
-		for position in positions {
-			'exp:de_unique(self) = 'exp:de_unique(self) or (primary_bits << position.toInternalRepresentation())
-		}
-	}else {
-		'at:pseudo_run
-		for position in positions {
-			'exp:de_unique(self) = 'exp:de_unique(self) or (primary_bits << position)
-		}
-	}
-
-	<'
-		Due to the `positions` being pseudo_run, the following expressions are ran at comptime if `positions`
-		turns out to be comptime:
-		[1] `(primary_bits << position.toInternalRepresentation())`
-		[2] `(primary_bits << position)`
-	'>
-}
-
-marco set_all[type Position](obj mut self: bits[T]) !
-apply bits_position_type_constraint[T, Position]() {
-	'exp:de_unique(self) = 'exp:de_unique(self) or @[mainType[T]]():max
-}
-
-marco unset[type Position](obj mut self: bits[T]) !
-apply bits_position_type_constraint[T, Position]() {
-	'todo
-}
-
-marco unset_all[type Position](obj mut self: bits[T]) !
-apply bits_position_type_constraint[T, Position]() {
-	'todo
-}
-
-marco test[type Position](obj self: bits[T], 'at:pseudo_comptime obj position: Position) bool
-apply bits_position_type_constraint[T, Position]() {
-	'at:comptime
-	obj primary_bits: [mainType[T]()] = 0000_0001₂
-
-	-> 'at:run if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
-		'exp:de_unique(self) and (primary_bits << position.toInternalRepresentation())
-	}else {
-		'at:pseudo_run
-		if position+1 gt @T:bit_width {
-			panicf("The position($(position)) is greater than the available bits which is 32, but remember bit count starts from 0, so it's 0~31 which is still 32 bits")
-		}
-		'exp:de_unique(self) and (primary_bits << position)
-	}#bool
-}
-
-marco flip[type Position](obj self: bits[T], 'at:pseudo_comptime obj ..positions: Position) !
-apply bits_position_type_constraint[T, Position] {
-	'at:comptime
-	obj primary_bits: [mainType[T]()] = 0000_0001₂
-
-	'at:run if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
-		'at:pseudo_run
-		for position in positions {
-			'exp:de_unique(self) = 'exp:de_unique(self) xor (primary_bits << position.toInternalRepresentation())
-		}
-	}else {
-		'at:pseudo_run
-		for position in positions {
-			'at:pseudo_run
-			if position+1 gt @T:bit_width {
-				panicf("The position($(position)) is greater than the available bits which is 32, but remember bit count starts from 0, so it's 0~31 which is still 32 bits")
-			}
-			'exp:de_unique(self) = 'exp:de_unique(self) xor (primary_bits << position)
-		}
-	}
-}
-
-marco flip_all[type Position](obj mut self: bits[T]) !
-apply bits_position_type_constraint[T, Position]() {
-	'exp:de_unique(self) = 'exp:de_unique(self) xor @[mainType[T]()]:max
-}
-
-struct bitsIterator = obj (data: bits[T], position: ui1)
-
-scope @bitsIterator =
-impl iterator[bool] =
-fn next(obj self: mut&bitsIterator) maybe[bool] {
-	-> if (self$.position + 1) not gt @[mainType[T]()]:bit_width {
-		obj old_position = self$.position
-		self$.position += 1
-		obj: maybe(self$.data.test(old_position))
-	}else
-}
-end impl
-end @bitsIterator scope
-
-marco iter(obj self: bits[T]) bitsIterator {
-	obj: bitsIterator(self, 0)
-}
-end @bits scope
+>! Also do linked lists
 
 >! -------------------------------------------------------------------------------------------------------
+
 contract[type Self] iterator[type Item] =
 fn next(obj self: mut&Self) maybe[Item]
 
@@ -436,7 +260,41 @@ marco filter[type Fn](obj (self: Self, fcn: Fn)) filter[Self, Fn] apply @Fn impl
 marco map[type (Fn, Output)](obj (self: Self, fcn: Fn)) map[Self, Fn] apply @Fn impls fn(Item)Output {
 	-> obj: map(&self, fcn)
 }
-end contract
+end
+
+>! singlyLinkedList implementation
+struct node = obj (node: {*}node, data: ui4)
+struct singlyLinkedList = obj node: {*}node
+
+scope singlyLinkedList =
+
+impl drop =
+marco drop(obj self: singlyLinkedList) {
+	>! Create to objects, `current_node` and `next_node`
+	>! `current_node` should steal the value of `self.node`
+	>! In an infinite loop do the following
+	>! Check if current_node is null or not
+	>! If null, exit the loop
+	>! If not null, `next_node` should steal the value of `current_node.node` and `current_node` should be deallocated
+
+	obj (current_node, next_node) = (self.node, obj: {*}node())
+
+	while {.a
+		current_node => some {
+			obj: allocator:basic.deallocate(next_node)
+			next_node = current_node.node
+
+			obj: allocator:basic.deallocate(current_node)
+		}else {
+			-> .a break
+		}
+		obj: allocator:basic.deallocate(current_node)
+		current_node = next_node
+	}
+}
+end impl
+
+end scope
 
 >! -------------------------------------------------------------------------------------------------------
 >: Change the implementation to the updated one
@@ -448,7 +306,7 @@ fn display[type UnicodeString](obj self: &Self) UnicodeString apply @UnicodeStri
 }
 end contract
 
-contract[type Self] to_NcDRL
+contract[type Self] to_NcDRL =
 end contract
 
 <"

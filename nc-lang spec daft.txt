@@ -3,34 +3,36 @@
 	- Attributes(scope 'at)
 	{
 		```(text)
-		'at:unpack												- Unpacks packed arguments
-		'at:comptime
-		'at:pseudo_comptime
-		'at:run
-		'at:pseudo_run
-		'at:from_comptime
-		'at:noImpl												- Means that the function or marco cannot implemented, only functions or marcos that have default implementations are allowed to use this
-		'at:enforceBranchCoverage								- Enforces branch coverage for conditonal expression in non expression context
-		'at:allow_uninitialization								- Allows uninitialization of objects and must be followed by the `unsafe` attribute
-		'at:index_object										- To mark the index object in the delay initialization of static arrays
-		'at:use_while_loop_for_delay_initialization_of(*)		- To mark the while-loop used in the delay initialization of static arrays
-		'at:unroll(*)											- To mark a loop that should be unrolled
-		'at:auto_deref											- To mark the give type that has the dereference operator for automatic dereference
-		'at:inline_fn_where_possible							- Attempt to iniline a function at the compiler's discretion
-		'at:useMoveValueSemantics								- Mark at the type-creator level that the type uses move value semantics
-		'at:restrict_primary_object_constructor					- Mark at the type-creator level that the type's object constructor is restricted to only factories
-		'at:factory												- Marks a marco or function as a factory
-		'at:hide(mod|pkg|scope|scope in mod|scope in pkg)		- Exposes item access restriction
-		'at:readonly(mod|pkg|scope|scope in mod|scope in pkg)	- Exposes object declaration item restriction
-		'at:accessDependsOnImpl									- Exposes dependent access restriction between a contract and it's implementation
-		'at:threadLocal											- Marks an object declaration as thread local
-		'at:unsafe												- Marks an expression operation as unsafe to enable some form of caution
-		'at:r"create category-1 allocMAR"						- [Update] Marks a type-creator as a category-1 allocating MAR
-		'at:r"create category-2 allocMAR"						- Marks a type-creator as a category-2 allocating MAR
-		'at:createAllocatorTagType								- Marks a type-creator as an allocator tag type
-		'at:createErrorManagementType							- Marks a type creator as an error management type
-		'at:createOptionalManagementType						- Marks a type creator as an optional management type
-		'at:explain												- Explains code(implementation is abstract still)
+		at:unpack												- Unpacks packed arguments
+		at:reverse_unpack										- Unpacks packed arguments in the reverse order
+		at:comptime
+		at:pseudo_comptime
+		at:run
+		at:pseudo_run
+		at:from_comptime
+		at:noImpl												- Means that the function or marco cannot implemented, only functions or marcos that have default implementations are allowed to use this
+		at:enforceBranchCoverage								- Enforces branch coverage for conditonal expression in non expression context
+		at:allow_uninitialization								- Allows uninitialization of objects and must be followed by the `unsafe` attribute
+		at:index_object										- To mark the index object in the delay initialization of static arrays
+		at:use_while_loop_for_delay_initialization_of(*)		- To mark the while-loop used in the delay initialization of static arrays
+		at:unroll(*)											- To mark a loop that should be unrolled
+		at:auto_deref											- To mark the give type that has the dereference operator for automatic dereference
+		at:inline_fn_where_possible							- Attempt to iniline a function at the compiler's discretion
+		at:useMoveValueSemantics								- Mark at the type-creator level that the type uses move value semantics
+		at:restrict_primary_object_constructor					- Mark at the type-creator level that the type's object constructor is restricted to only factories
+		at:factory												- Marks a marco or function as a factory
+		at:hide(mod|pkg|scope|scope in mod|scope in pkg)		- Exposes item access restriction
+		at:readonly(mod|pkg|scope|scope in mod|scope in pkg)	- Exposes object declaration item restriction
+		at:accessDependsOnImpl									- Exposes dependent access restriction between a contract and it's implementation
+		at:threadLocal											- Marks an object declaration as thread local
+		at:unsafe												- Marks an expression operation as unsafe to enable some form of caution
+		at:r"create category-1 allocMAR"						- [Update] Marks a type-creator as a category-1 allocating MAR
+		at:r"create category-2 allocMAR"						- Marks a type-creator as a category-2 allocating MAR
+		at:createAllocatorTagType								- Marks a type-creator as an allocator tag type
+		at:createErrorManagementType							- Marks a type creator as an error management type
+		at:createOptionalManagementType						- Marks a type creator as an optional management type
+		at:explain												- Explains code(implementation is abstract still)
+		at:useGlobalMemorySpace
 		```
 	}
 	- Expressions(scope 'exp)
@@ -50,7 +52,7 @@
 		'exp:type_size_without_padding[?]()
 		
 		'exp:which_type_creator[?]()							: gives the type_creator of a type represented as a valueDef type creator
-		'exp:type_creator_metadata[T, U[?]]()
+		'exp:getTypeCreatorMetadata[T, U[?]]()
 
 		'exp:argument_column(~> <parameter>)					: Can only be called in the body of a marco
 		'exp:isArgumentResultOfExp(~> ?, ~> ?)					: A way to enable compile time guarantees on a value before being used in a function
@@ -73,6 +75,7 @@
 		'exp:recursive_deref_if(?)
 
 		'exp:embedFile(path"resources:image.png")
+		'exp:isPrimordial
 	}
 	- Type(ty scope)
 	{
@@ -85,12 +88,12 @@
 		'ty:valueExp(~> <expression>)		: 'ty:valueExp(~> fcn())
 		'ty:from_string(?)
 	}
-	- Others
+	- Miscellaneous(misc scope)
 	{
-		'todo
-		'op <operator>
-		'collectionExp(<string-literal-token>)
-		'literal
+		'misc:todo
+		'misc:operator <operator>	(out)
+		'misc:collectionExp(`userIdentifierToken`)
+		'misc:literal(`userIdentifierToken`)
 	}
 
 	- Comma seperated entry for attribute LCI
@@ -126,6 +129,22 @@
 		}
 	}
 }
+: New dot type operator that asks for the string version of and identifier
+{
+	```NPL
+	x.{"age"}
+	x.{"name"}
+
+	at:comptime
+	obj mut field = "age"
+
+	x.{field} += 34
+
+	field = "name"
+
+	x.{field} = "Daniel"
+	```
+}
 : Constraint application
 {
 	```
@@ -143,6 +162,11 @@
 }
 : Parameter and Argument (2 unresolved)
 {
+	- And this type argument entry `[/name, /age]` should not be present in parameters
+	{
+		Just mandate it for parameters, i.e that the parameters syntax used in function, marco and such
+	}
+
 	Parameter
 	─────────
 	in relation to programming, is a list of one or more requests made by an item to be fufilled when it is used.
@@ -415,7 +439,7 @@
 : Introduction of expression item argument entry
 {
 	```(nc-lang)
-	foo(->>> 34 + 34)
+	foo(~> 34 + 34)
 	```
 
 	For now its type is only available to the LCI, its type would be made available in due time to user code
@@ -424,41 +448,37 @@
 : Nc-lang supports generic typing
 : Function
 {
-	- 'fn' <capture-parameter>? <identifier> <type-parameter>? (<function-parameter> <type>?)? <block-expression>
-	- Function as a type and call for objects is not the same with functions
+	- Addition of the `todo` symbol for value giving or functions with parameters
 	{
-		```(nc-lang)
-		fn fcn(type si4 x) {
+		```NPL
+		fn add((x, y): ui4) ui4 {
+			...
+		}
+		```
+
+		But this only works if the function is not going to be compiled into a library
+	}
+	- 'fn' <capture-parameter>? <identifier> <type-parameter>? (<function-parameter> <type>?)? <block-expression>
+	- Function to expression conversion and function expression to function conversion
+	{
+		```NPL
+		fn fcn(x: si4) {
 			x
 		}
 
 		/# Undergoes monomorphisation for every value argument given to the num value parameter of type si4
-		fn calc!(type si4 num)() {
-			num ÷ 2 % 4
+		fn calc!(num: si4)() {
+			num / 2 % 4
 		}
 
 		fn main {
-			type fn(si4)si4 fcn = fn:fcn /# Getting a function as an expression that gives a value of function type
-			type fn(si4)si4 fcn2 = fn(type si4 x) {x} /# Function expression doesn't need it because it mimics a function as an expression
+			obj foo: fn(si4)si4 = exp from fcn
+			obj doo: fn(si4)si4 = exp from calc!(34)
 
-			(fcn as fn)(89)
-			(fcn2 as fn)(89)
-			fcn(89)
-
-			infer calc = fn:calc!(3)
-
-			// Supports grouping syntax
-			fn:(calc!(3), main, fcn, parse[ui4])
+			obj _ = (fn from foo)(34)
+			obj _ = (fn from doo)(56)
 		}
 		```
-	}
-	- To disambuiguate unscoped function (identifier) call syntax with type argumenty entry, simply scope it with the global scope
-	{
-		```(nc-lang)
-		infer = :fcn[ui4, ui8]()
-		```
-		This is only needed for unscoped function (identifiers) call syntax that require type argument entry and isn't a problem for
-		comptime value argument entry.
 	}
 	- The use of `infer` for value parameters are banned, use type parameters instead
 	- Additional syntax for capture functions
@@ -542,10 +562,36 @@
 	}
 	- New capture function syntax
 	{
-		```(nc-lang)
-		fn|mut x, y| cost() {}
-		fn|mut b=45| cost() {}
-		fn|b=&45| cost() {}
+		```NPL
+		obj function = fn|=, clone(x, y)| cost() ui4 {
+			x.[0] = 90; y.[1] = 89
+			x.[0] + y.[1]
+		}
+
+		obj function = fn|&, clone(x, y)| cost() ui4 {
+			x.[0] = 90; y.[1] = 89
+			x.[0] + y.[1]
+		}
+
+		>: `&` here means that the language will capture the local environment's object with whatever mutability it has
+		obj function = fn|&, move(x, y)| cost() ui4 {
+			x.[0] = 90; y.[1] = 89
+			x.[0] + y.[1]
+		}
+
+		obj function = fn|&, move(x, y), clone(a, b)| cost() ui4 {
+			x.[0] = 90; y.[1] = 89
+			x.[0] + y.[1]
+		}
+		```
+
+		So, the following are the capture group available syntax
+
+		```NPL
+		fn|=| foo() {}									>: Capture local environment by value (Does not perform move capturing)
+		fn|&| foo() {}									>: Capture local environment by value reference
+		fn|=, move(x, y), clone(x, y)| foo() {}			>: Capture local environment by value and selectively capture move and clone some objects
+		fn|&, move(x, y), clone(x, y)| foo() {}			>: ,,,
 		```
 	}
 	- Function inlining is fudamentally different from function marcos
@@ -684,15 +730,66 @@
 : Function and marcos now share the same namespace
 : Variadics syntax and semantics
 {
+	- Change in the variadic implementation of a single type
+	{
+		This also works for non variadic type type parameters
+
+		```NPL
+		fn sum(nums: ..ui4) ui4 {
+			obj result: ui4()
+
+			for num in varaidic(nums) {
+				result += num
+			}
+			result
+		}
+
+		<'
+			[Implementation]
+
+			fn sum(nums_array: &arrb) ui4 {
+				obj result: ui4()
+
+				while obj i = 0; i lt size; i += 1 {
+					result += nums_array.[i]
+				}
+				result
+			}
+		'>
+		```
+	}
+	- New function signature concrete type entry for varaidic
+	{
+		```NPL
+		obj x: fn(..ui4)ui4
+		```
+	}
+	- Now allowing this for the variadics feature
+	{
+		```(ncLang)
+		obj a: tuple[ui4'foo, ui8'doo]()
+
+		obj b: tuple['foo, 'doo](34, 45) >! New addition
+		```
+	}
 	- Varaidics are now zero or more no longer one or more
+	- Variadics new access
+	{
+		```(ncLang)
+		variadic[T].size
+		variadic(args).size
+		variadic(args).[1]
+		variadics[T].[4]
+		```
+	}
 	- Variadic access redefinition
 	{
 		- For variadic parameters
 		{
 			```(nc-lang)
-			fn foo() {
-				args.[1] + args.[2]
-				args.size
+			fn foo(obj ..args: ui4) {
+				variadic(args).[1] + (args).[2]
+				variadic(args).size
 			}
 			```
 		}
@@ -706,10 +803,10 @@
 				obj x: foo(3, 4, 5)
 
 				>! Normal varaidic and-field access
-				x.fields.[1]
+				x.variadic(fields).[1] >! Not anymore
 
-				>! Syntatic sugar for variadic and-field access.
-				x.1
+				>! Syntatic sugar
+				x.[1]
 				```
 			}
 			- Or-fields
@@ -793,21 +890,22 @@
 
 	- Variadics acting on function
 	{
-		```
-		fn fcn(type ui4 _..) {} // fcn(3, 5, 6, 7, 8)
+		```NPL
+		fn foo(_: ..ui4)! {}					>! foo(9, 0, 8, 5)
 
-		fn fcn2<type T>(type T _..) {} // fcn2(3.0, 9.8) or fcn2("daniel", "emeka", "chimudi") -- must all be the same type
+		fn doo[type T](_: ..T)! {}				>! doo(5'r4, 90, 90)
 
-		fn fcn3<type T..>(type T.. _..) {} // fcn3(3.0, "daniel", &45) or fcn3("emeka", '+', 45)
+		fn hoo[type ..T](_: ..T)! {}			>! hoo(3.0, "Daniel", &45)
 		```
 	}
 	- Variadics acting on type creators
 	{
+		```NPL
+		struct type1[type ..T] =
+			x: ..T
 		```
-		struct type1<type T..> = type T.. x..
 
-		struct type2<type T..>
-		```
+		Variadics acting on union type creator will be removed
 	}
 	- Use of variadics --any use of variadics outside the following isn't valid--
 	{
@@ -837,11 +935,11 @@
 			```
 			fn cost(type si4 x...) {
 				#at:comptime
-				for arg in x {
+				for arg in variadic(x) {
 					print(i)
 				}
 				#at:comptime
-				for {arg, index} in x {
+				for {arg, index} in variadic(x) {
 					!printf(%{index}. %{arg})
 				}
 			}
@@ -857,14 +955,12 @@
 		bit  8, 16, 32, 64, 128, 256, 512, 1024, 2048, 4096
 		byte 1, 2,  4,  8,  16,  32,  64,  128,  256,  512
 
-		And platform integers i.e si and ui
-
 		Width integers:
 			si1, si2,  si4,  si8,  si16,  si32,  si64,  si128,  si256,  si512
 			ui1, ui2,  ui4,  ui8,  ui16,  ui32,  ui64,  ui128,  ui256,  ui512
 		Platform integers:
-			si
-			ui
+			platform:si
+			platform:ui
 		```
 	}
 	- Real numbers
@@ -936,6 +1032,8 @@
 	  which is 128 bits, with that logic, static arrays are meant to be move types
 	- Untyped number literals semantics
 	{
+		Untyped number literal semantics are now for both primitive integer types and semantic ranged integer types
+
 		Unlike text literals tokens, number literal tokens do not have a default assigned literal type when none is specified by the
 		user. A number literal token that is devoid of a literal type is called an untyped number literal. The literal type of an
 		untyped number literal token is inferred by the compiler in situations where it is possible to be inferred and given default
@@ -1027,7 +1125,6 @@
 
 		```(nc-lang)
 		union coulmn = type (customer, product, distribution) (customer, product, distribution)
-		union colum = type (customer, product, distribution) column
 		```
 
 		- Implementation of the union type creator
@@ -1042,29 +1139,54 @@
 		}
 		- Union type creators would allow the same types
 		{
-			```(nc-lang)
-			union input = obj (left_arrow_key, right_arrow_key): nil, obj char character_key
+			```NPL
+			union input = (left_arrow_key, right_arrow_key): nil, character_key: char
+			```
+		}
+		- Union initialization problem resolution (Union init functions are overloads, remember)
+		{
+			Due to the need for the or-fields of a union having the same type but different identifiers, the
+			following serves as a way to distinguish between or-fields of the same type when used in initialization
+
+			```NPL
+			at:createErrorManagementType
+			union parseStringResult = ok: string, error: string
+
+			fn main {
+				obj result = obj: parseStringResult(.ok= string"123434")
+
+				result = obj: parseStringResult(.error= string"Error Value")
+			}
 			```
 		}
 	}
-	- Value def type creator declaration item semantics [Unresolved]
+	- Set type creator declaration item semantics
 	{
-		```(nc-lang)
-		valueDef[.BaseType= ui1] direction_1 = north, east, west, south
-		valueDef[.BaseType= _] direction_2 = north, east, west, south // ui1 is the default base type
-		valueDef[] direction_3 = north, east, west, south // ui1 is the default base type
-		valueDef direction_4 = north, east, west, south // ui1 is the default base type
+		The values from sets can now be accessed via a lone dot operator in code that the language
+		can infer its set type like in odin, `.north` instead of `@direction.north`
+
+		```NPL
+		set[.BaseType= ui1] direction_1 = north, east, west, south
+		set[.BaseType= _] direction_2 = north, east, west, south >: ui1 is the default base type
+		set[] direction_3 = north, east, west, south >: ui1 is the default base type
+		set direction_4 = north, east, west, south >: ui1 is the default base type
 
 		>: Values can be accessed by using the dot operator
 		obj _ = @direction.north
 		obj _ = @direction.east
 		obj _ = @direction.west
+		
+		obj _: direction = .north
+		obj _: direction = .east
+		obj _: direction = .west
 		```
 
-		Default provided items
+		- Default provided items
+		{
 			- `toInternalRepresentation()` => marco that converts it's values to it's internal
 			  representation, that is to the unsigned integers they are represented as.
-			- `value_count` => comptime object that gives the value count of the valueDef type-creator.
+			- `value_count` => comptime object that gives the value count of the set type-creator.
+		}
 	}
 	- Unique type creator declaration item semantics
 	{
@@ -1084,9 +1206,57 @@
 		- Uniqued integers can be ranged
 		{
 			```(ncLang)
-			unique ui4_shift_amount = ui1 with 1~32
+			scope ui4 =
+			unique shiftRange = ui1 from 0~31
+			end scope
 			```
 		}
+		- Unique types can now have the option of using all the properties of the uniqued types
+		{
+			```(ncLang)
+			>! Has all the properties of ui4
+			unique rng = ui4 with *
+			```
+		}
+		- Addition of the `use` keyword to import items from the uniqued type
+		{
+			```(ncLang)
+			unique something = ui4
+
+			scope @something =
+			use impl display
+			use 'operator (+, -, *, /)
+			end scope
+			```
+		}
+	}
+	- Addition of a `range` type that is take over range semantic types
+	{
+		```NPL
+		range[ui1] shiftRange = 1~4
+		range[char] alphaBetRange = 'a'~'z' and 'A'~'Z'
+		```
+
+		And unlike the semantics of the unique type, a ranged type behaves exactly like its base type, having
+		all the arthimetic operations of its base type but with the limitation of having its maximum and
+		minimum values set by the user. Example
+
+		```NPL
+		range[ui1] smallRange = 2~38
+
+		fn main()! {
+			obj x: smallRange = 38
+			obj y: smallRange = 1
+
+			obj z = x.overflow_add(y)
+
+			printf("$(z)=") >! Prints "z = 2"
+		}
+		```
+
+		There is provision for conjoining multiple ranges in a range type, but with the requirement of the it
+		being arranged from smallest range to highest range. Only the character type supports such a feature,
+		though
 	}
 	- Should scope @items be visible to it's typecreator? NO
 	{
@@ -1096,15 +1266,6 @@
 			struct node
 		}
 	}
-}
-: Type creator that have fields that do not have default init functions cannot be move types (VALUE SEMANTICS)
-{
-	```(nc-lang)
-	'at:useMoveValueSemantics
-	struct = type &ui4 x >! Error: cannot be a move type because a value-reference does not have an empty init function
-	```
-
-	Yes, because a move type assures the reset of a value accordingly to it's type, but non-empty init functions cannot be reset
 }
 : Tokens
 {
@@ -1129,6 +1290,9 @@
 		"\'"	>: Does not belong
 		'\"'	>: Does not belong
 		'\#'	>: Does not belong
+		
+		"#"emeka"#"
+		regex"\#(emeka)#"
 		```
 	}
 	- Raw text entry for character text literal token
@@ -1293,56 +1457,112 @@
 		- The second or-field must be a ZST
 		- The first or-field is not allowed to be a ZST
 	}
-	- Or-field query syntatic sugar for error and optional management types [Unresolved]
+	- Or-field query syntatic sugar for error and optional management types
 	{
-		- `err` and `none` or-fields default panic syntatic sugar in or-field query
+		- Addition of context language identifiers to failure handling
 		{
-			```(nc-lang)
-			x => some {
-				someWork(some)
-				cleanup()
-			}|{err, 10} /# The second parameter thing is optional, default is 2
+			Due to the ubiquitious nature of failure handling, the following smart language functions are
+			provided for identifying the variants of failure handling types
 
-			/# Equivalent to
+			- `Ok`: is generic over the `ok` or-field of all error management types
+			- `Err`: is generic over the `err` or-field of all error management types (Err in particular is generic over all possible error types in the error or-field)
+			- `Some`: is generic over the `some` or-field of all optional management types
+			- `None`: is generic over the `none` or-field of all optional management types
 
-			x => some {
-				someWork(some)
-				cleanup()
-			}|err {
-				!panicf(10, "%{err}") /# Paniced at main.ncl on line 1007 with error message ...
+			These failure handling context language identifiers have the same semantics purposes that their
+			Rust counterpart have, except for `Err` which has the added semantic of representing `err`
+			or-fields that are unions
+
+			```NPL
+			fn foo() result[none, ui4] {
+				Err(78)
+			}
+
+			union possibleErrors = errorMessage: &str, errorIndex: ui8
+
+			fn doo() result[none, possibleErrors] {
+				if true {
+					Err(12)
+				}else {
+					Err("Could not do this!")
+				}
 			}
 			```
 
-			- Multiple or-field query syntax does not support the above syntatic sugar
+			The purpose of the added semantic for `Err` is to provide an explicit rendition of the capability
+			of exceptions to throw multiple errors
 		}
-		- The error propagation operator is only for error management types as the names implies
+		- `err` and `none` or-fields default panic syntatic sugar in or-field query
 		{
-			- When an error propagation operator is used, the give type of the function must be specified
-			- Allowing the propagation of multiple errors
-			{
-				```
-				union possibleErrors = type ui4 indexErr, type str errMessage
+			```NPL
+			x => ok {
+				someWork(ok)
+				cleanup()
+			}|panic
 
-				fn try() type result[nil, type possibleErrors] {
-					infer _input = some()? // some() gives type result[ui4, ui4]
-					infer _output = other() ? // other() gives type result[ui4, str]
-				}
-				fn try() type result[nil, type variant[ui4, &str]] {
-					infer _ = some()? //
-				}
-				```
+			>: Equivalent to the below
+
+			x => ok {
+				someWork(ok)
+				cleanup()
+			}|err {
+				panicf("$(error)") >! Paniced at main.npl on line 1007 with error message: [$(error)]
 			}
-			- Used for reference on how I want them to be.
+
+
+			x => some {
+				do_something(some)
+			}|panic
+
+			>: Equivalent to the below
+			x => some {
+				do_something(some)
+			}|none {
+				panicf("Contians no value") >! Paniced at main.npl on line 1007 with error message: [Contains no value]
+			}
+			```
+
+			- Supports multiple or-field query, where it requires only a single failure variant
 			{
-				```(rust)
-				fn fcn2(x: Result<i32, &'static str>) -> Result<(), &'static str> {
-					let answer = x?;
-					println!("The answer is: {}", answer);
-					Ok(())
-				}
+				```NPL
+				x => some(a), some(b), some(c) {
+					a+b+c
+				}|panic
 				```
 			}
 		}
+		- Removing `?` which is failure propagation in favour of the already explicit failure handling syntactic sugar
+		- Used for reference on how I want them to be.
+		{
+			```(rust)
+			fn fcn2(x: Result<i32, &'static str>) -> Result<(), &'static str> {
+				let answer = x?;
+				println!("The answer is: {}", answer);
+
+				Ok(())
+			}
+			```
+
+			```NPL
+			fn fcn2(x: result[ui4, &str]) result[none, &str] {
+				x => some(answer) {
+					printf("The answer is $(answer)")
+				}|-> Err
+
+				Ok(none)
+			}
+			```
+		}
+		- Ehmm, how would the panic function be made available to the language?
+	}
+	- Optional type optimization
+	{
+		There is an optimization for the representation of types that have unrepresentable nullable states
+		like value references, this optimization uses the unrepresentable nullable state as the nullable
+		state in the optional type instead of introducing an object to keep track of the nullable state
+
+		Yes, this is a rust optimization. I will call it non-null types optimization, and it will be
+		implemented in the programming language
 	}
 }
 : Operator overloading
@@ -1385,6 +1605,13 @@
 			```
 		}
 	}
+	- Arithmetic operators taking the same types as inputs must give the same type as output
+	{
+		Meaning something like the below is not allowed:
+		```(text)
+		type(ui4) + type(ui4) = type(ui8)
+		```
+	}
 }
 : Operators (1 unresolved)
 {
@@ -1411,7 +1638,7 @@
 			4 gt or eq random()
 			4 gt or not eq random()
 		}
-		- Logical `and`, `or` and `xor` combinations with only relational operators and not operator combinations with `eq` and `in`
+		- Logical `and` and `or` combinations with only relational operators and equality operators
 		{
 			x gt 4 and lt 90
 			x gt or eq 4 and lt or eq 90
@@ -1445,6 +1672,7 @@
 	- Integer range to have a lower precedence than '+' and '-'. Think more about it.
 	- Operator list
 	{
+		- `.[]`
 		- 'memoryof'		(memory of operator) [Will be removed for to be implemented as a function instead]
 		- 'MAR'				(memory address reference operator)
 		- '#'				(cast operator)
@@ -1500,72 +1728,57 @@
 	}
 	- <for-loop-statement> Using `intoIterator` now
 	{
-		- 'for' (<object-declaration-list> ';')? ('&''mut'?)? <identifier> 'in' <expression> <block-expression>
-
 		: `for`'s semantics
 		{
-			for mut age in ages.iter() { // Makes the `type maybe<?>` mutable instead of immutable
-				age = 90
-			}
-			for mut age in (&ages).iter() { // Makes the `type maybe<&?>` mutable instead of immutable
-				...
-			}
-			for mut mut age in (&mut ages).iter() { // Makes the `type maybe<&mut ?>` mutable instead of mutable
-				...
-			}
-			for {age, index} in ages.iter().enumerate() { // For unpacking
-				...
-			}
-			for {x, y, z} in (xs, ys, zs) { // And multiple values
-				...
-			}
+			```NPL
+			for x in items {}
 
-			for name in (&names).iter() {
-				io:!printf("%{name*}=")
-			}
-			for {name, age} in ((&(names, ages)).iter()) {
-				io:!printf("%{name*}= %{age*}=")
-			}
-			for name in &names {
-				..
-			}
-			for {name, age} in (&names, &ages) {
-				io:printf("%{name* + age*}")
-			}
+			for mut x in items {}
 
+			for at:move x in items {}
+
+			for at:move mut x in items {}
+
+			>: The references equivalents are not allowed to be made mutable, hence no mutable entry syntax is provided for them
+
+			for &x in items {}
+
+			for mut&x in items {}
+
+			>: This can then all be combined for groupings (follow the constraints for reference types)
+			for (a, b, c) in (items, items_2, items_3) {}
+
+			>: For unpacking
+			for [age, index] in ages.iter().enumerate() {}
+
+			>: Remember that a for loop is just syntatic sugar for a while loop
 			{
-				infer iter = (&names).iter()
+				obj iter = &names.iter()
 
 				while {.block
-					iter.next() => some as name {
-						io:!printf("%{name*}=")
+					iter.next() => some(name) {
+						io:printf("$(name$)=\n")
 					}else {
-						break block
+						break .block
 					}
 				}
 
-				infer (iter, iter2) = (&(names, ages)).iter() // How does this grouping even work?
+				obj (iter, iter2) = &(names, ages).iter()
 
-				type (str, ui4) (name, age)
+				obj (name: str(), age: ui4())
 				while {.block
-					$[(&(iter, iter2)).next()] => some as name, some as age {
-						io:!printf("%{name*}= %{age*}=")
+					&(iter, iter2).next() => some(name), some(age) {
+						io:printf("$(name$)= $(age$)=\n")
 					} else {
-						break block
+						break .block
 					}
 				}
 			}
+			```
 		}
-		- Change for loop to the following
+		- Into iterator potential implementation
 		{
 			```(nc-lang)
-			for mut i in (&x).iter() {}
-			for mut i in (&mut x).iter() {}
-			for mut i in x.iter() {}
-
-			for i in &x {}
-			for i in &mut x {}
-
 			contract[type Self, type Iter, type Iter_vref, type Iter_mut_vref] intoIterator
 			apply impls[Iter] iterator and impls[Iter_vref] iterator and impls[Iter_mut_vref] iterator {
 				fn intoIterator(obj self: Self) Iter
@@ -1575,19 +1788,26 @@
 			```
 		}
 	}
-	- <give-jump-statement>
+	- Jump statement
 	{
-		- 'give' <expression>?
-	}
-	- <break-jump-statement>
-	{
-		- 'break' (':' <identifier>)?
-		- Only to be used in chameleon block expressions
-	}
-	- <continue-jump-statement>
-	{
-		- 'continue' (':' <identifier>)?
-		- Only to be used in loop statement bodies
+		```NTPL
+		jumpStatement = ('->' blockID? expression|'!')|('break'|'continue' blockID?)
+		```
+
+		- Semantics of default jump statement without blockID
+		{
+			A give jump statement without a blockID always refer to the function block it is used in, while to
+			refer to other blocks, it must use the blockID of that block.
+
+			A break and continue jump statement without a blockID always refer to the block expression it was
+			defined in, while to refer to other blocks, it must use the blockID of that block
+		}
+		- Exiting out of a non-value-giving function
+		{
+			```NPL
+			-> !
+			```
+		}
 	}
 }
 : Expression items
@@ -1616,30 +1836,26 @@
 			}else {
 				...
 			}
-
-			This version must always be comptime
-			match <T> with <ui4> {
+			```
+		}
+		- New addition syntax for operating on multiple values
+		{
+			```NPL
+			match 23 with 45 {
 				...
-			}|<ui8> {
-				...
-			}|<ui4, ui32> {
+			}|34, 89, 90 {
 				...
 			}
 			```
 		}
-		- For match conditional expressions special syntax for operating on valueDefs
+		- `match-with` on types
 		{
 			```(nc-lang)
-			valueDef direction = north, east, west, south
-
-			type direction where()
-			match where with _:north {
+			match @T with @ui4 {
 				..
-			}|_:east {
+			}|@ui8 {
 				..
-			}|_:west {
-				..
-			}|_:south {
+			}else {
 				..
 			}
 			```
@@ -1647,48 +1863,46 @@
 	}
 	- <or-field-query-operator> which leads to an or-field query expression
 	{
-		```
+		```NPL
 		struct (dog, cat, duck)
-		scope @dog { fn speak{!print("bark!")} }
-		scope @cat { fn speak{!print("meow!")} }
-		scope @duck { fn layEgg{!print("layEgg")} }
+		scope @dog { fn speak{print("bark!")} }
+		scope @cat { fn speak{print("meow!")} }
+		scope @duck { fn layEgg{print("layEgg")} }
 
-		union animal = type (dog, cat, duck) (dog, cat, duck)
+		union animal = obj (dog: dog, cat: cat, duck: duck)
 
-		struct customer = type (str_a, ui1) (name, age)
-		union db_column = type (customer, tuple<ui4:"int", r4:"real">) (customer, num)
+		struct customer = obj (name: stringTemp, age: ui1)
+		union db_column = customer: customer, num: tuple[ui4'int, r4'real]
 
 		fn main {
-			type animal animal(type dog)
+			obj animal: animal(obj: dog)
 
-			animal => dog+cat as \"dog&cat" {
-				\"dog&cat".speak()
+			animal => (dog, cat)(dog_cat) {
+				dog_cat.speak()
 			}|duck {
-				duck.layEgg()
-			}else { /# This else branch is illegal since the branch already has full coverage
-				!print("generic")
+					duck.layEgg()
 			}
 
-			type db_column() => customer as {name, age} {
-				!printf("%{name}= %{age}=")
+			obj: db_column() => customer[name, age] {
+				printf("$(name)= $(age)=")
 			}|num {
-				!print("%{num."int"} %{num."real"}")
+				printf("$(num.int) $(num.real)")
 			}
 		}
 		```
 
 		- Addition of redefining an or-field as another identifier during or-field query
 		{
-			```(nc-lang)
-			union \"2d shape" =
-				obj circle: r4,
-				obj rectangle: tuple[r4:width, r4:height],
-				obj rectangle: tuple[r4:base, r4:height]
+			```NPL
+			union r"2d shape" =
+				circle: tuple[r4'radius],
+				rectangle: tuple[r4'width, r4'height],
+				triangle: tuple[r4'base, r4'height]
 
 			fn main() {
-				obj x: \"2d shape"()
-				x => circle(radius) {
-					radius + radius
+				obj x: r"2d shape"()
+				x => circle {
+					circle.radius * 2
 				}|rectangle(rect) {
 					rect.width + rect.height
 					rect.[1] + rect.[2]
@@ -1699,60 +1913,149 @@
 			}
 			```
 		}
-		- Addition of the `as` unpacking syntax to or-field query syntax
+		- Addition of the unpacking syntax to or-field query syntax
 		{
-			```(nc-lang)
-			x => circle(radius) {
+			```NPL
+			x => circle[radius] {
 				radius + radius
-			}|rectangle as {width, height} {
+			}|rectangle[width, height] {
 				width + height
-			}|triangle as {base, height} {
-				base + height
+			}|triangle[base, height] {
+				(base * height)/2
 			}
 			```
 		}
 		- Addition of special grouping semantics for or-field query expressions also to replace the for loop statement one
 		{
-			```(nc-lang)
-			/$ The tedious and inefficient way that only checks if a single or-field is the current value then extracts its value
-			a => some {obj: maybe(some)}else + b => some {obj: maybe(some)}else + c => some {obj: maybe(some)}else
-
-			/$ The compact and efficient way that checks if all or-fields are the current object before extracting the values
-			(a, b, c) => some(x), some(y), some(z) {obj: maybe(x+y+z)}else
-			```
-		}
-		- Addition of inner grouping for compactly defining identifier aliases for or-bojects during the special grouping semantics for or-field query
-		{
-			```(nc-lang)
-			/$ This
-			(a, b, c) => some as (x, y, z) {obj: maybe(x+y+z)}else
-
-			/$ Instead of
-			(a, b, c) => some as x, some as y, some as z {obj: maybe(x+y+z)}else
-			```
-		}
-		- Addition of the `+` syntax in combination with the or-field redefining syntax for treating multiple or-fields as one
-		{
-			```(nc-lang)
-			union specific_int = type (si4, si8) (si4, si8)
-
-			type specific_int x(9'si4)
-
-			x => si4+si8(any) {
-				any + any
+			- The tedious and inefficient way that only checks if a single or-field is the current value then extracts its value
+			{
+				```NPL
+				obj result = a => some {
+					b => some {
+						c => some {
+							obj: maybe(some + outer:some + outer:outer:some)
+						}else
+					}else
+				}else
+				```
 			}
+			- The compact and efficient way that checks if all or-fields are the current object before extracting the values
+			{
+				```NPL
+				obj _ result = (a, b, c) => some(x), some(y), some(z) {
+					Some(x+y+z)
+				}else
 
-			type maybe(34) => some+none(_) {
-				dothis()
+				obj _ result = (a, b, c) => (some, none)(_), (some, none)(_), (some, none)(_) {
+					print("Printing anything at all")
+				}
+				```
+			}
+		}
+		- Addition of the `()` syntax in combination with the or-field redefining syntax for treating multiple or-fields as one
+		{
+			```NPL
+			union specific_int = si4: si4, si8: si8
+
+			fn main {
+				obj specific_int x = 9'si4
+
+				x => (si4, si8)(any) {
+					any + any
+				}
 			}
 			```
 		}
-		- Addition of or-field automatic give syntatic sugar
+		- Addition of special syntax for failure handling
 		{
-			```(nc-lang)
-			infer x = try_divide() => (some)|err(_) {90}
-			/# Equivalent to:
-			infer x = try_divide() => some {some}|err(_) {90}
+			- Expected or-field or panic syntax
+			{
+				```NPL
+				x => ok {
+					do_something(ok)
+				}|panic
+
+				y => some {
+					do_something(some)
+				}|panic
+				```
+			}
+			- Expected or-field or break jump statement syntax
+			{
+				```NPL
+				x => ok {
+					do_something(ok)
+				}|break
+
+				y => some {
+					do_something(some)
+				}|break
+				```
+			}
+			- Expected or-field or continue jump statement syntax
+			{
+				Same as its break jump statement counterpart
+			}
+			- Expected or-field or give jump statement syntax
+			{
+				```NPL
+				>: Wraps the error or-field and gives it as is
+				x => ok {
+					do_something(ok)
+				}|-> Err
+
+				>: Gives the none or-field as is
+				y => some {
+					do_something(some)
+				}|-> None
+
+				b = {.a
+					x => some {
+						do_something(some)
+					}|-> .a None
+
+					y => ok {
+						do_something(ok)
+					}|-> .a Err
+				}
+
+				z => some {
+					do_something(some)
+				}|-> !
+
+				z => some {
+					do_something(some)
+				}|-> 34
+				```
+
+				Basically does all the things the give jump statement can do, but with the addition of the
+				`Err` and `None` to form a new semantic for failure handling types
+			}
+		}
+		- All valid or-field query  syntax
+		{
+			```NPL
+			x => some {}
+
+			x => some(x) {}
+			x => some[x, y] {}
+			x => (some, none)(x) {}
+
+			x => some(a), some(b) {}
+			x => some[x, y], some[z, y] {}
+			x => (some, none)(x), (some, none)(y), (some, none)(z) {}
+
+			x => ok {
+				..
+			}|break .a
+
+			x => ok {
+				..
+			}|-> !
+
+			x => ok {
+				..
+			}|panic
 			```
 		}
 	}
@@ -1928,7 +2231,7 @@
 		function marco containing the exit function.
 		```
 	}
-	- Integer exclusive and inclusive range expressions with the integer exculsive and inclusive range operators
+	- Integer and character exclusive and inclusive range expressions with the integer exculsive and inclusive range operators
 	{
 		```
 		3~4			// type integerEndInclusiveRange(3, 4)
@@ -2058,7 +2361,7 @@
 		import type std:collections:arrayList
 
 		fn to_individual_bits(obj num: ui4) arrayList[ui1] {
-			/$ ..
+			>! ..
 			arrayList[num as ui1, 0]
 		}
 		```
@@ -2090,8 +2393,41 @@
 	'at:accessDependsOnImpl	=> This access restriction is only used by contracts, which simply denotes that the access restriction of the item is to be defined by the implementation
 	```
 }
-: Identifier items semantics
+: Scope and namespace semantics
 {
+	: For scope access
+	{
+		An identifier must be accessed with its full scope qualifications when in another scope
+		
+		```(ncLang)
+		scope dead =
+		obj proxy = 90
+		
+		scope alive =
+		fn foo {
+			-> :dead:proxy
+		}
+		end
+
+		end
+		```
+	}
+	: Introduction of the `outer` reserved identifier to refer to the immediate outer block
+	{
+		```(ncLang)
+		scope jerry =
+		fn cost() {}
+
+		scope merry =
+		fn cost() {
+			outer:cost();
+		}
+		end scope
+
+		end scope
+		```
+	}
+
 	Identifier Item
 	───────────────
 	are items that declare identifers
@@ -2146,9 +2482,12 @@
 	have unique names for their identifers.
 	Meaning something like this:
 	```
-	scope sameIdentifier {
-		scope sameIdentifier{}
-	}
+	scope sameIdentifier =
+	
+	scope sameIdentifier =
+	end
+
+	end
 	```
 	Is possible because they are not in the same scope even though the are in the same namespace.
 
@@ -2208,76 +2547,7 @@
 	x.kafa_something()
 	```
 
-	Internal Scope Access[1]
-	────────────────────────
-	Inner self scope access is not allowed in nc.
-
-	Take this example:
-	```
-	scope some {
-		fn fcn{}
-
-		scope some2 {
-			fn callfcn {
-				fcn() ``our focus
-			}
-		}
-	}
-	```
-	How is the inner scope(scope some2) able to access the outer scope's(scope some) function 'fcn'?
-
-	It is possible because of the following language exception:
-	- During inner scope access, if there is no identifier conflict between any of the outer scope's items and the inner scope's item,
-		scope access can be done without the scope accessor symbols.
-
-	When the exception applies:
-	```
-	scope some1 {
-		fn fcn{give 4000}
-
-		scope some2 {
-			fn fcn{give '8'}
-
-			fn another() {
-				give fcn() ``to access the outer scope's fcn, [some1::fcn()] is used
-			}
-		}
-	}
-
-	scope some {
-		fn fcn{give 450}
-
-		scope some {
-			fn fcn {
-				give fcn()
-				``to access the outer's scope function fcn [some::fcn()]
-				``but there is one problem with this, the inner and outer scope's scope both have the same identifier [some]
-				``But since inner self scope access is not allowed, can't the language just assume it is from the outer scope? No the language
-				``would not assume that because inner self scope access is not allowed period. But then how is the inner scope(scope some)
-				``supposed to access the outer scope's(scope some) function fcn? The outer scope's(scope some) is accessed by using it's
-				``outer scope(i.e the global scope in this case) to clear the ambiguity, which is [::some::fcn()]
-			}
-		}
-	}
-	```
-	Same with the above example but more complicated
-	```
-	{
-		scope g {
-			scope f {
-				scope v {
-					fn fcn(){}
-
-					scope v {
-						fn fcn(){
-							g:f:v:fcn ``which??
-						}
-
-					}
-				}
-			}
-		}
-	}
+	Scope Access is written up
 	```
 
 	Scope Visibility
@@ -2455,294 +2725,356 @@
 	}
 	```
 }
-: Block scope access
-{
-	When a block is given an identifier, it's block identifier acts like a scope
-
-	```(ncLang)
-	fn foo(){.a
-		obj x = 23
-		{.b
-			obj x = 90
-			printf("$(a:x)= $(b:x)=")
-		}
-	}
-	```
-}
-: Constraints applied to a type creator or constrained items in a contract should reflect on all it's scope @or impls
-{
-	But using the context reserved identifier `_`, the compiler automatically adds the constraint expression eliminating endless
-	duplication.
-	```
-	contract<type Self> some apply true {
-		fn const apply true {}
-	}
-	scope @ui4 {
-		impl<_> ui4 { // not applied here because that is not a parameter
-			fn const apply _ {}
-		}
-	}
-	```
-}
 : `contract` & `impl`
 {
-	- Either a type or a type constructor can be the type parameter
+	- Look at this to remind yourself of the semantics of contract
+	{
+		```NPL
+		contract[type Self] iterator[type T] =
+		fn next(self: &Self) maybe[&T];
+		end contract
+		```
+
+		With the above, the language allows it so a contract of the above nature can be implemented more than
+		once, as long as the exact types aren't used in the same order in more than more implementation of such
+		contract.
+
+		So, with this, a form of overloading is achieved. Example:
+
+		```NPL
+		contract[type Self] heavy[type T] =
+		fn something(self: Self) T;
+		end contract
+
+		struct myInt = int: ui4
+
+		scope @myInt =
+		impl[&myInt] into[ui4] =
+		fn something(self: &myInt) ui4 {
+			self.int
+		}
+		end impl
+
+		impl[&myInt] into[ui8] =
+		fn something(self: &myInt) ui8 {
+			self.int.into()
+		}
+		end impl
+		end scope
+
+		fn main()! {
+			obj value: myInt(34)
+
+			obj _ x = value.something[ui4]()
+			obj _ y = value.something[ui8]()
+		}
+		```
+
+		The above use of `.something` without contract scope differentiation is intentional to allow some
+		form of overloading in the language. Which is necessary to implement `into` contract and many more
+		derived application code
+	}
+	- A type cannot contain an identifier that is already present in a contract implementation, only contracts have that privilege
+	{
+		```(ncLang)
+		contract[Self] (some, any) =
+		fn foo()! {}
+		end contract
+
+		struct (t1, t2);
+
+		scope t1 =
+		fn foo() {}
+		impl some; >! Error not allowed, this type already contains a conflicting identifier
+		end scope
+
+		scope t2 =
+		impl (some, any); >! Nice, it works because the identifier conflict is present in the contracts
+		end scope
+		```
+	}
+	- Either a type or a type constructor can be the type parameter in the contract (Make an example)
 	- If there is no default implementation then the user must provide one when implementating the contract
-
-	- Impl types now have their symbol [!] back, function marcos was holding them hostage (Runtime polymorphic types)
-	{
-		- Only types that can be impl types are the ones that implement a contract with a single type parameter i.e 'Self' or 'SELF'
-		- Impl types do not have default in function marcos
-		- A value of a type that implements a contract can be converted to an impl type of that contract
-		- A internal mutable impl type can be converted to an internal immutable type
-
-		```(nc-lang)
-		contract[type Self] animal { fn sound(type Self self)! }
-
-		struct (dog, cat)
-
-		scope @dog {
-			impl[dog] animal { fn sound(type dog _self) { print!("woof") } }
-		}
-		scope @cat {
-			impl[cat] animal { fn sound(type cat _self) { print!("meow") } }
-		}
-
-		fn animal_sound(type !animal animal) { animal.sound() }
-		fn animal_sound_vr(type !&animal animal) { animal.sound() }
-		fn animal_sound_vr_mut(type !&mut animal animal) { animal.sound() }
-
-		fn main {
-			// type !animal animal() [ERROR] it does not have a default init function
-			type (dog, cat) (dog, cat)()
-
-			animal_sound(type !animal(dog) /*dog as !animal*/)
-			animal_sound_vr(type !&animal(&cat) /*cat as !&animal*/)
-			animal_sound_vr_mut(type !&mut animal(&mut dog) /*dog as !&mut animal*/)
-
-			// (type !&mut animal as !&animal)
-		}
-		```
-
-		- My implementation does not make use of static dispatch or early binding, it is implemented similarly to a union type creator
-		{
-			```(nc-lang)
-			// IMPLEMENTATION (Explanation below would change)
-			// First when the compiler sees the use of a runtime polymorphic type, it gives a unique id(an interger in this case)
-			// to all the types making use of the subject of the runtime polymorphic type, for example, once the compiler
-			// sees `type contract(animal)`, it proceeds to give all the types implementing the animal contract a unique id,
-			// this unique id would be stored by `type contract(animal)` which it would use to compare exactly which type to cast
-			// the typeErasedValue to
-
-			// [type dog] => having the unique id [1]
-			// [type cat] => having the unique id [2]
-
-			// Actually, there are exactly two types created [*?] and [*mut ?] for immutable and mutable scenarios each
-
-			#at:copyType
-			unit {
-				union impl_animal = type (dog, cat)
-				struct impl_vr_animal = type (*?, ui2) (typeErased_value, current_id)
-				struct impl_vr_mut_animal = type (*mut ?, ui2) (typeErased_value, current_id)
-			}
-
-			fn main {
-				...
-				animal_sound(type impl_animal(dog))
-				animal_sound_vr(type impl_vr_animal(type *?(addressof cat), 2'ui2))
-				animal_sound_vr(type impl_vr_mut_animal(type *mut ?(addressof cat), 2'ui2))
-			}
-
-			// fn animal_sound would just be implemented like a typical or-field query
-
-			fn animal_sound_vr(type impl_vr_animal animal) {
-				if animal.current_id = 1 {
-					infer dog_MAR = #at:unsafe (animal.typeErased_value as *dog)
-					dog_MAR* =>(some){some.sound()}
-				}
-				or_if animal.current_id = 2 {
-					infer cat_MAR = #at:unsafe (animal.typeErased_value as *cat)
-					cat_MAR* =>(some){some.sound()}
-				}
-			}
-
-			// fn animal_sound_vr_mut would be implemented just like the above
-			```
-		}
-	}
-	- Or-field query would be used for types who give themselves in functions or function marcos, but it would be optional
+	- My implementation does not make use of static dispatch or early binding, it is implemented similarly to a union type creator
 	{
 		```(nc-lang)
-		obj: number = obj: genericNumber(34.5)
+		// IMPLEMENTATION (Explanation below would change)
+		// First when the compiler sees the use of a runtime polymorphic type, it gives a unique id(an interger in this case)
+		// to all the types making use of the subject of the runtime polymorphic type, for example, once the compiler
+		// sees `type contract(animal)`, it proceeds to give all the types implementing the animal contract a unique id,
+		// this unique id would be stored by `type contract(animal)` which it would use to compare exactly which type to cast
+		// the typeErasedValue to
 
-		obj result = (number + number) => r4 {
-			r4
-		}
-		```
-	}
-	- To expose functions or function marcos that do not use the primary type parameter, the following is used
-	{
-		`@dog:contract(animal):speak()`
-	}
-	- Contract inheritance
-	{
-		```(nc-lang)
-		// An impl type of iterator defined this way would allow the use of display and debug_display items
-		contract<type Self> iterator: display + debug_display {}
+		// [type dog] => having the unique id [1]
+		// [type cat] => having the unique id [2]
 
-		// An impl type of iterator defined this way would only allow the use of the iterator items
-		contract<type Self> iterator -> impls<Self> display and impls<Self> debug_display {}
-		```
+		// Actually, there are exactly two types created [*?] and [*mut ?] for immutable and mutable scenarios each
 
-		- Advantages
-		{
-			- Allows for sub contract items inclusion to the super contract during impl types definition
-			- Allows type conversion of impl type of super contract to the various sub contracts
-		}
-
-		```(nc-lang)
-		contract<type Self> animal {
-			fn name(type Self self)type str
-		}
-		contract<type Self> pet: animal {
-			fn \"likes cuddles?"(type Self self) type bool
-		}
-
-		struct cat
-		scope @cat {
-			impl<_> pet {
-				fn name(type Self _) {"cat"}
-			}
-			impl<_> animal {
-				fn \"likes cuddles?"(type Self _) {false}
-			}
-		}
-
-		fn pets(type $pet pet) {
-			!printf("%= and %=", pet.(name, \"likes cuddles?")())
-		}
-		fn animals(type $animal animal) {
-			!printf("%=", pet.name())
+		#at:copyType
+		unit {
+			union impl_animal = type (dog, cat)
+			struct impl_vr_animal = type (*?, ui2) (typeErased_value, current_id)
+			struct impl_vr_mut_animal = type (*mut ?, ui2) (typeErased_value, current_id)
 		}
 
 		fn main {
-			type cat dexter()
-			type $pet pet(dexter)
-			pets(pet)
-			animals(pet as $animal)
+			...
+			animal_sound(type impl_animal(dog))
+			animal_sound_vr(type impl_vr_animal(type *?(addressof cat), 2'ui2))
+			animal_sound_vr(type impl_vr_mut_animal(type *mut ?(addressof cat), 2'ui2))
 		}
-		```
 
-		- Nc-lang changes the lingo/terminology of inheritance with contract inheritance
+		// fn animal_sound would just be implemented like a typical or-field query
+
+		fn animal_sound_vr(type impl_vr_animal animal) {
+			if animal.current_id = 1 {
+				infer dog_MAR = #at:unsafe (animal.typeErased_value as *dog)
+				dog_MAR* =>(some){some.sound()}
+			}
+			or_if animal.current_id = 2 {
+				infer cat_MAR = #at:unsafe (animal.typeErased_value as *cat)
+				cat_MAR* =>(some){some.sound()}
+			}
+		}
+
+		// fn animal_sound_vr_mut would be implemented just like the above
+		```
+	}
+	- For contract types, function or marcos that give the implementing type will give the contract type when called instead
+	- Pseudo contract inheritance
+	{
+		- NPL changes the lingo/terminology of inheritance with contract inheritance
 		- Super contract: the contract doing the inheriting
 		- Sub contract: the contracts that are being inherited from
-		- Remember there is supposed to be a way to call functions with the same identifier but from different contracts
-		{
-			```(nc-lang)
-			x.$pet:call()
-			x.$zoo:call()
 
-			@animal:$pet:call(x) /$ This should be preferred for obvious reasons
-			```
+		When a user defined constraint application for a contract includes the check for the implementation
+		of certain contracts, it enforces an invariant that mimics "contract inheritance".
+		
+		And because of this, contract types of such a contract, includes the contract properties of those
+		contract that are checked for implementations.
+		And apart from inclusion features of the contract type properties, the language sees the contract type
+		as super contract type and will perform sub contract type conversions
+
+		```NPL
+		contract a[type Self] =
+		fn a(_ self: Self)! {
+			print("A\n")
 		}
+		end contract
+
+		contract b[type Self] =
+		fn b(_ self: Self)! {
+			print("B\n")
+		}
+		end contract
+
+		contract c[type Self] apply {@Self impls a and impls b} =
+		fn c(_ self: Self)! {
+			print("C")
+		}
+		end contract
+
+		struct x;
+
+		scope @x =
+		impl c;
+		end scope
+
+		fn main()! {
+			obj lala: x()
+
+			obj c_contract: contract(&c)(&x)
+
+			>: C contract type can call contract propeties of a, b, and c
+
+			c_contract$.a()
+			c_contract$.b()
+			c_contract$.c()
+
+			>: Since the C contract is a super contract, the language will perform sub contract type conversion
+
+			foo(c_contract.into())
+			doo(c_contract.into())
+		}
+
+		fn foo(_: contract(&a))! {}
+		fn doo(_: contract(&b))! {}
+		```
 	}
 	- Under contract implementation
 	{
 		When implementing a function or function marco, copy exactly how the function or function marco was declared verbatim
+
+		With `_` helping to replicate constraint application
 	}
 	- Constraint application is allowed on impl items
 	{
-		```(nc-lang)
-		scope @array[type T] {
-			impl[array[T]] empolyee apply @T impls unicode_string {
-				#decl:todo
-			}
-		}
+		```NPL
+		scope @array[type T] =
+		impl[array[T]] employee apply {@T impls unicode_string};
+		end scope
 		```
 	}
-	- New contract query
+	- New contract impl query
 	{
 		```(nc-lang)
 		@ui4 impls iterator[char]
+
 		@fn(ui4)! impls fn(ui8)!
+
 		@cat impls animal
 		```
 	}
-	- New entry for impl types
+	- New contract types and how they are to be used
 	{
-		```(nc-lang)
-		obj c: !iterator[char]
+		```NPL
+		obj a: contract(&animal)
+		obj b: contract(mut&animal)
+
+		obj c: contract(animal)
+		obj d: box[contract(animal)]
+		obj e: boxb[contract(animal)]
+
+		>: And their reference equivalent
+		obj _: &contract(animal)
+		obj _: *contract(animal)
+
+		>: Usage example
+
+		a$.some()
+		a.some_ref()
+		[Not allowed]
+
+		b$.some()
+		b.some_ref()
+		b.some_mut_ref
+
+		>: The same can be applied to the category value reference
+		```
+
+		Because type `contract(animal)` is dynamically sized, it is advised to put it behind a category MAR or
+		allocating reference
+	}
+	- How contracts are accessed [New]
+	{
+		```NPL
+		contract[type Self] animal =
+		fn speak() !
+		fn sound(self: Self) &str
+		end
+
+		struct (dog, cat);
+
+		scope @dog =
+		impl[dog] animal =
+		fn speak() ! {
+			print("Woof Bitch!")
+		}
+		fn sound(self: dog) &str {
+			"Woof Woof"
+		}
+		end
+		end scope
+
+		scope @cat =
+		impl[cat] animal =
+		fn speak() ! {
+			print("Meow Bitch!")
+		}
+		fn sound(self: cat) &str {
+			"Meow Meow"
+		}
+		end
+		end scope
+
+		fn main() ! {
+			obj andy: dog()
+			obj dio: cat()
+
+			obj _ = (andy, dio).sound()
+
+			andy.contract(animal):sound()
+
+			@contract(animal):sound(andy)
+			@contract(animal):speak()
+
+			>: How can I call non member properties from an object of contract type?
+			obj any_animal: contract(animal)(andy)
+
+			any_animal$.sound()
+			
+			@contract(animal in any_animal):speak()
+		}
 		```
 	}
-	- Remember `#at:onlyImpl`
+	- Remember `'at:onlyImpl`
 	- Replicating constraint applications on implemantions of a contract can be done by using `_` as the placeholder
 	{
-		```(nc-lang)
-		contract[type Self] show {
-			fn show_me(obj self: Self)! apply @Self impls display
-		}
+		```NPL
+		contract[type Self] show =
+		fn show_me(self: Self)! apply {@Self impls display};
+		end contract
 
-		struct person = obj name: &str, obj age: ui4
-		scope @person {
-			impl[_] show {
-				fn show_me(obj self: Self)! apply _ {
-					printf("This is you: %{self}")
-				}
-			}
+		struct person = name: &str, age: ui4
+
+		scope @person =
+		impl show =
+		fn show_me(self: person)! apply _ {
+			printf("This is you: $(self + self)")
 		}
+		end impl
+		end scope
 		```
 	}
 	- Introduction of implementation fields(objects in a type-creator) along with how they are meant to be implemented
 	{
-		```(nc-lang)
-		contract[type Self] widget {
-			struct =
-				#at:readonly
-				obj font_size: si4,
-				obj (theme, my_theme): theme,
-				#at:hide
-				obj main_settings: settings
+		```NPL
+		contract[type Self] widget =
+		struct =
+			at:readonly font_size: ui4,
+			(theme, my_theme): theme,
+			at:hide main_settings: settings
 
-			fn font_size(obj self: &Self) si4 {
-				-> if self$.font_size lt 0 {
-					self$.theme.get_standard_font_size()
-				}else {
-					self$.font_size
-				}
+		fn font_size(self: &Self) ui4 {
+			if self$.font_size lt 0 {
+				self$.theme.get_standard_font_size()
+			}else {
+				self$.font_size
 			}
 		}
+		end contract
 		```
 
 		Anonymous struct and union type creators are used to define the implementation fields required by the
 		contract. They specifically define the least amount of fields required by the contract, with any metadata
 		attached to it.
 	}
-	- An implementation of a contract cannot be subject to access restriction, this is because it is meant to model extactly what the contract that it is implementing wants.
 	- The syntax for using a contract identifier as a scope
 	{
 		```(nc-lang)
 		obj _ = self.contract(iterator[char]):next()
-		obj _ = contract(iterator[char]):next(self)
+		obj _ = @any:contract(iterator[char]):next(self)
 		```
 	}
 	- An implementation can specify a function or marco without a body only if it has a default implementation
 	{
-		```(nc-lang)
-		contract[type Self] blades {
-			#at:accessDependsOnImpl
-			fn spin() {
-				print("Spining")
-			}
+		```NPL
+		contract[type Self] blades =
+		at:accessDependsOnImpl
+		fn spin()! {
+			print("--- spinning ---")
 		}
+		end contract
 
-		struct fan
-		scope @fan {
-			#at:hide(type)
-			impl[] blades {
-				fn spin()!
-			}
-		}
+		struct fan;
+
+		scope @fan =
+		impl blades =
+		at:hide fn spin()!;
+		end impl
+		end scope
 		```
+
 		This isn't particularly useful but when paired with access restriction for function or marco items that
 		depends on the implementation, it becomes invaluable.
 	}
@@ -2774,14 +3106,14 @@
 
 	>! (->) :: f a -> a -> f b
 	>! fn #misc::operator~> [type B](type Self[A] self, type A a) type Self[B] -- Has no actual use
-	end contract
+	end
 
 	scope @hashMap[type Key, type Value] =
 	impl[hashMap[Key, ?]] functor[Value] =
 	fn fmap[type B](type hashMap[Key, Value] self, type fn(Value)B fcn) type hashMap[Key, B] {
 		(&self).iter().map(fcn).collect()
 	}
-	end impl
+	end
 	end scope
 
 	scope @maybe[type T] =
@@ -2791,7 +3123,7 @@
 			type maybe(fcn(some))
 		}else
 	}
-	end impl
+	end
 	end scope
 
 	scope @[obj size: ui]type T =
@@ -2799,7 +3131,7 @@
 	fn fmap[type B](type [size]T self, type fn(T)B fcn) type [?]T {
 		(&self).iter().map(fcn).collect()
 	}
-	end impl
+	end
 	end scope
 
 	scope @arrayList[type T] =
@@ -2807,7 +3139,7 @@
 	fn fmap[type B](type arrayList[T] self, type fn(T)B fcn) type arrayList[B] {
 		(&self).iter().map(fcn).collect()
 	}
-	end impl
+	end
 	end scope
 
 	struct collection[type TC[?], type T] = type TC[T] wrapper
@@ -2828,7 +3160,7 @@
 	fn fmap[type U](type (collection[AbstractType[?], T], fn(T)U) (self, fcn)) type collection[AbstractType[?], U] {
 		type collection(self.wrapper.fmap(fcn))
 	}
-	end impl
+	end
 
 	fn increment[type U](type collection[AbstractType[?], T] collection) type collection[AbstractType[?], U] {
 		collection.fmap(fn(infer x){x + 1})
@@ -2863,8 +3195,111 @@
 		4. Flattened type argument passing
 	}
 }
+: Removing `at:unsafe` from the language
+: Make the following available for collection expressions [Read This, Very Important]
+{
+	```NPL
+	x = arrb[32|4, 5, 6, 7, 8]
+	y = arrList[arena, 32|4, 5, 6, 7]
+
+	marco collectionExp(x: allocator, y: capacity, x: ..T) {
+		...
+	}
+	>: So, it will work by allowing any number of parameters before the variadic parameter
+	```
+
+	And make the collection literals have the same semantics as number literal tags
+
+	```NPL
+	fn main()! {
+		obj a = [3, 4, 5, 6]
+		obj b: arrb = [3, 4, 5, 6]
+		obj c: arrList = [4, 5, 6, 0]
+	}
+	```
+}
 : References (Change that rule that says comptime friendly category 2 allocating MARs inner allocating MAR advance function marco changes to request comptime arguments)
 {
+	- Solution to making references that reference the individual objects in a category-2 allocating MAR unique
+	{
+		Due to something like the below:
+		
+		```NPL
+		fn push_vec(obj vec: mut&arrayList[ui4], obj value: &ui4) {
+			vec$.push(value)
+			vec$.push(value)
+		}
+
+		fn main {
+			obj mut x = arrayList[2, 3, 4]
+
+			obj mut ref = &(x.[3])
+			obj other_ref = &34
+
+			swap_refs(ref, other_ref)
+
+			push_vec(mut&x, ref)
+		}
+
+		fn swap_refs(obj mut (x, y): &ui4) {
+			obj z = x
+			(x, y) = (y, z)
+		}
+		```
+
+		References of the individual objects in a category-2 allocating MAR must be defined as immutable
+		objects to make them easy for the compiler to track
+	}
+	- Scanning functions and marcos to the below issue
+	{
+		```text
+		In a function or marco, the compiler will look to see if the category-2 allocating MAR is used after
+		deallocation, if yes, then the constraint applies, if no, then the constraint does not apply. Like the
+		`push` function
+		```
+
+		```NPL
+		fn main {
+			obj intLists = arrayList[2, 3, 4, 5]
+			obj intRef = &(intLists[2])
+
+			push_to_arrayList(inLists, intRef)
+		}
+
+		fn push_to_arrayList(obj (intLists: mut&arrayList[ui4], intRef: &ui4)) {
+			intLists$.push(intRef) >: First push is safe
+			intLists$.push(intRef) >: Second push is not allowed because the value referenced by `intRef` is dead
+		}
+		```
+	}
+	- Individual objects in a category-2 allocating MAR move semantics
+	{
+		Individual objects in a category-2 allocation MAR use non-destructive moves that leave them in a null
+		and valid state after a move
+	}
+	- Addition of allocating value references
+	{
+		```(nc-lang)
+		obj x: {&}ui4
+		x = allocate(45)
+
+		obj y = x
+		x = allocate(34)
+		```
+	}
+	- Non allocating references limitation on moving what they reference
+	{
+		- A non allocating reference cannot move what they reference
+	}
+	- For objects that use destructive moves
+	{
+		The objects cannot move themselves when they are being referenced without re-assignment after
+	}
+	- Think about enforcing this allocating reference rules on recursive data structures
+	{
+		Like linked lists and trees
+	}
+
 	There are two types of references
 	- value references
 	- memory address references (non allocating memory address reference and allocating memory address reference)
@@ -2895,14 +3330,16 @@
 	- MAR(Memory-address-reference) semantics
 	{
 		- Dereference operator gives an optional handling type
-		- Then for memory-address referencing regardless of the memory-value type [*?] is used
+		- No more equivalent of raw pointers in NPL
 		{
-			obj x: *? = malloc()
-			``getting the internal type representation is not defined for the type
+			Everything will now be a byte
+			
+			```NPL
+			unique byte = ui1
+			```
 
-			#at:unsafe
-			obj ui8: *ui8 = x as *ui // Casting from a untyped MAR to a typed MAR is unsafe and dangerous
-			// But casting from a typed MAR to an untyped MAR is safe
+			The `byte` type refers to the fundamental unit of memory and will be what anything that requires
+			an equivalent of raw pointers will use
 		}
 	}
 	- Non allocating memory address reference provides a handy unsafe function for peeking at memory
@@ -3050,7 +3487,7 @@
 				- Makes use of the `advance` function marco, therefore it is know to manage multiple objects
 				- Supports delay initialization
 
-				RULES
+				RULES+
 				- Must be put inside a struct type creator
 				- There must be three and-fields and an optional field with purposes, types and identifiers already set for them
 				  - allocMAR
@@ -3060,9 +3497,9 @@
 				- The allocMAR and-field must be hidden
 				- The allocMAR and-field cannot use the advance function marco
 				- The capacity and size and-field must be readonly
-				- The size and-field is not allowed to be reassignmed or incremented in user code but can be decremented and
+				- The size and-field is not allowed to be reassigned or incremented in user code but can be decremented and
 				  set to zero in user code
-				- Decrementing the size and-field must be done so using the sutraction operator for maximum safety
+				- Decrementing the size and-field must be done so using the subtraction operator for maximum safety
 				- The capacity and-field can only be mutated in two instances
 				  - During allocation where it must be assigned a value and then must be used as the argument of the amount
 				  parameter in the allocate function immediately after the assignment
@@ -3144,23 +3581,46 @@
 				}
 				```
 			}
-		}
-	}
-	- Creation of abstract objects to last just enough as the reference
-	{
-		Abstract objects bound to value references get promoted to concrete values that live as long as there are still valid value
-		references bound to them
+			- Okay, here is my final decision [NEW]
+			{
+				References that can allocate memory are divided into two
+				- Allocating references
+				- Category references
 
-		```(nc-lang)
-		fn main {
-			infer ref = &45 // Lives as along as ref since it is only bound to ref
-			take_valueRef(&56) // Lives as long as the parameter it is bound to since there are no more value references bound to it
-			infer ref2 = take_and_give_valueRef(&90)
-			printf!("%{ref}=, %{ref2}=")
+				The whole point of creating a different type of references for allocation is to track
+				allocations and deallocations and as a byproduct enforce initialization constraints on newly
+				allocated objects. Plain allocating references do not have the capabilities to allow the
+				language to check for and enforce said constraints, but category references, so because of
+				that, plain allocating references are limited in their use
+
+				[Limitations of plain allocating references]
+				- Cannot be an allocatable type
+
+				```NPL
+				at:createCategoryValueReference(1)
+				struct box[type T] =
+					obj data: {&}T,
+					obj allocator: {&}contract(allocator)
+
+				fn goo(x: box[ui4]) {
+					x = @box:new(89, &arena)
+				}
+				```
+
+				The truth is the above is percieved to be solely for allocating references that do not
+				allocate multiple objects. Meaning I want allocating references that allocate multiple
+				references to result to category 2 references only
+
+
+				```NPL
+				exp:isCategoryReference(1), exp:isCategoryReference(2), exp:isCategoryReference(3)
+
+				exp:isCategoryMemoryAddressReference(1)
+
+				exp:isCategoryValueReference(1)
+				```
+			}
 		}
-		fn take_valueRef(type &ui4 _){}
-		fn take_and_give_valueRef(type &ui4 x){x}
-		```
 	}
 	- Resolved ideas
 	{
@@ -3173,6 +3633,34 @@
 		arrayList[1, 2, 3, 4; @allocatorTag:bump]
 		type arrayList<ui4> x()
 		x.drop()
+		```
+	}
+	- News flash, I haven't fixed allocator awareness as I thought I did [NEW]
+	{
+		Instead of this dumb allocator allocator tags, why don't I structure it around an allocator contract,
+		and have the category types store the allocator contract types.
+
+		Well the above idea is great, I just need to make allocator entry accessible now
+
+		```NPL
+		fn foo() {
+			obj arena = @memory:allocator:arena_allocator:new(12'kb)
+			obj bump = @memory:allocator:bump_allocator:new()
+
+			obj intsFile = @file:new()
+
+			obj numsList = arrayList[arena|3, 4, 5, 6]
+			numsList.clear()
+			numsList.push_with_allocator(bump, 2, 3, 4, 5, 6)
+			numsList.changeAllocator(arena)
+		}
+		```
+
+		Okay, the below is very good. Now I just have to come up with a way to specify an allocator for
+		custom string text literal tags
+
+		```NPL
+		@string:new_with_allocator(arena, "Daniel Emeka Citizen")
 		```
 	}
 }
@@ -3201,9 +3689,9 @@
 	- There would be a `static_utility` contract that must be implemented and `dynamic_utility` contract for categoty2 allocating MAR
 	- `static_utility` contract would contain the capacity push marcos.
 }
-: You can now define value reference scope @items in the scope @of the type they are referencing
+: You can now define value reference scope @items in the scope of the type they are referencing
 {
-	```(nc-lang)
+	```(ncLang)
 	import mod std:io
 
 	scope @&ui4 {
@@ -3727,6 +4215,9 @@
 			- Loop statement
 				Dependencies must be comptime and it attempts to unroll the loop while running what is comptime in the body of the
 				loop. If the entire body is contains comptime constructs, then it simply runs the loop natively
+
+		- Main function
+			Qualifying the main function with `at:run` ensures that the entire program is ran at compile time
 	}
 	- `#at:pseudo_run` (Diasllow pseudo_run for parameters)
 	{
@@ -3758,6 +4249,8 @@
 }
 : Unpacking syntax and semantics
 {
+	- Adding special semantics for structs unpacking in another struct, to enable that rust behaviour
+
 	- Unpacking implementation is devoid of value semantics, therefore it is encouraged.
 	- Must be more than on identifier in an unpacking parameter
 	- Varaidics, structures, special category-2 allocating MAR and comptime category-2 allocating MAR
@@ -3777,16 +4270,16 @@
 	- Value parameters
 
 	```(nc-lang)
-	infer {x, y} = $(2, 3) /# Same thing
-	infer {x, {y, z}} = $(2, $(3, 5))
-	infer {x, {y, z}} = $(2, [2, 3])
+	obj [x, y] = obj: tuple(2, 3) >! Same thing
+	obj [x, [y, z]] = obj: tuple(2, obj: tuple(3, 5))
+	obj [x, [y, z]] = obj: tuple(2, [2, 3])
 
-	infer {x, ., z} = $(8, 9, 4, 6) /# (x=8) and (z=6)
-	infer {x, y, .} = $(8, 9, 4, 6) /# (x=8) and (y=9)
-	infer {., y, z} = $(8, 9, 4, 6) /# (y=4) and (z=6)
+	obj [x, ., z] = obj: tuple(8, 9, 4, 6) >! (x=8) and (z=6)
+	obj [x, y, .] = obj: tuple(8, 9, 4, 6) >! (x=8) and (y=9)
+	obj [., y, z] = obj: tuple(8, 9, 4, 6) >! (y=4) and (z=6)
 
-	/# Unpacking parameters when applied to object declarations do not support delay initialization
-	infer {x, y} /# Does not support delay initialization
+	>! Unpacking parameters when applied to object declarations do not support delay initialization
+	obj [x, y] >! Does not support delay initialization
 	x := 34'ui4
 	y := 90'ui4
 	```
@@ -3794,56 +4287,98 @@
 	- The `at:unpack` or `at:reverse_unpack` attribute is used to unpack packed arguments both non-unpacking parameters.
 
 	```(nc-lang)
-	infer (x, y) = #at:unpack $(2, 3)
-	
-	/# Note it does not have unpacking parameter powers though
-	infer (x, (y, z)) = #at:unpack $(2, [2, 3]) /# [ERROR] grouping amount of both actors aren't the same
+	>! Cheer up, `at:reverse_unpack` unpacks in the reverse order, which is something not available to groupings
+	obj [x, y] = at:reverse_unpack obj: tuple(2, 3) >! x = 3 and y = 2
 
-	/# Cheer up, `at:reverse_unpack` unpacks in the reverse order, which is something not available to groupings
-	infer (x, y) = #at:reverse_unpack $(2, 3) /# x = 3 and y = 2
+	>! It can also unpack arguments in the following:
+	>! [1] tuple and collection expression context
+	>! [2] static array argument entry
+	>! [3] comptime argument entry(This is already obvious since they share the semantics with value argument entry)
 
-	/# It can also unpack arguments in the following:
-	/# [1] tuple and collection expression context
-	/# [2] static array argument entry
-	/# [3] comptime argument entry(This is already obvious since they share the semantics with value argument entry)
+	obj tuple = obj: tuple(2, 3, 4)
+	obj _ = obj: tuple(at:unpack tuple)
+	obj _ = [at:unpack tuple, 4, 5, 6]
 
-	infer tuple = $(2, 3, 4)
-	infer _ = $(#at:unpack tuple)
-	infer _ = [#at:unpack tuple, 4, 5, 6]
-	#at:comptime
-	infer static_array = [2, 1]
-	type [#at:unpack static_array]ui4 _ = [[2], [3]]
-	type matrix[#at:unpack static_array] _ ([[2], [3]])
+	at:comptime
+	obj static_array = [2, 1]
+
+	type [at:unpack static_array]ui4 _ = [[2], [3]]
+	type matrix[at:unpack static_array] _ ([[2], [3]])
+
+	obj _: matrix!(at:unpack static_array)(
+		[
+			[2], [3]
+		]
+	)
 	```
 
 	Variadics are comptime constructs are naturally packed arguments and therefore shares the same semantics as packed arguments
 	when used in certain places.
+
+	- Unpacking can now fully be applied to parameters and objects
+	{
+		```NPL
+		fn close(obj {name, age, address}: person) person {
+			obj jack: person(name, age, address)
+			jack
+		}
+
+		obj _ = iter.map(fn(obj {name, age}){ name + age.into() })
+		```
+	}
+	- Special semantics for unpacking struct values in the same struct
+	{
+		```NPL
+		struct person = obj (name: &str, age: ui1, address: &str)
+
+		obj josh: person("Josh", 34, "Downey Street Pack")
+
+		obj daniel: person(
+			at:unpack josh,
+			.name= "Daniel"
+		)
+		```
+	}
+	- Unpacking values with some postfix or prefix operator is allowed
+	{
+		```NPL
+		obj x: tuple(3, 4, 5, 6)
+
+		obj _ = arr[at:unpack &x]
+		```
+	}
 }
-: Cast(& transmutation & type & item) operator(`->`) is needed now since function identifier overloading isn't a thing anymore
+: Type cast semantics (involved in is transmutation)
 {
-	- Transmutation would be available
-	- Any conversion for language known types that isn't failiable would be available
+	Type casting will now follow rust's into interface method, no more `23 as bool` or `23#bool`, just
+	`23.into[bool]()`
 
-	```
-	type *? type_erased_MAR()
-	type *ui4 typed_MAR = #at:unsafe type_erased_MAR as *ui4
+	```NPL
+	obj rawMAR: *?()
 
-	3 as r4
+	obj typedMAR: *ui4 = at:unsafe rawMAR.into()
 	```
 }
+: Remeber that memory content function that gives the raw memory contents of a memory location
+{
+	```NPL
+	std:os:memoryof(45'r4)
+	```
+}
+: No more cast operator actually, put everything into contract and impls
 : Grouping syntax and semantics
 {
 	Groupings
 	─────────
-	Is a language feature that encapsulates multiple items and allows them to be treated as a single item. It's main inclusion to the
-	language is to eliminate unnecessary typing that sometimes leads to code verbosity and to add a more high-level touch to the
-	language.
+	Is a language feature that encapsulates multiple items and allows them to be treated as a single item.
+	It's main inclusion to the language is to eliminate unnecessary typing that sometimes leads to code
+	verbosity and to add a more high-level touch to the language.
 	
 	Semantics
 	───────────
-	Grouping usually consists of two parts, a left and right actor which consitis of participants, A participant can either be a
-	single entity or a grouping. Groupings operate by the participants of the left actor acting on the participants of the right actor.
-	This type of grouping is called a binary grouping.
+	Grouping usually consists of two parts, a left and right actor which consitis of participants, A participant
+	can either be a single entity or a grouping. Groupings operate by the participants of the left actor acting
+	on the participants of the right actor. This type of grouping is called a binary grouping.
 
 	Example:
 	```(random)
@@ -3881,21 +4416,21 @@
 	Levels of groupings essentially means the nesting levels of a grouping, just like how blocks can be nested
 	example:
 	```(random)
-	(a, (l, o))
+	(p₁, (p₁, p₂)₂)
 	└───┼──┬─┼┘
 		│  1 │
 		└──┬─┘
 		   2
 
-	(a, (b, (c, (d, e))), f)
-	└───┼─┬─┼───┼────┼┼┼───┘
-		│ 1 │   │    │││
-		└───┼─┬─┼────┼┼┘
-			│ 2 │    ││
-			└───┼──┬─┼┘
-				│  3 │
-				└──┬─┘
-				   4
+	(p₁, (p₁, (p₁, (p₁, p₂)₂)₂)₂, p₃)
+	└┬───┼────┼────┼──────┼─┼─┼────┘
+	 1   │    │    │      │││
+		 └┬───┼────┼──────┼┼┘
+		  2   │    │      ││
+			  └┬───┼──────┼┘
+			   3   │      │
+				   └┬─────┘
+				   	4
 	```
 
 	Grouping Amount
@@ -3910,10 +4445,14 @@
 	(x, (y, (z, (c, g)))) ∘ (a, (b, c))		-- Left actor grouping amount = (2) and Right actor grouping amount = (2)
 	```
 
+	{
+		Wait, remember the use of `_` in grouping
+	}
+
 	Grouping Rule Of Use
 	────────────────────
 	1. User written lonely groupings do not support grouping levels.
-	2. The language permits only an expression and object declaration to have mutiple levels of a grouping.
+	2. The language permits only an expression [and object declaration] to have mutiple levels of a grouping.
 	3. The resulting expansion must result in valid ungrouped nc-lang code
 	4. Each actor in a binary grouing must have the same grouping amount which ensures full coverage between both actors. Example:
 	```(random)
@@ -3974,7 +4513,7 @@
 	───────────────────────────
 	- Declaration items
 	{
-		- Types entry
+		- Types entry (No more)
 		{
 			```(nc-lang)
 			type (si4, si8)
@@ -3994,8 +4533,84 @@
 			type ui4 mut(c, b)
 			type ui4 (mut c, mut b)
 			```
+
+			- New object grouping
+			{
+				```NPL
+				>: Object declaration grouping
+
+				: Version 1 (`mut` outside and initialization outside)
+				{
+					obj mut (x: si4, y: si4) = (34, 56, 78)
+					obj mut (x: si4, y: si4)()
+					obj mut (x: si4, y: si4)
+				}
+				: Version 2 (`mut` inside and initialization outside)
+				{
+					obj (mut x: si4, mut y: si4) = (34, 56, 78)
+					obj (mut x: si4, mut y: si4)()
+					obj (mut x: si4, mut y: si4)
+
+					Note, `mut` and initialization in this case is optional
+				}
+				: Version 3 (`mut` inside and initialization inside)
+				{
+					obj (mut x: si4(), mut y: si8 = 45)
+
+					Note, `mut` and initialization in this case is optional
+				}
+				Version 5 (`mut` outside and initialization inside)
+				{
+					obj mut (x: si4(), y: si8 = 9)
+
+					Note, initialization in this case is optional
+				}
+				Version 6 (`mut` outside, initialization outside and type outside)
+				{
+					obj mut (x, y): si4
+				}
+				Version 7 (`mut` inside, initialization outside and type outside)
+				{
+					obj (mut x, mut y): si8
+				}
+
+
+				>! For normal application
+				{
+					obj (x: si4, y: si4) = (34, 56, 78)
+					obj (x: si4, y: si4)()
+
+					obj (x: si4 = 2, y: si4 = 3)
+					obj (x: si4(), y: si4())
+
+					obj (x, y): si4 = (34, 56)
+					obj (x, y): si4()
+				}
+
+				>! For `mut` application
+				{
+					obj mut (x: si4, y: si4) = (34, 56, 78)
+					obj (x: si4, mut y: si4)()
+					obj (mut x: si4, y: si4)()
+					obj (mut x: si4, mut y: si4)()
+				}
+
+				>! Problem
+				{
+					obj (x, y, z): person("Daniel", 34; "David", 90; "Jungle", 34) >! Not possible
+
+					obj (x, y, z) = obj: (person("Daniel", 34), person("David", 90), person("Jungle", 34))
+				}
+
+				>: Object expression grouping
+				fcn(obj: person(), obj: (pop(34), dance(9.4)), obj: (pop, dance))
+				obj: (si4, si8)
+				obj: (person("Daniel Emeka", 34), person("Dennis Vaschi", 90))
+				type (si4(), si8())
+				```
+			}
 		}
-		- Function declaration
+		- Function declaration [No grouping for functions]
 		{
 			```(nc-lang)
 			/# Can only be applied to it's identifiers
@@ -4032,30 +4647,37 @@
 			}
 			```
 		}
-	}
-	- Typescope
-	{
-		```(nc-lang)
-		scope @(ui4, ui8) {
+		- Typescope
+		{
+			```(nc-lang)
+			scope @(ui4, ui8) {
+				fn someFn() {}
+			}
+
+			scope (@ui4, @ui8) =
 			fn someFn() {}
+			end scope
+
+			scope @(ui4, ui8) =
+			fn someFn() {}
+			end scope
+			```
 		}
-		```
 	}
 	- Import
 	{
-		```(nc-lang)
+		```NPL
 		import mod (some, none)
-		import (mod, pkg) (some, none)
 		```
 	}
 	- Scoped access
 	{
 		Although not classified as an item, but they are part items used in enough important places that they deserve their section.
-		```(nc-lang)
+		```NPL
 		x:(a, b, c)
 		@si4:(x, y, z)
-		#at:(a, b, c)
-		#exp:(x, y, z)
+		at:(a, b, c)
+		exp:(x, y, z)
 		```
 	}
 	- Statement
@@ -4151,75 +4773,6 @@
 			It is important to note that scope access is not intrinsically an expression(primary expression) which is why they are
 			part of import items and type declaration items. Any where that scope items need to be accessed, scoped items would be
 			present.
-		}
-	}
-	- Grouping combinations
-	{
-		Due to some items existing as part items, the groupings of those part items can be used to act on the groupings of the whole
-		items they are involed in, but not all are valid because they can produce invalid grouping use that violates the grouping rule
-		of use. All valid and invalid would be listed below
-
-		- Function declarations and (give)type declarations
-		{
-			```(nc-lang)
-			/# They do not support the groupings for it's give type, this is because it violates the 3rd grouping rule of use
-			fn some() type (si4, si8) {} /# Error, WTF?
-			```
-		}
-		- Import and scoped access
-		{
-			```(nc-lang)
-			import (mod, pkg) x:(a, b)
-			```
-		}
-		- Type entry and scoped access
-		{
-			```(nc-lang)
-			type x:(a, b, c)
-			```
-		}
-		- Object declarations and type declarations [The new rule applies, but I am to lazy to add it]
-		{
-			```(nc-lang)
-			type (si4, si8) (a, b)
-			type &(si4, si8) mut(a, b)
-			/# And as stated, above they support grouping levels
-			type (si4, si8) (a, (b, c))
-			```
-		}
-		- Object declarations and type declarations, expressions and the use of the context identifer
-		{
-			```(nc-lang)
-			/# Can apply as a whole
-			type (si4, si8) (a, (b, c)) = (2, (3, 4))
-			type si4 (a, b, c) = {
-				(1, 2, 4)
-			}
-			type si4 (a, b, c)()
-
-			/# Can apply individually
-			type si4 (a(), b(), c())
-			type si4 (a = 3'si4, b = 4'si4, c = 6'si4)
-
-			/# Context identifier defined use for expression grouping when acting on object identifiers
-			/# When used in place of a value expression during grouping initialization, it leaves the object identifer uninitialized
-
-			type si4 (a, b, c)(_, 3, 90)
-
-			if b == 3 {
-				a := b * 2
-			}
-			else {
-				a := b * 3
-			}
-			```
-		}
-		- Type creator declarations and type declarations
-		{
-			```(nc-lang)
-			/# Only for unique type creators, since they take single types, they can be applied to it's identifiers and body
-			unique (delta, maga) = type (si4, si8)
-			```
 		}
 	}
 }
@@ -4461,6 +5014,14 @@
 }
 : Object semantics
 {
+	- Unused object identifiers must be prefixed with the `_` identifier
+	{
+		```(ncLang)
+		obj _ a = 34
+		obj _ b = 90
+		```
+	}
+
 	An OBJECT in nc-lang is a user allocated memory region that contains valid values of the object's type
 	A NON-OBJECT in nc-lang is a user allocated memory region that does not contain valid values of the object's type
 	A PSEUDO-OBJECT in nc-lang is a memory region that has not been allocated by the user or compiler
@@ -4580,6 +5141,30 @@
 }
 : Value semantics
 {
+	- Type creator that have fields that do not have default init functions cannot be move types
+	- Move semantics would now be non-destructive moves but made explicit
+	{
+		This form of move semantics uses the default object constructor of a particular type on the `RHS`
+		It is for this reason that types with a default object constructor cannot be move types and therefore
+		be allowed to participate in move semantics
+
+		```NPL
+		at:createMoveType
+		struct someThing = largeNum: ui2048
+
+		fn main {
+			obj a = arrayList[2, 3, 4]
+
+			obj b = at:move a
+		}
+		```
+
+		Also remember that the move semantics of allocating MARs already used this form of move semantics, you
+		just allowed your Rust brain to confuse yourself in this
+	}
+	- Would move value semantics be different for optional types(including MARs) and error management types though?
+
+
 	VALUE SEMANTICS defines what exactly are values in nc-lang, how they are treated and passed around.
 
 	A VALUE in nc-lang is just simply data that has been made meaningful due to a type.
@@ -4737,24 +5322,7 @@
 		A type creator without an allocating MAR can become a move type by using the LCI attribute `at:moveType`
 	}
 }
-: Automatic dereferencing for values originating from a give type
-{
-	`#at:auto_deref` - automatically dereferences the give value of a function and function marco when qualified. It recursively
-	dereferences as long as the type implements the dereference operator and stops if it doesn't.
-
-	```(nc-lang)
-	fn studio(type &&&&si4 x) #at:auto_deref type &&&&si4 {
-		x
-	}
-
-	import mod std:io as !
-	fn main {
-		type si4 x = studio(&&&&3)
-		!print(x)
-	}
-	```
-}
-: Custom literal definition semantics
+: Literal tag definition semantics
 {
 	- Custom literal definition function marcos must be defined in the type scope of their give type and a type scope is only
 	  meant to contain one custom literal definition function marco.
@@ -4780,7 +5348,7 @@
 
 	- The literal data-types are only to be used as function parameters in a literal definition function.
 }
-: Collection expression definition semantics
+: Collection expression tag definition semantics
 {
 	- The collection expression must be defined in the type scope they are giving and only one can be defined in that type
 	- The identifiers entered define their own namespace and are devoid of scope semantics
@@ -4798,7 +5366,7 @@
 	array[3, 4, 5; @allocTag:bump]			/# Array has no use for allocator tags so it should not be there
 	```
 }
-: `nil` of `type nil` is the language's default ZST
+: `none` of `type none` is the language's default ZST
 : Process exit
 {
 	Nc-lang provides a builtin function for exiting a proccess and another builtin function for registering functions to call at
@@ -4869,7 +5437,7 @@
 		support circular dependencies.
 	}
 }
-: `type array` The dynamic stack array in nc-lang that solves the limitations of the static array
+: Bounded array in nc-lang that solves the limitations of the static array
 {
 	- Problem with array initialization from functions, to be solved with function marcos [Not a problem anymore]
 	{
@@ -4961,7 +5529,7 @@
 	marco iter[type ..T](obj x: tuple['at:unpack T]) tupleIterator['at:unpack T] {
 		-> obj: tupleIterator['at:unpack T](&x, 1)
 	}
-	end @tupleIterator scope
+	end scope
 
 	import marco std:io:(print, printf)
 
@@ -5033,19 +5601,16 @@
 			- 2
 			```
 		}
-		- Using any whitespace information to parse the new give jump statement and function marcos
+		- Miscellaneous
 		{
-			```(nc-lang)
-			give ! 3
-			!fcn()
-			```
-		}
-		- Using line whitespace information to parse any item that requires braces, so that they must be on the same line
-		{
-			```(nc-lang)
-			fn main /# Error: no block
-			{}
-			```
+			- Scoped identifiers decisive parsing with whitespace
+			- Using line whitespace information to parse any item that requires braces, so that they must be on the same line
+			{
+				```(nc-lang)
+				fn main /# Error: no block
+				{}
+				```
+			}
 		}
 	}
 }
@@ -5059,15 +5624,16 @@
 : Basically a matrix type already implemented
 {
 	```(nc-lang)
-	infer x = type matrix([[3, 4], [3, 4]])
-	infer y = matrix[[3, 4], [3, 4]]
+	obj x = obj: matrix([[3, 4], [3, 4]])
+	obj y = matrix[[3, 4], [3, 4]]
 
-	unique matrix!(type ui (row, column)) = [row][column]ui4
-	scope @matrix!(type ui (row, column)) {
-		fn #misc:collectionExp("matrix")!(type ui column) (type [column]ui4 args..) type matrix!(#exp:varaidic_size(args), column) {
-			type matrix([#at:unpack args])
-		}
+	unique matrix!(obj (row, column): ui) = arr[arr[ui4]!(column)]!(row)
+
+	scope @matrix!(obj (row, column): ui) =
+	marco 'collectionExp(matrix) (obj ..args: arr[ui4]!(column)) matrix!(variadic(args).size, column) {
+		-> obj: matrix(['at:unpack args])
 	}
+	end scope
 	```
 }
 : Removal of the declaration definition and disclosure semantic
@@ -5090,20 +5656,6 @@
 
 	>: Object expressions
 	obj: person(.name= "Daniel Emeka", .age= 90)
-
-	>: Object declaration grouping
-	obj (x: si4, y: si4, z: si8) = (34, 56, 78)
-	obj (x: si4(), y: si4(), z: si8())
-	obj (x, y, z): si4 = (34, 56, 90)
-	obj (x, y, z): person("Daniel", 34; "David", 90; "Jungle", 34)
-	fcn(obj: person(), obj: (pop(34), dance(9.4)), obj: (pop, dance))
-	obj mut x: si8
-	obj (mut x, y): si4
-
-	>: Object expression grouping
-	obj: (si4, si8)
-	obj: (person("Daniel Emeka", 34), person("Dennis Vaschi", 90))
-	type (si4(), si8())
 
 	>: New variadic value and type parameter syntax
 	[type ..T]
@@ -5150,11 +5702,11 @@
 	  constrained by a runtime conditional, the compiler must behave as though the conditonal is a false case
 	  meaning it must behave as though the good actor would not get executed.
 }
-: I will make like an SI unit library showing how ergonomic custom literal types are
+: I will make like an SI unit library showing how ergonomic custom literal tags are
 {
 	```(nc-lang)
-	34'MPH + 34'MPH
-	34'KM ÷ 34'hour /# 68'KMPH
+	34'mph + 34'mph
+	100'km / 20'hour  eq 5'kmph
 	```
 }
 : Literal token representations
@@ -5179,37 +5731,84 @@
 
 	All literal tokens when referenced have the defined behaviour of giving it's static memory. I do love consistency.
 }
-: A utf8 code unit type to formally distinguish it from ui1, it helps in various scenarios
+: `str` implementation
 {
-	```(nc-lang)
-	unique utf8_codeUnit = ui1
-	```
-}
-: `str` implementation --> convert to an allocating MAR which would introduce category 2 case 1 allocating MAR
-{
-	```(nc-lang)
-	obj id_1_actual_data: [11]utf8_codeUnit = compiler_magic("Emeka Daniel")
+	- The `str` implementation that maintains consistency with other literal tag memory model semantics
+	{
+		```NPL
+		obj id_1_actual_data: arr[ui]!(12) = compiler_magic("Emeka Daniel")
 
-	struct str = #at:hide obj data: *utf8_codeUnit, obj size: ui
+		struct str =
+			at:hide data: *utf8, size: ui
 
-	scope @str {
-		#at:hide
-		marco new(obj (data: *utf8_codeUnit, size: ui)) {
+		scope @str =
+		at:hide
+		marco new(data: *utf8, size: ui) str {
 			obj: str(data, size)
 		}
-	}
-	obj id_1 = @str:new(id_1_actual_data, 11)
+		end scope
 
-	fn some() {
-		obj x: str = "Emeka Daniel"
-		obj x: &str = &"Emeka Daniel" /# Referencing the global value which is `id_1`
-	}
-	```
+		obj id_1 = @str:new(id_1_actual_data, 11)
 
-	The following implementation maintains consistency with other literal token behaviours.
+		fn some() {
+			obj a: str = "Emeka Daniel"
+			<'
+				obj a: str = id_1
+			'>
+
+			obj b: &str = &"Emeka Daniel" >: Referencing the global value which is `id_1`
+		}
+		```
+	}
+	- The `str` implementation that reflects the actual semantics of the string literal memory model
+	{
+		Since the string literal tag is stored in the readonly section of a process' address space, it cannot
+		be modified for throughout its lifetime, meaning unlike an integer or real number literal tag, it
+		cannot be assigned to another memory space and be manipulated, like so:
+
+		```NPL
+		fn main {
+			obj y = 34
+			obj _ = y + y
+		}
+		```
+
+		So, it is because of this fact that the string literal tag shall give a reference to the global
+		`str` object instead of just the `str` object like the previous implementation
+
+		```NPL
+		fn main {
+			obj _ a: &str = "Emeka Daniel"
+		}
+		```
+	}
+	- String literal tags can be added
+	{
+		```NPL
+		"Daniel" + "Daniel"
+		```
+	}
+	- Custom literal tags addition optimization
+	{
+		```NPL
+		string"Daniel" + string"Daniel"
+		```
+	}
 }
-: The Language generic string interface defines a unicode_string contract
+: The Language generic string interface defines a generic unicode string contract
 {
+	- The preferred string type implementation
+	{
+		```NPL
+		unique utf8 = ui1
+
+		union string =
+			expensive: 	arrayList[utf8],
+			cheap: 		tuple[arr[utf8]!(30)'data_capacity, ui1'size],
+			static: 	&str
+		```
+	}
+
 	Nc-lang defines a generic string interface through a contract called `unicode_string` to work with strings regardless of their
 	implementation. The contract would contain all the functional properties in the unicode standard and more.
 
@@ -5241,24 +5840,6 @@
 	>: String slice function must very much be there
 	end contract
 
-	unique char = #at:hide type ui4
-	struct str = #at:hide type &{*}ui1 data, #at:readonly type ui size
-
-	scope @str {
-		impl[str] accessForCategory2AllocMAR {} // .!nth, .!try_nth, .!unsafe_nth
-		impl[str] string {}
-	}
-
-	/# `&str`			is the primitive string referencing type str which is accessible to the normal users
-	/# `string` 		is a basic string from an arrayList
-	/# `stringTemp` 	is a basic string from an array
-	/# `stringSlice` 	is a slice of a string
-	/# `path` 			is a string that represents a filesystem path
-
-	unique string = #at:hide type arrayList[ui1]
-	unique stringTemp = #at:hide type array[ui1]
-	unique stringSlice = #at:hide type slice[ui1]
-
 	fn foo[type CharIterator]() apply @CharIterator impls iterator[char] {}
 	```
 
@@ -5274,134 +5855,70 @@
 		```
 	}
 }
-: Go to back `Slice implemantion` [Something about `array[utf8_codeUnit]` holding the pre-condition that it holds valid ordered utf8_codeUnit]
+: Slice and View implemantion
 {
-	```(nc-lang)
-	'at:restrict_primary_object_constructor
-	struct slice[type T] = obj beginMAR: *T, obj end: ui
+	- Slice and view
+	{
+		For referencing the individual objects in a collection, the following types are used
 
-	>! slice[utf8_codeUnit] has to hold the precondition that they are valid utf8 code units
-	scope @slice[type T] =
-	'at:factory
-	marco new[type DataStructure](obj dataStructure: DataStructure, obj range: integerEndExclusiveRange) slice[T]
-	apply #exp:is_category2AllocMAR[DataStructure]() or @DataStructure impls unicode_string {
-		if range.end gt range.start {
-			panic("") >! Add a reasonable error message
-		}|range.end eq range.start {
-			-> _ obj: slice()
-		}
+		- Slice(and strSlice): For mutably referencing the individual objects in a collection
+		- View(and strView): For immutably referencing the individual objects in a collection
 
-		-> #at:run
-		if @DataStructure impls unicode_string {
-			if range.end gt dataStructure.char_count() {
-				panicf("`range.end`($(range.end)) is greater than character count in the (generic)string.")
-			}
-			obj try_range = dataStructure.try_getNthCharInternalRepresentationRange(range)
-
-			try_range => ok {
-				obj: slice(addressof (try_range.start), range.end)
-			}|err {
-				panicf("The following error occurred: $(err)")
-			}
-		}else {
-			if range.end gt dataStructure.size {
-				panicf("`range.end`($(range.end)) is greater than the size of the allocating category MAR")
-			}
-			obj: slice(addressof (dataStructure.nth(range.begin)), range.end)
-		}
+		Slice and view stores the referenced data and the count or size of characters
 	}
 
-	impl[slice[T]] unicode_string apply @T eq utf8_codeUnit =
-	end impl
-	impl[slice[T]] unicode_string apply @T eq char =
-	end impl
-	end @slice scope
+	Discard the notion of `arrayList[utf8]` or `arrayList[utf8_codeUnit]` mimicking a proper string. It simply
+	just holds an array of `utf8` values without the semantic meaning. There will be conversion to and from
+	the type, but this should no longer hold any bearing on your design of the slice types
 
-	scope @str =
-	marco slice(obj (self: Self, integerEndExclusiveRange: range)) slice[utf8_codeUnit] {
-		@slice[utf8_codeUnit]:new(self, range)
-	}
-	end @str scope
+	```NPL
+	struct slice[type T] =
+		beginDataVRef: &mut T, count: platform:ui
 
-	>! arrayList[utf8_codeUnit] has to hold the precondition that they are valid utf8 code units
-	scope @arrayList[type T] =
-	marco slice(obj (self: Self, integerEndInclusiveRange: range)) slice[T] {
-		@slice[T]:new(self, range)
-	}
-	impl[arrayList[T]] unicode_string apply @T eq utf8_codeUnit =
-	end impl
-	impl[arrayList[T]] unicode_string apply @T eq char =
-	end impl
-	end @arrayList scope
+	struct view[type T] =
+		beginDataVRef: &T, count: platform:ui
+
+	struct strSlice[type T] = slice: slice[T]
+	struct strView[type T] = view[T]
 	```
+
+	Difference between a slice and a string slice is that the string slice types implement generic_string
+	which are enforced with constraint application
 }
-: Constraint application can be applied whole to `unit` item
+: Constraint application can be applied whole to `unit` item (REMOVED FROM THE FEATURE SET)
 {
 	```(nc-lang)
 	scope @array[type T] {
 		unit apply @T eq char or eq utf8_codeUnit {
-			#decl:todo
+			'todo
 		}
 	}
 	```
 }
-: Introduction of object identifier shadowing for block expressions and use of block expression identifiers as scope identifiers
+: Block follow the scoping rules of normal scopes now, but since they don't have scope identifiers, they solely rely on the `outer` reserved identifier
 {
 	```(nc-lang)
-	marco foo() {.g
+	fn foo() {
 		obj x: ui4()
-		{.a
+		{
 			obj x: ui8 = 45
 			{
 				obj x: ui4 = 90
-				print(!_:x, !a:x, x)
+				print(outer:outer:x, outer:x, x)
 			}
 		}
 	}
 	```
 }
-: Removal of object identifier overloading
-: Jump statements change
+: Removal of object identifier overloading (Look at this again)
+: Features that enable closed system specialization of type constructors
 {
-	- There would be a single jump statement called the jump statement symbol with the following syntax:
-		```(ncRegex)
-		@jumpStatement = '->' @blockExpId? @expression|'break'|'continue'
-		@blockExpId = ('.' <identifier>)|'_'
-		```
-	- '_' symbolizes the block expression identifier for both functions and marcos.
-
-	```(nc-lang)
-	fn count_down(obj x: ui4) {
-		if x eq 0 {
-			print("[0]")
-			-> _ break
-		}
-
-		printf("[%{x}]")
-		count_down(x-1)
-	}
-	```
-}
-: `match-with` on types
-{
-	```(nc-lang)
-	match @T with @ui4 {
-		..
-	}|@ui8 {
-		..
-	}else {
-		..
-	}
-	```
-}
-: Features that enable open system specialization of type constructors
-{
-	- Multiple impl definition with constraint application
+	- Multiple impl definition with constraint application [NO LONGER PART OF THE FEATURE SET]
 	{
 		A contract is allowed to be implemented several times with constraint application in the scope of a type
 		constructor, but must have a single implementation after monomorphisation.
 	}
-	- Unit declaration with constraint application
+	- Unit declaration with constraint application [NO LONGER PART OF THE FEATURE SET]
 	{
 		A unit declaration can make use of constraint application to enable open system specialization in the
 		scope of a type, but this is only reasonable used in the scope of a type constructor.
@@ -5418,11 +5935,17 @@
 		application to. Also since object declarations do not support constriant application individual, this
 		method can be used to enforce constraint application on them regardless.
 	}
-}
-: Monomorphisation failure handling
-{
-	- Monomorphisation failure that is a result of constraint application does not error.
-	- Monomorphisation failure that is not a result of constraint application errors.
+	- Adpoting the closed system for specialization of type constructors also
+	{
+		Impls and other scope contents like functions making use of constraint application and comptime type
+		introspection to simulate closed system specialization
+	}
+	: Limited specialization for type constructor contents
+	{
+		- Monomorphisation failure handling of the contents in the scope of a type
+			- Monomorphisation failure that is a result of constraint application does not error.
+			- Monomorphisation failure that is not a result of constraint application errors.
+	}
 }
 : Type creator metadata query format change change
 {
@@ -5435,13 +5958,22 @@
 		end @type_creator scope
 
 		struct fieldInfo =
-			'at:hide(mod) obj (name: &str, typeName: &str)
+			at:readonly(mod) obj (name: &str, typeName: &str)
 
-		struct type_creator_metadata[type T[?]] apply 'exp:r"is type-creator category-2 allocMAR"[T[?]]() =
-			'at:readonly(mod) obj (typeName: &str, kind: type_creator),
-			'at:readonly(mod) obj info: variant[nil, &str/uniquedType, T[fieldInfo]/fieldInfoList, T[&str]/valueIdentList]
+		struct type_creator_metadata[type Category2AllocMAR[?]]
+		apply exp:r"is type-creator category-2 allocMAR"[Category2AllocMAR[?]]() =
+		at:readonly(mod) obj (
+			typeName: &str,
+			kind: type_creator,
+			info: variant[
+				nil,
+				&str/uniquedType,
+				Category2AllocMAR[fieldInfo]/fieldInfoList,
+				Category2AllocMAR[&str]/valueIdentList
+			]
+		)
 
-		>! `'exp:type_creator_metadata[T, U[?]]()` gives a type_creator_metadata type populated with the metadata
+		>! `'exp:getTypeCreatorMetadata[T, Category2AllocMAR[?]]()` gives a type_creator_metadata type populated with the metadata
 		```
 	}
 
@@ -5459,9 +5991,9 @@
 			'at:comptime
 			obj mut meta: type_creator[array]
 
-			>! `struct` and `union`
+			>! `struct`
 			{
-				meta := 'exp:type_creator_metadata[person, array]()
+				meta := 'exp:getTypeCreatorMetadata[person, array]()
 
 				printf("%(meta.kind) %(meta.typeName) =\n")
 
@@ -5470,8 +6002,10 @@
 						printf("\t%{fieldInfo.name} : %{fieldInfo.typeName}\n")
 					}
 				}else {}
-
-				meta = 'exp:type_creator_metadata[animal, array]()
+			}
+			>! `union`
+			{
+				meta = 'exp:getTypeCreatorMetadata[animal, array]()
 
 				printf("%(meta.kind) %(meta.typeName) =\n")
 
@@ -5483,6 +6017,8 @@
 			}
 			>! `valueDef`
 			{
+				meta = 'exp:getTypeCreatorMetadata[direction, array]()
+
 				printf("%(meta.kind) %(meta.typeName) =\n")
 
 				meta.info => valueIdentList {
@@ -5493,6 +6029,8 @@
 			}
 			>! `unique`
 			{
+				meta = 'exp:getTypeCreatorMetadata[byte, array]()
+
 				printf("%(meta.kind) %(meta.typeName) =\n")
 
 				meta.info => uniquedType {
@@ -5509,7 +6047,7 @@
 		```
 	}
 }
-: Encoding effect and state information in my type system [No longer included in the feature set]
+: Encoding effect and state information in my type system [NO LONGER INCLUDED IN THE FEATURE SET]
 {
 	```(nc-lang)
 	struct file = ...
@@ -5596,36 +6134,23 @@
 		}else
 	}
 	end impl
-	end @pointIterator scope
+	end scope
 
-	end @point scope
+	end scope
 
 	contract[type Self] iterator[type Item] =
 	end contract
 
 	scope[type T] @arrayList[T] =
-	end @arrayList scope
+	end scope
 
 	scope[type T] @array[T] =
-	end @array scope
+	end scope
 
 	>! Addition of lightweight empty impl block
 	scope @some =
-	impl display
-	end @some scope
-	```
-}
-: Dot operator acting on comptime unicode strings as identifiers
-{
-	```(ncLang)
-	struct foo = obj (age: ui1, address: &str)
-
-	obj x: foo()
-	x.{"age"} = 34
-
-	'at:comptime
-	obj id = "address"
-	x.{id} = "GoldCity3"
+	impl display;
+	end scope
 	```
 }
 : Introduce the concept of function, marco, type and object constructors
@@ -5738,11 +6263,6 @@
 	'at:foreign(.linkName= "_ZstructNameSome")
 	struct some = type si (a, b)
 	```
-}
-: Under scope visibility
-{
-	Scope visibility for type creators in block expressions would only recieve specific visibility when given
-	from functions.
 }
 : UFCS(Universal Function Call Syntax)
 {
@@ -6066,3 +6586,72 @@
 	simd not (2, 3, 4)
 	```
 }
+: Make it conveneint to run executables
+{
+	```(text)
+	exe("ls") => some {
+		some.search("'Fortnite'")
+	}else {
+		...
+	}
+	```
+}
+: String addition has to be compile time
+{
+	"Emeka" + "Daniel" >! Has to be compile time
+}
+: Serious about making contracts for numbers just like there is for strings
+{
+	There would be a number contract, integer number contract, real number contract
+
+	```(ncLang)
+	fn foo[type (Lhs, Rhs)](obj (lhs: Lhs, rhs: Rhs)) apply @Lhs and @Rhs impls integerNumber {
+		'todo
+	}
+	```
+}
+: Concurrency is next
+{
+	Thinking adding thread types
+}
+: GUI library problem
+{
+	A GUI library is very important to get right in the language and a combination ncML with ncPL would do the
+	job, making it available for web based GUI, system base GUI and mobile devices based GUI.
+}
+: Idea for the integration of nc graphics language with NPL
+{
+	```NPL
+	fn greetingFn() &str {
+		"Nc Programming Language"
+	}
+
+	obj greeting = "Nc Programming Language"
+
+	at:threadLocal
+	obj mut count: ui4()
+
+	fn incrementCount() ! {
+		count += 1
+	}
+	```
+
+	```NGL
+	text {
+		Hello $(greetingFn())\n Hello $(greeting)
+	}
+
+	rawText {
+		Hello $(greetingFn())
+		Hello $(greeting)
+	}
+
+	button {
+		onEvent: $(incrementCount())
+		text: {
+			Clicked $(count) $(if count eq 1 {"time"}else {"times"})
+		}
+	}
+	```
+}
+: The structure of platform agnostic programming that involves GUI programming will be decided after reviewing current GUI alternatives

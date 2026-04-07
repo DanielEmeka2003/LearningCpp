@@ -1,0 +1,187 @@
+>! Remember to work on `bitsRange!(34~78)`
+
+at:comptime
+marco mainType[type T]() type {
+	-> if exp:whichTypeCreator[T](@type_creator.r:valueDef) {
+		@T:BaseType
+	} else {
+        @T
+    }
+}
+
+at:comptime
+marco bits_type_constraint[type T]() bool {
+	-> (
+		'exp:whichTypeCreator[T](@type_creator.r'valueDef)
+		and
+		(
+			>: If the type is of valueDef type creator origin, it checks for two things, first, if the
+			>: bit-width is within the maximum allowed bit-width for the bits type which is 256-bits or
+			>: 32-bytes, second, if the value count of the valueDef type-creator is within the base-type's
+			>: bit-width, because the number of values cannot surpass the bit-width
+			@T:BaseType:bit_width lt or eq 256 and gt @T:value_count
+		)
+	)
+	or (
+		>: If it is an unsigned integer, it checks if the bit-width is within the maximum allowed bit-width for
+		>: the bits type which is 256-bits or 32-bytes
+		@T eq @ui1 or eq @ui2 or eq @ui4 or eq @ui8 or eq @ui16 or eq @ui32
+	)
+}
+
+at:comptime
+marco bits_position_type_constraint[type (BitType, Position)]() bool {
+	-> if exp:whichTypeCreator[Position](@type_creator.r'valueDef) {
+		@Position eq @BitType
+	}else {
+		>! @Position eq @ui1 or eq @ui2 or eq @ui4 or eq @ui8 or eq @ui16 or eq @ui32
+		match @BitType with @ui1 {
+			@Position eq @ui1:shiftRange
+		}|@ui2 {
+			@Position eq @ui2:shiftRange
+		}|@ui4 {
+			@Position eq @ui4:shiftRange
+		}|@ui8 {
+			@Position eq @ui8:shiftRange
+		}|@ui16 {
+			@Position eq @ui16:shiftRange
+		}|@ui32 {
+			@Position eq @ui32:shiftRange
+		}else
+	}
+}
+
+at:restrict_primary_object_constructor
+unique bits[type T] apply bits_type_constraint[T]() = [mainType[T]()]
+
+>! [both valueDef and unsigned integers start from 0]
+scope[type T] @bits[T] =
+marco default() bits[T] {
+	-> obj: bits[T](obj: [mainType[T]()]())
+}
+
+marco set[type Position](mut self: bits[T], at:pseudo_comptime ..positions: Position) !
+apply bits_position_type_constraint[T, Position]() {
+	at:comptime
+	obj primary_bits: [mainType[T]()] = 0000_0001₂
+
+	at:run if exp:whichTypeCreator[T](@type_creator.r'valueDef) {
+		at:pseudo_run
+		for position in positions {
+			exp:de_unique(self) = exp:de_unique(self) or (primary_bits << position.toInternalRepresentation())
+		}
+	}else {
+		at:pseudo_run
+		for position in positions {
+			exp:de_unique(self) = exp:de_unique(self) or (primary_bits << position)
+		}
+	}
+
+	<'
+		Due to the `positions` being pseudo_run, the following expressions are ran at comptime if `positions`
+		turns out to be comptime:
+		[1] `(primary_bits << position.toInternalRepresentation())`
+		[2] `(primary_bits << position)`
+	'>
+}
+
+marco set_all(mut self: bits[T]) ! {
+	exp:de_unique(self) = exp:de_unique(self) or @[mainType[T]]():max
+}
+
+marco unset[type Position](mut self: bits[T], at:pseudo_comptime ..positions: Position) !
+apply bits_position_type_constraint[T, Position]() {
+	at:comptime
+	obj primary_bits: [mainType[T]()] = 0000_0001₂
+
+	at:run if exp:whichTypeCreator[T](@type_creator.r'valueDef) {
+		at:pseudo_run
+		for position in positions {
+			exp:de_unique(self) = exp:de_unique(self) and (not primary_bits << position.toInternalRepresentation())
+		}
+	}else {
+		at:pseudo_run
+		for position in positions {
+			exp:de_unique(self) = exp:de_unique(self) and (not primary_bits << position)
+		}
+	}
+
+	<'
+		Due to the `positions` being pseudo_run, the following expressions are ran at comptime if `positions`
+		turns out to be comptime:
+		[1] `(not primary_bits << position.toInternalRepresentation())`
+		[2] `(not primary_bits << position)`
+	'>
+}
+
+marco unset_all(mut self: bits[T]) ! {
+	exp:de_unique(self) = exp:de_unique(self) and 0
+}
+
+marco test[type Position](self: bits[T], at:pseudo_comptime position: Position) bool
+apply bits_position_type_constraint[T, Position]() {
+	at:comptime
+	obj primary_bits: [mainType[T]()] = 0000_0001₂
+
+	-> at:run if exp:whichTypeCreator[T](@type_creator.r:valueDef) {
+		exp:de_unique(self) and (primary_bits << position.toInternalRepresentation())
+	}else {
+		exp:de_unique(self) and (primary_bits << position)
+	}.into()
+}
+
+marco flip[type Position](self: bits[T], 'at:pseudo_comptime ..positions: Position) !
+apply bits_position_type_constraint[T, Position] {
+	'at:comptime
+	obj primary_bits: [mainType[T]()] = 0000_0001₂
+
+	'at:run if 'exp:whichTypeCreator[T](@type_creator.r:valueDef) {
+		'at:pseudo_run
+		for position in positions {
+			'exp:de_unique(self) = 'exp:de_unique(self) xor (primary_bits << position.toInternalRepresentation())
+		}
+	}else {
+		'at:pseudo_run
+		for position in positions {
+			'exp:de_unique(self) = 'exp:de_unique(self) xor (primary_bits << position)
+		}
+	}
+}
+
+marco flip_all[type Position](mut self: bits[T]) !
+apply bits_position_type_constraint[T, Position]() {
+	'exp:de_unique(self) = 'exp:de_unique(self) xor @[mainType[T]()]:max
+}
+
+struct bitsIterator = obj (data: bits[T], position: ui1)
+
+scope @bitsIterator =
+impl iterator[bool] =
+fn next(self: mut&bitsIterator) maybe[bool] {
+	-> if (self$.position + 1) not gt @[mainType[T]()]:bit_width {
+		obj old_position = self$.position
+		self$.position += 1
+		obj: maybe(self$.data.test(old_position))
+	}else
+}
+end impl
+end scope
+
+marco iter(self: bits[T]) bitsIterator {
+	obj: bitsIterator(self, 0)
+}
+end scope
+
+<'
+	Example:
+
+	obj bits: bits[ui32]()
+
+	bits.set(23)
+	bits.set(15)
+	bits.set(8)
+
+	for [bit, count] in bits.iter().count() {
+		printf("count: $(bit)")
+	}
+'>

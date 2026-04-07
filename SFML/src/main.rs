@@ -1,3 +1,5 @@
+use std::f32::consts::E;
+
 
 fn main() {
     let x = 0b11111111_u8 as u32;
@@ -30,4 +32,16 @@ fn half_pi() -> f64 {
     }
 
     half_pi_result
+}
+
+fn foo() -> Result<None, &str> {
+    Err("Big error over here!")
+}
+
+fn goo() -> Result<None, u32> {
+    Err(45)
+}
+
+fn foo_goo() -> Result<u64, &str> {
+    foo()?
 }

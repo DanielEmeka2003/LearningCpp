@@ -1,3 +1,401 @@
+: Defining changes
+{
+	- New ranged integers syntax
+	- For loop statement syntax addition
+	- Jump statement
+	- Removing `?` symbol
+	- The following are now context identifiers
+	{
+		- `default`
+		- `Ok`
+		- `Err`
+		- `Some`
+		- `None`
+		- `panic`
+		- `clone`
+		- `move`
+	}
+	- I did not include the syntax of variadic access for types
+	{
+		```NPL
+		variadics[T].[4]
+		```
+	}
+	- Wait since the above is possible and well defined iSn my type system, let me write syntax for it
+	{
+		```NPL
+		obj x: @Result[ui4, ui4]:Error
+		obj x: ty:typeof(a):Error
+		```
+	}
+	- Since function give types are now to be entered explicitly, remove the optional requirement on them in syntax
+	- New syntax for objects in parameters and fields (Remember, the syntax still remains the same, I am just to remove the `obj` signal symbol)
+	{
+		```NPL
+		fn foo(x: string, y: ui8) {}
+
+		struct person = name: string, age: ui1
+		```
+	}
+	- Changing the symbol of variadic type argument identifier entry
+	{
+		```NPL
+		obj: tuple[ui4'age, ui1'byte]
+		```
+	}
+	- Write the objectives of the specification at the beginning of the document
+	- Not to self that type parameter syntax does not include type constructor type parameter, but includes something else
+	- Make entry syntax for a lone dot operator
+	{
+		```NTPL
+		'.' userIdentifierToken
+		```
+
+		To be used to infer valueDef values
+	}
+	- Addition for function syntax
+	{
+		Instead of `todo`, function body shall now expect the symbol `...` or a series of block contents
+
+		```NPL
+		fn foo() ui4 {
+			...
+		}
+		```
+
+		The semantic of this is similar to todo and shall only be allowed for functions that give values
+	}
+	- Addition of the count syntax for `forLoopStatement`
+	{
+		```NPL
+		for x, count in 1~90 {
+			print(count, ':', x)
+		}
+		```
+	}
+	- Okay again, haha. Another big change, and this time it is for constraint application entry
+	{
+		Constraint application expressions shall now expect only a block expression
+
+		```NPL
+		fn foo() ! apply {34 eq 23} {
+			print("Yah")
+		}
+		```
+	}
+	- Rename `valueDef` type-creator to `set` type-creator again
+	{
+		This should be your final change of this type creator
+	}
+	- Function capture area syntax change
+	{
+		fn|=| foo() {}									>: Capture local environment by value (Does not perform move capturing)
+		fn|&| foo() {}									>: Capture local environment by value reference
+		fn|=, move(x, y), clone(x, y)| foo() {}			>: Capture local environment by value and selectively capture move and clone some objects
+		fn|&, move(x, y), clone(x, y)| foo() {}			>: ,,,
+	}
+	- New function signature concrete type entry for varaidic
+	{
+		```NPL
+		obj x: fn(..ui4)ui4
+		```
+	}
+	- Change in variadic syntax
+	{
+		```NPL
+		fn a(x: ..ui4) {}
+		fn b[type T](x: ..T) {}
+		fn c[type ..T](x: ..T) {}
+		```
+	}
+	- New contract types and how they are to be used [Added] [UpForSyntaxChange]
+	{
+		```NPL
+		obj a: contract(&animal)
+		obj b: contract(mut&animal)
+
+		obj c: contract(animal)
+		obj d: box[contract(animal)]
+		obj e: boxb[contract(animal)]
+
+		>: And their reference equivalent
+		obj _: &contract(animal)
+		obj _: *contract(animal)
+
+		>: Usage example
+
+		a$.some()
+		a.some_ref()
+		[Not allowed]
+
+		b$.some()
+		b.some_ref()
+		b.some_mut_ref
+
+		>: The same can be applied to the category value reference
+		```
+
+		Because type `contract(animal)` is dynamically sized, it is advised to put it behind a category MAR or
+		allocating reference
+	}
+	- How contracts are accessed [Added] [UpForSyntaxChange]
+	{
+		```NPL
+		contract[type Self] animal =
+		fn speak() !
+		fn sound(self: Self) &str
+		end
+
+		struct (dog, cat);
+
+		scope @dog =
+		impl[dog] animal =
+		fn speak() ! {
+			print("Woof Bitch!")
+		}
+		fn sound(self: dog) &str {
+			"Woof Woof"
+		}
+		end
+		end scope
+
+		scope @cat =
+		impl[cat] animal =
+		fn speak() ! {
+			print("Meow Bitch!")
+		}
+		fn sound(self: cat) &str {
+			"Meow Meow"
+		}
+		end
+		end scope
+
+		fn main()! {
+			obj andy: dog()
+			obj dio: cat()
+
+			obj _ = (andy, dio).sound()
+
+			andy.contract(animal):sound()
+
+			@contract(animal):sound(andy)
+			@contract(animal):speak()
+
+			>: How can I call non member properties from an object of contract type?
+			obj any_animal: contract(animal)(andy)
+
+			any_animal$.sound()
+
+			@contract(animal in any_animal):speak()
+		}
+		```
+	}
+	- I have not added types as expressions syntax yet
+	- Make the contract type parameter expect only one type parameter. Add for impl
+	{
+		```NPL
+		contract[type Self] a =
+		end contract
+
+		contract[type Self[?]] b =
+		end contract
+		```
+	}
+	- `impls` is now among the operator list, but I have not added their right operands
+	{
+		```NPL
+		@T impls add[ui4]
+		@T impls @fn(ui4)ui8
+		```
+
+		Okay, so instead of applying it natively, result to a type expression that contain function signatures
+
+		Remember, a function signature is among the list of valid contracts, so add that
+	}
+	- Addition of a `range` type that is take over range semantic types
+	{
+		```NPL
+		range[ui1] shiftRange = 1~4
+		range[char] alphaBetRange = 'a'~'z' and 'A'~'Z'
+		```
+	}
+	- Problems to go over
+	{
+		- Fix the NTPL syntaxes and fix those syntaxes that required me to explain how a group syntax should be parsed
+		- And look at the expression syntax that mandates whitespace parsing, see if you can represent it in NTPL alone
+	}
+
+
+
+
+
+	- I will introduce runtime type introspection, but it will be later on
+	- Addition of catch statment for catching external exceptions thrown by platforms [Deferred]
+	{
+		```NPL
+		catch (x: platform:signal) {
+			printf("$(x)")
+		}
+
+		catch (x: platform:exception:generic) {
+			printf("$(x.what())")
+		}
+		```
+	}
+	- As for type inference, NPL will use the immediate type inference philosophy rather than the deferred type inference philosophy that Rust uses
+	{
+		- Type inference will be identical to Rust, so note that
+
+		The below is deferred type inference which is not allowed in NPL
+
+		```NPL
+		fn foo()! {
+			obj x = arrList:new()
+			x.push(34)
+		}
+		```
+	}
+	- Mutable types are to be implicitly converted to immutable types
+	{
+		They are the only implicit conversion allowed in NPL
+	}
+	- Conversion between types is now implemented via the `into` contract [Look more into this]
+	{
+		The language implements `into` conversion for all types to contract types and primodial types. The
+		rest are to be implemented by the user
+
+		```NPL
+		contract[type Self] into[type Output] =
+		fn into(self: &Self) Output;
+		end contract
+		```
+
+		```NPL
+		struct person =
+			name: &str, age: ui1
+
+		scope @person =
+		marco into[type Output](self: person) Output {
+			match @Output with string {
+				-> self.name.into[string]() + self.age.into[string]()
+			}|panic
+		}
+		end scope
+		```
+	}
+	- Discuss the need for literal token tags in NPL and how the alternative type inference can fix it's purpose
+	{
+		Even discuss it for collection expressions
+
+		```NPL
+		3'ui4
+		string"Daniel"
+		x'x'
+		```
+
+		- On bits with ranges
+		{
+			```NPL
+			obj x: bitsRange!(1~32)
+			obj y: bitsRange!('a'~'z')
+
+			unique jack = ui1 from 0~32
+			unique jake = char from 'a'~'z'
+			```
+
+			Add a check for unique type creator with range creation in the bits type
+		}
+	}
+	- Remember the platform agnostic code problem I have to fix
+	- Ehmm, how would the panic function be made available to the language?
+	{
+		```NPL
+		x => some {
+			some + 3
+		}|panic
+		```
+	}
+	- How will parsing context identifiers look like?
+	- Category reference [Add to references]
+	{
+		- Category 1 [data + allocatorTag?]
+		- Category 2 [data + size + allocatorTag?]
+		- Category 3 [data + capacity + size + allocatorTag?]
+	}
+	- `default` is now the context identifier responsible for default function definition in types
+	{
+		```NPL
+		struct person = name: string, age: ui1
+
+		scope person =
+		marco default() person {
+			-> obj: person(.name= string"Daniel Emeka", .age= 45)
+		}
+		end scope
+		```
+	}
+	- Remember to define semantics for something like this `foo(at:move (at:unpack x))`
+}
+: How to explain nc-lang
+{
+	x.{"a"}
+	x.{d}
+	- Parameters and arguments
+	- Type creators and type constructors
+	- Types and their multiple identity
+	- Functions and function constructors
+	- Marcos and marco constructors
+	- Objects and object constructors
+	- Groupings
+	- Import system
+	- Access restriction
+	- Variadics
+	- Constraint application
+	- Contract and impls
+	- Comptime polymorphism
+	- Runtime polymorphism
+	- Generic string interface
+	- Generic typing
+	- LCI
+	- UFCS
+	- Operator overloading
+	- Literal tag definitions
+	- Collection expressions
+	- Collection expression tag definitions
+	- References and lifetimes
+	- Value semantics
+	- Identifier items
+	- Scope
+	- Statement items
+	- Expression items
+	- Conditional expression items
+	- Comptime evaluation
+	- Nc data representation language
+	- Type introspection
+	- Value unpacking
+	- Mutability
+	- Automatic dereferencing for values originating from a give type
+	{
+		Instead of this make the following an operator:
+		```(ncLang)
+		args.[3] >! The access operator(Variadics also use it)
+		args.(3) >! The new one
+		```
+	}
+	- Process exit related functions
+	- Foreign interface
+	- Remember, this `_` is a reserved identifier
+}
+: For nc markdown editor
+{
+	Replicate this link feature for abbreivations and acronyms
+}
+: Nc chat(or messanger, don't really know right now)
+{
+	- Add a feature that would allow replying to a message but also pointing to several messages at the same
+	  time, like Replying to why didn't you do this, I didn't do this because of this(pointed message) and
+	  this(another pointed message)
+}
 : Nc decimal real numbers
 {
 	: Add support for nc decimal floating point 8 and 16 - in a later version of the language

@@ -29,29 +29,26 @@ fn main() {
 	}
 }
 
+// Rust
 fn fibonacci() -> impl Iterator<Item = u64> {
 	std::iter::successors(Some((0, 1)), |&(a, b)| Some((b, a + b))).map(|(a, _)| a) // Lazily extracts the Fibonacci number
 }
+// NcLang
+fn fibonacci[type T]() T apply @T impls Iterator[ui8] {
+	-> std:iter:successors(
+		obj: maybe(obj: tuple(0, 1)),
+		fn(obj val: tuple[ui8/a, ui8/b]) {
+			-> obj: maybe(obj: tuple(val.b, val.a + val.b)).map(fn(obj val: tuple[ui8/a, ui8/_]) {-> val.a})
+		}
+	)
+}
+
 
 marco format[type (..T, UnicodeString, ResultUnicodeString)]('at:comptime obj format_unicode_string: UnicodeString, obj ..args: ..T) ResultUnicodeString
 apply @UnicodeString impls unicode_string and @ResultUnicodeString impls unicode_string {
 	'todo
 }
 
-/*
-	Default Constructor
-	class House {
-		House() {}
-	}
-*/
+unique matrix!(obj (row, column): ui) = arr[arr[ui4]!(column)]!(row)
 
-// struct g apply true = ... (problem remember)
-
-// Grouping semantics for type parameters
-// [type (T, Value)]
-
-// Access restriction combinations
-// 'at:hide(type, mod) => The order matters `types in the mod`
-// 'at:hide(type, pkg)
-//
-// 'at:readonly(mod)
+b = at:move arrayList[3, 4, 5]

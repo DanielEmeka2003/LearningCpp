@@ -1,0 +1,52 @@
+   0.906725598s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint: fingerprint error for SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML)/Check { test: false }/TargetInner { name: "SFML", doc: true, ..: with_path("/home/emekadaniel/Documents/LearningCpp/SFML/src/main.rs", Edition2024) }
+   0.906758811s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/emekadaniel/Documents/LearningCpp/SFML/target/debug/.fingerprint/SFML-a35a7a8c9a1e070e/bin-SFML`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <unknown>
+   1: <unknown>
+   2: <unknown>
+   3: <unknown>
+   4: <unknown>
+   5: <unknown>
+   6: <unknown>
+   7: <unknown>
+   8: <unknown>
+   9: <unknown>
+  10: <unknown>
+  11: <unknown>
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: __libc_start_main
+  16: <unknown>
+   1.008268690s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint: fingerprint error for SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML)/Check { test: true }/TargetInner { name: "SFML", doc: true, ..: with_path("/home/emekadaniel/Documents/LearningCpp/SFML/src/main.rs", Edition2024) }
+   1.008284846s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/emekadaniel/Documents/LearningCpp/SFML/target/debug/.fingerprint/SFML-2865eba95b142492/test-bin-SFML`
+
+Caused by:
+    No such file or directory (os error 2)
+
+Stack backtrace:
+   0: <unknown>
+   1: <unknown>
+   2: <unknown>
+   3: <unknown>
+   4: <unknown>
+   5: <unknown>
+   6: <unknown>
+   7: <unknown>
+   8: <unknown>
+   9: <unknown>
+  10: <unknown>
+  11: <unknown>
+  12: <unknown>
+  13: <unknown>
+  14: <unknown>
+  15: __libc_start_main
+  16: <unknown>
+    Checking SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML)
+error: could not compile `SFML` (bin "SFML") due to 4 previous errors; 2 warnings emitted
+warning: build failed, waiting for other jobs to finish...
+error: could not compile `SFML` (bin "SFML" test) due to 4 previous errors; 2 warnings emitted
