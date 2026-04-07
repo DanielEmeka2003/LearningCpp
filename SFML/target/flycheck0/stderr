@@ -1,5 +1,5 @@
-   0.906725598s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint: fingerprint error for SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML)/Check { test: false }/TargetInner { name: "SFML", doc: true, ..: with_path("/home/emekadaniel/Documents/LearningCpp/SFML/src/main.rs", Edition2024) }
-   0.906758811s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/emekadaniel/Documents/LearningCpp/SFML/target/debug/.fingerprint/SFML-a35a7a8c9a1e070e/bin-SFML`
+   0.012643117s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint: fingerprint error for SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML)/Check { test: false }/TargetInner { name: "SFML", doc: true, ..: with_path("/home/emekadaniel/Documents/LearningCpp/SFML/src/main.rs", Edition2024) }
+   0.012676120s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/emekadaniel/Documents/LearningCpp/SFML/target/debug/.fingerprint/SFML-a35a7a8c9a1e070e/bin-SFML`
 
 Caused by:
     No such file or directory (os error 2)
@@ -22,8 +22,8 @@ Stack backtrace:
   14: <unknown>
   15: __libc_start_main
   16: <unknown>
-   1.008268690s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint: fingerprint error for SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML)/Check { test: true }/TargetInner { name: "SFML", doc: true, ..: with_path("/home/emekadaniel/Documents/LearningCpp/SFML/src/main.rs", Edition2024) }
-   1.008284846s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/emekadaniel/Documents/LearningCpp/SFML/target/debug/.fingerprint/SFML-2865eba95b142492/test-bin-SFML`
+   0.013710559s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint: fingerprint error for SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML)/Check { test: true }/TargetInner { name: "SFML", doc: true, ..: with_path("/home/emekadaniel/Documents/LearningCpp/SFML/src/main.rs", Edition2024) }
+   0.013724979s  INFO prepare_target{force=false package_id=SFML v0.1.0 (/home/emekadaniel/Documents/LearningCpp/SFML) target="SFML"}: cargo::core::compiler::fingerprint:     err: failed to read `/home/emekadaniel/Documents/LearningCpp/SFML/target/debug/.fingerprint/SFML-2865eba95b142492/test-bin-SFML`
 
 Caused by:
     No such file or directory (os error 2)
